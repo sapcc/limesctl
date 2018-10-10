@@ -62,7 +62,7 @@ var (
 	domainShowCmd = domainCmd.Command("show", "Query data for a specific domain. Requires a domain-admin token.")
 	domainShowID  = domainShowCmd.Arg("domain-id", "Domain ID (name/UUID).").Required().String()
 
-	domainSetCmd    = domainCmd.Command("set", "Change resource(s) quota for a domain. Requires a domain-admin token.")
+	domainSetCmd    = domainCmd.Command("set", "Change resource(s) quota for a domain. Requires a cloud-admin token.")
 	domainSetID     = domainSetCmd.Arg("domain-id", "Domain ID (name/UUID).").Required().String()
 	domainSetQuotas = Quota(domainSetCmd.Arg("quota", "Quota value(s) to change. Format: service/resource=value(unit)").Required())
 
@@ -73,10 +73,14 @@ var (
 	projectShowDomain = projectShowCmd.Flag("domain", "Domain ID.").Short('d').String()
 	projectShowID     = projectShowCmd.Arg("project-id", "Project ID (name/UUID).").Required().String()
 
-	projectSetCmd    = projectCmd.Command("set", "Change resource(s) quota for a project. Requires project member permissions.")
+	projectSetCmd    = projectCmd.Command("set", "Change resource(s) quota for a project. Requires a domain-admin token.")
 	projectSetDomain = projectSetCmd.Flag("domain", "Domain ID.").Short('d').String()
 	projectSetID     = projectSetCmd.Arg("project-id", "Project ID (name/UUID).").Required().String()
 	projectSetQuotas = Quota(projectSetCmd.Arg("quota", "Quota value(s) to change. Format: service/resource=value(unit)").Required())
+
+	projectSyncCmd    = projectCmd.Command("sync", "Sync a project's quota and usage data from the backing services into Limes' local database. Requires a project-admin token.")
+	projectSyncDomain = projectSyncCmd.Flag("domain", "Domain ID.").Short('d').String()
+	projectSyncID     = projectSyncCmd.Arg("project-id", "Project ID (name/UUID).").Required().String()
 )
 
 func main() {
@@ -184,6 +188,12 @@ func main() {
 			},
 		}
 		cli.RunSetTask(&p, *projectSetQuotas, *outputFmt)
+	case projectSyncCmd.FullCommand():
+		p := cli.Project{
+			ID:       *projectSyncID,
+			DomainID: *projectSyncDomain,
+		}
+		cli.RunSyncTask(&p)
 	}
 }
 
