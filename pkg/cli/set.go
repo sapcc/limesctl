@@ -20,8 +20,6 @@
 package cli
 
 import (
-	"sort"
-
 	"github.com/alecthomas/kingpin"
 	"github.com/gophercloud/gophercloud"
 	"github.com/gophercloud/gophercloud/openstack"
@@ -47,17 +45,10 @@ func (c *Cluster) set(q interface{}) {
 
 	sc := q.(map[string][]api.ResourceCapacity)
 
-	//serialize service types with ordered keys
-	services := make([]string, 0, len(sc))
-	for srvInMap := range sc {
-		services = append(services, srvInMap)
-	}
-	sort.Strings(services)
-
-	srvCaps := make([]api.ServiceCapacities, 0, len(services))
-	for _, srvInList := range services {
-		resCaps := make([]api.ResourceCapacity, 0, len(sc[srvInList]))
-		for _, r := range sc[srvInList] {
+	srvCaps := make([]api.ServiceCapacities, 0, len(sc))
+	for srv, resList := range sc {
+		resCaps := make([]api.ResourceCapacity, 0, len(resList))
+		for _, r := range resList {
 			resCaps = append(resCaps, api.ResourceCapacity{
 				Name:     r.Name,
 				Capacity: r.Capacity,
@@ -67,7 +58,7 @@ func (c *Cluster) set(q interface{}) {
 		}
 
 		srvCaps = append(srvCaps, api.ServiceCapacities{
-			Type:      srvInList,
+			Type:      srv,
 			Resources: resCaps,
 		})
 	}
