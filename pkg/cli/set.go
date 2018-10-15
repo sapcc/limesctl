@@ -20,6 +20,8 @@
 package cli
 
 import (
+	"fmt"
+
 	"github.com/alecthomas/kingpin"
 	"github.com/gophercloud/gophercloud"
 	"github.com/gophercloud/gophercloud/openstack"
@@ -30,10 +32,11 @@ import (
 	"github.com/sapcc/gophercloud-limes/resources/v1/domains"
 	"github.com/sapcc/gophercloud-limes/resources/v1/projects"
 	"github.com/sapcc/limes/pkg/api"
+	"github.com/sapcc/limes/pkg/limes"
 )
 
 // set updates the resource capacities for a cluster.
-func (c *Cluster) set(q interface{}) {
+func (c *Cluster) set(q *Quotas) {
 	provider, err := clientconfig.AuthenticatedClient(nil)
 	if err != nil {
 		kingpin.Fatalf("can not connect to OpenStack: %v", err)
@@ -43,16 +46,14 @@ func (c *Cluster) set(q interface{}) {
 		kingpin.Fatalf("could not initialize Limes client: %v", err)
 	}
 
-	sc := q.(map[string][]api.ResourceCapacity)
-
-	srvCaps := make([]api.ServiceCapacities, 0, len(sc))
-	for srv, resList := range sc {
+	srvCaps := make([]api.ServiceCapacities, 0, len(*q))
+	for srv, resList := range *q {
 		resCaps := make([]api.ResourceCapacity, 0, len(resList))
 		for _, r := range resList {
 			resCaps = append(resCaps, api.ResourceCapacity{
 				Name:     r.Name,
-				Capacity: r.Capacity,
-				Unit:     r.Unit,
+				Capacity: r.Value,
+				Unit:     &r.Unit,
 				Comment:  r.Comment,
 			})
 		}
@@ -63,15 +64,14 @@ func (c *Cluster) set(q interface{}) {
 		})
 	}
 
-	c.IsList = false
-	c.Result = clusters.Update(limesClient, c.ID, clusters.UpdateOpts{Services: srvCaps})
-	if c.Result.Err != nil {
-		kingpin.Fatalf("could not set new capacities for cluster: %v", c.Result.Err)
+	err = clusters.Update(limesClient, c.ID, clusters.UpdateOpts{Services: srvCaps})
+	if err != nil {
+		kingpin.Fatalf("could not set new capacities for cluster: %v", err)
 	}
 }
 
 // set updates the resource quota(s) for a domain.
-func (d *Domain) set(q interface{}) {
+func (d *Domain) set(q *Quotas) {
 	provider, err := clientconfig.AuthenticatedClient(nil)
 	if err != nil {
 		kingpin.Fatalf("can not connect to OpenStack: %v", err)
@@ -94,17 +94,16 @@ func (d *Domain) set(q interface{}) {
 		kingpin.Fatalf("more than one domain exists with the name %v", d.Name)
 	}
 
-	sq := q.(api.ServiceQuotas)
+	sq := makeServiceQuotas(q)
 
-	d.IsList = false
-	d.Result = domains.Update(limesClient, d.ID, domains.UpdateOpts{Services: sq})
-	if d.Result.Err != nil {
-		kingpin.Fatalf("could not set new quota(s) for domain: %v", d.Result.Err)
+	err = domains.Update(limesClient, d.ID, domains.UpdateOpts{Services: sq})
+	if err != nil {
+		kingpin.Fatalf("could not set new quota(s) for domain: %v", err)
 	}
 }
 
 // set updates the resource quota(s) for a project within a specific domain.
-func (p *Project) set(q interface{}) {
+func (p *Project) set(q *Quotas) {
 	provider, err := clientconfig.AuthenticatedClient(nil)
 	if err != nil {
 		kingpin.Fatalf("can not connect to OpenStack: %v", err)
@@ -161,11 +160,31 @@ func (p *Project) set(q interface{}) {
 		p.DomainName = d.Name
 	}
 
-	sq := q.(api.ServiceQuotas)
+	sq := makeServiceQuotas(q)
 
-	p.IsList = false
-	p.Result = projects.Update(limesClient, p.DomainID, p.ID, projects.UpdateOpts{Services: sq})
-	if p.Result.Err != nil {
-		kingpin.Fatalf("could not set new quota(s) for project: %v", p.Result.Err)
+	respBody, err := projects.Update(limesClient, p.DomainID, p.ID, projects.UpdateOpts{Services: sq})
+	if err != nil {
+		kingpin.Fatalf("could not set new quota(s) for project: %v", err)
 	}
+
+	if respBody != nil {
+		fmt.Println(string(respBody))
+	}
+}
+
+func makeServiceQuotas(q *Quotas) api.ServiceQuotas {
+	sq := make(api.ServiceQuotas)
+
+	for srv, resList := range *q {
+		sq[srv] = make(api.ResourceQuotas)
+
+		for _, r := range resList {
+			sq[srv][r.Name] = limes.ValueWithUnit{
+				Value: uint64(r.Value),
+				Unit:  r.Unit,
+			}
+		}
+	}
+
+	return sq
 }

@@ -22,11 +22,11 @@ package main
 import (
 	"fmt"
 	"os"
+	"regexp"
 	"strconv"
 	"strings"
 
 	"github.com/alecthomas/kingpin"
-	"github.com/sapcc/limes/pkg/api"
 	"github.com/sapcc/limes/pkg/limes"
 	"github.com/sapcc/limesctl/pkg/cli"
 )
@@ -55,7 +55,7 @@ var (
 
 	clusterSetCmd  = clusterCmd.Command("set", "Change resource(s) quota for a cluster. Requires a cloud-admin token.")
 	clusterSetID   = clusterSetCmd.Arg("cluster-id", "Cluster ID.").Required().String()
-	clusterSetCaps = Capacity(clusterSetCmd.Arg("quota", "Quota value(s) to change. Format: service/resource=value(unit)").Required())
+	clusterSetCaps = ParseQuotas(clusterSetCmd.Arg("quota", "Quota value(s) to change. Format: service/resource=value(unit)").Required())
 
 	domainListCmd = domainCmd.Command("list", "Query data for all the domains. Requires a cloud-admin token.")
 
@@ -64,7 +64,7 @@ var (
 
 	domainSetCmd    = domainCmd.Command("set", "Change resource(s) quota for a domain. Requires a cloud-admin token.")
 	domainSetID     = domainSetCmd.Arg("domain-id", "Domain ID (name/UUID).").Required().String()
-	domainSetQuotas = Quota(domainSetCmd.Arg("quota", "Quota value(s) to change. Format: service/resource=value(unit)").Required())
+	domainSetQuotas = ParseQuotas(domainSetCmd.Arg("quota", "Quota value(s) to change. Format: service/resource=value(unit)").Required())
 
 	projectListCmd    = projectCmd.Command("list", "Query data for all the projects in a domain. Requires a domain-admin token.")
 	projectListDomain = projectListCmd.Flag("domain", "Domain ID.").Short('d').Required().String()
@@ -76,7 +76,7 @@ var (
 	projectSetCmd    = projectCmd.Command("set", "Change resource(s) quota for a project. Requires a domain-admin token.")
 	projectSetDomain = projectSetCmd.Flag("domain", "Domain ID.").Short('d').String()
 	projectSetID     = projectSetCmd.Arg("project-id", "Project ID (name/UUID).").Required().String()
-	projectSetQuotas = Quota(projectSetCmd.Arg("quota", "Quota value(s) to change. Format: service/resource=value(unit)").Required())
+	projectSetQuotas = ParseQuotas(projectSetCmd.Arg("quota", "Quota value(s) to change. Format: service/resource=value(unit)").Required())
 
 	projectSyncCmd    = projectCmd.Command("sync", "Sync a project's quota and usage data from the backing services into Limes' local database. Requires a project-admin token.")
 	projectSyncDomain = projectSyncCmd.Flag("domain", "Domain ID.").Short('d').String()
@@ -113,12 +113,8 @@ func main() {
 	case clusterSetCmd.FullCommand():
 		c := cli.Cluster{
 			ID: *clusterSetID,
-			Opts: cli.Options{
-				Names: *namesOutput,
-				Long:  *longOutput,
-			},
 		}
-		cli.RunSetTask(&c, *clusterSetCaps, *outputFmt)
+		cli.RunSetTask(&c, clusterSetCaps)
 
 	case domainListCmd.FullCommand():
 		d := cli.Domain{
@@ -146,12 +142,8 @@ func main() {
 	case domainSetCmd.FullCommand():
 		d := cli.Domain{
 			ID: *domainSetID,
-			Opts: cli.Options{
-				Names: *namesOutput,
-				Long:  *longOutput,
-			},
 		}
-		cli.RunSetTask(&d, *domainSetQuotas, *outputFmt)
+		cli.RunSetTask(&d, domainSetQuotas)
 
 	case projectListCmd.FullCommand():
 		p := cli.Project{
@@ -182,12 +174,8 @@ func main() {
 		p := cli.Project{
 			ID:       *projectSetID,
 			DomainID: *projectSetDomain,
-			Opts: cli.Options{
-				Names: *namesOutput,
-				Long:  *longOutput,
-			},
 		}
-		cli.RunSetTask(&p, *projectSetQuotas, *outputFmt)
+		cli.RunSetTask(&p, projectSetQuotas)
 	case projectSyncCmd.FullCommand():
 		p := cli.Project{
 			ID:       *projectSyncID,
@@ -197,175 +185,96 @@ func main() {
 	}
 }
 
-// custom parser magiggy for quota values
-type quotas api.ServiceQuotas
+type quotas cli.Quotas
 
-func (q *quotas) Set(str string) error {
-	rawQuotaVals := strings.Fields(str)
+// Set implements the kingpin.Value interface
+func (q *quotas) Set(value string) error {
+	value = strings.TrimSpace(value)
+	// tmp holds the different components of a single parsed quota value. This makes it easier to refer
+	// to individual components and pass them to the cli.Quotas map
+	var tmp cli.Resource
 
-	for _, rq := range rawQuotaVals {
-		// tmp holds the different components of a single parsed quota value. This makes it easier to refer
-		// to individual components and pass them to the api.ServiceQuotas type
-		var tmp struct {
-			Service  string
-			Resource string
-			Value    uint64
-			Unit     limes.Unit
-		}
-
-		// separate the value from the identifier
-		idfVal := strings.SplitN(rq, "=", 2)
-		if len(idfVal) != 2 {
-			return fmt.Errorf("expected a quota value in the format: service/resource=value(unit), got '%s'", rq)
-		}
-
-		// separate the service from the resource
-		srvRes := strings.SplitN(idfVal[0], "/", 2)
-		if len(srvRes) != 2 {
-			return fmt.Errorf("expected service/resource, got '%s'", idfVal[0])
-		}
-		tmp.Service = srvRes[0]
-		tmp.Resource = srvRes[1]
-
-		// separate the quota value from the unit and determine the type of unit, if one was given
-		valStr := idfVal[1]
-		tmp.Unit = limes.UnitNone
-		// tmpVal allows easier string slicing
-		tmpVal := idfVal[1]
-		if len(tmpVal) > 1 && tmpVal[len(tmpVal)-1:] == "B" {
-			tmp.Unit = limes.UnitBytes
-			valStr = (tmpVal)[:(len(tmpVal) - 1)]
-		}
-		if len(tmpVal) > 3 {
-			units := map[string]limes.Unit{
-				"KiB": limes.UnitKibibytes,
-				"MiB": limes.UnitMebibytes,
-				"GiB": limes.UnitGibibytes,
-				"TiB": limes.UnitTebibytes,
-				"PiB": limes.UnitPebibytes,
-				"EiB": limes.UnitExbibytes,
-			}
-			for unitStr, limesUnit := range units {
-				if unitStr == tmpVal[len(tmpVal)-3:] {
-					tmp.Unit = limesUnit
-					valStr = (tmpVal)[:len(tmpVal)-3]
-				}
-			}
-		}
-
-		valUint, err := strconv.ParseUint(valStr, 10, 64)
-		if err != nil {
-			return fmt.Errorf("could not parse quota value: '%s'", valStr)
-		}
-		tmp.Value = valUint
-
-		if _, exists := (*q)[tmp.Service]; !exists {
-			(*q)[tmp.Service] = make(api.ResourceQuotas)
-		}
-		(*q)[tmp.Service][tmp.Resource] = limes.ValueWithUnit{tmp.Value, tmp.Unit}
+	// separate the quota value from its identifier
+	idfVal := strings.SplitN(value, "=", 2)
+	if len(idfVal) != 2 {
+		return fmt.Errorf("expected a quota in the format: service/resource=value(unit), got '%s'", value)
 	}
+
+	// separate service and resource
+	srvRes := strings.SplitN(idfVal[0], "/", 2)
+	if len(srvRes) != 2 {
+		return fmt.Errorf("expected service/resource, got '%s'", idfVal[0])
+	}
+	srv := srvRes[0]
+	tmp.Name = srvRes[1]
+
+	// separate quota value and comment (if one was given)
+	valCom := strings.SplitN(idfVal[1], ":", 2)
+	if len(valCom) > 1 {
+		if valCom[1] != "" {
+			tmp.Comment = strings.TrimSpace(valCom[1])
+		}
+	}
+
+	// separate quota's value from its unit (if one was given)
+	rx := regexp.MustCompile(`^([0-9]+)([A-Za-z]+)?$`)
+	match := rx.MatchString(valCom[0])
+	if !match {
+		return fmt.Errorf("expected a quota value with optional unit in the format: 123Unit, got '%s'", valCom[0])
+	}
+
+	// rxMatchedList: []string{"entire regex matched string", "quota value", "unit (empty, if no unit given)"}
+	rxMatchedList := rx.FindStringSubmatch(valCom[0])
+	intVal, err := strconv.ParseInt(rxMatchedList[1], 10, 64)
+	if err != nil {
+		return fmt.Errorf("could not parse quota value: '%s'", rxMatchedList[1])
+	}
+	tmp.Value = intVal
+
+	tmp.Unit = limes.UnitNone
+	if rxMatchedList[2] != "" {
+		switch rxMatchedList[2] {
+		case "B":
+			tmp.Unit = limes.UnitBytes
+		case "KiB":
+			tmp.Unit = limes.UnitKibibytes
+		case "MiB":
+			tmp.Unit = limes.UnitMebibytes
+		case "GiB":
+			tmp.Unit = limes.UnitGibibytes
+		case "TiB":
+			tmp.Unit = limes.UnitTebibytes
+		case "PiB":
+			tmp.Unit = limes.UnitPebibytes
+		case "EiB":
+			tmp.Unit = limes.UnitExbibytes
+		default:
+			return fmt.Errorf("acceptable units: ['B', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB'], got '%s'", rxMatchedList[2])
+		}
+	}
+
+	if _, exists := (*q)[srv]; !exists {
+		(*q)[srv] = make([]cli.Resource, 0)
+	}
+	(*q)[srv] = append((*q)[srv], tmp)
 
 	return nil
 }
 
+// String implements the kingpin.Value interface
 func (q *quotas) String() string {
 	return ""
 }
 
+// IsCumulative allows consumption of remaining command line arguments.
 func (q *quotas) IsCumulative() bool {
 	return true
 }
 
-func Quota(s kingpin.Settings) (target *api.ServiceQuotas) {
-	target = &api.ServiceQuotas{}
+// ParseQuotas parses a command line argument to a quota value and assigns it to the
+// aggregate cli.Quotas map.
+func ParseQuotas(s kingpin.Settings) (target *cli.Quotas) {
+	target = &cli.Quotas{}
 	s.SetValue((*quotas)(target))
-	return
-}
-
-// magiggy continued...
-type capacities map[string][]api.ResourceCapacity
-
-func (c *capacities) Set(str string) error {
-	rawCapacityVals := strings.Fields(str)
-
-	for _, rc := range rawCapacityVals {
-		// resCap holds the different components of a single parsed capacity value. This makes it easier to refer
-		// to individual components and pass them to the map[string][]api.ResourceCapacity type
-		var resCap api.ResourceCapacity
-
-		// separate the value from the identifier
-		idfVal := strings.SplitN(rc, "=", 2)
-		if len(idfVal) != 2 {
-			return fmt.Errorf("expected a capacity value in the format: service/resource=value(unit):comment, got '%s'", rc)
-		}
-
-		// separate the service from the resource
-		srvRes := strings.SplitN(idfVal[0], "/", 2)
-		if len(srvRes) != 2 {
-			return fmt.Errorf("expected service/resource, got '%s'", idfVal[0])
-		}
-		tmpSrv := srvRes[0]
-		resCap.Name = srvRes[1]
-
-		//separate capacity value from comment
-		valCom := strings.SplitN(idfVal[1], ":", 2)
-		if len(valCom) != 2 {
-			return fmt.Errorf("expected value(unit):comment, got '%s'", idfVal[1])
-		}
-		resCap.Comment = valCom[1]
-
-		// separate the capacity value from the unit and determine the type of unit, if one was given
-		valStr := valCom[0]
-		tmpUnit := limes.UnitNone
-		// tmpVal allows easier string slicing
-		tmpVal := valCom[0]
-		if len(tmpVal) > 1 && tmpVal[len(tmpVal)-1:] == "B" {
-			tmpUnit = limes.UnitBytes
-			valStr = (tmpVal)[:(len(tmpVal) - 1)]
-		}
-		if len(tmpVal) > 3 {
-			units := map[string]limes.Unit{
-				"KiB": limes.UnitKibibytes,
-				"MiB": limes.UnitMebibytes,
-				"GiB": limes.UnitGibibytes,
-				"TiB": limes.UnitTebibytes,
-				"PiB": limes.UnitPebibytes,
-				"EiB": limes.UnitExbibytes,
-			}
-			for unitStr, limesUnit := range units {
-				if unitStr == tmpVal[len(tmpVal)-3:] {
-					tmpUnit = limesUnit
-					valStr = (tmpVal)[:len(tmpVal)-3]
-				}
-			}
-		}
-
-		valInt, err := strconv.ParseInt(valStr, 10, 64)
-		if err != nil {
-			return fmt.Errorf("could not parse quota value: '%s'", valStr)
-		}
-		resCap.Capacity = valInt
-		resCap.Unit = &tmpUnit
-
-		if _, exists := (*c)[tmpSrv]; !exists {
-			(*c)[tmpSrv] = make([]api.ResourceCapacity, 0)
-		}
-		(*c)[tmpSrv] = append((*c)[tmpSrv], resCap)
-	}
-
-	return nil
-}
-
-func (c *capacities) String() string {
-	return ""
-}
-
-func (c *capacities) IsCumulative() bool {
-	return true
-}
-
-func Capacity(s kingpin.Settings) (target *map[string][]api.ResourceCapacity) {
-	target = &map[string][]api.ResourceCapacity{}
-	s.SetValue((*capacities)(target))
 	return
 }
