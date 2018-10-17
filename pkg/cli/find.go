@@ -20,85 +20,114 @@
 package cli
 
 import (
-	"github.com/gophercloud/gophercloud"
+	"errors"
+
 	"github.com/gophercloud/gophercloud/openstack/identity/v3/domains"
 	"github.com/gophercloud/gophercloud/openstack/identity/v3/projects"
 	"github.com/gophercloud/gophercloud/pagination"
 )
 
-// find finds a specific domain within the token scope.
-// Use if domain name is given instead of a UUID, or if not sure whether the given ID is a name or an UUID.
-func (d *Domain) find(client *gophercloud.ServiceClient) (int, error) {
-	var nameCount int
-	pager := domains.List(client, domains.ListOpts{})
-	if pager.Err != nil {
-		return 0, pager.Err
-	}
-	err := pager.EachPage(func(page pagination.Page) (bool, error) {
-		domainList, err := domains.ExtractDomains(page)
+// FindDomain uses the user's input (name/UUID) to find a specific domain within the token scope.
+func FindDomain(userInput string) (*Domain, error) {
+	identityV3, _ := getServiceClients()
+	d := new(Domain)
+
+	// check if userInput is a UUID
+	tmpD, err := domains.Get(identityV3, userInput).Extract()
+	if err == nil {
+		d.ID = tmpD.ID
+		d.Name = tmpD.Name
+	} else {
+		// userInput appears to be a name so we do domain listing restricted to the name
+		page, err := domains.List(identityV3, domains.ListOpts{Name: userInput}).AllPages()
 		if err != nil {
-			return false, err
+			return nil, err
+		}
+		dList, err := domains.ExtractDomains(page)
+		if err != nil {
+			return nil, err
+		}
+		// no need to continue, if there are multiple domains in the list
+		if len(dList) > 1 {
+			return nil, errors.New("more than one domain exists with the name " + userInput)
 		}
 
-		for _, dInList := range domainList {
-			if dInList.ID == d.ID || dInList.Name == d.ID {
-				d.ID = dInList.ID
-				d.Name = dInList.Name
-			}
-			if dInList.Name == d.Name {
-				nameCount++
-			}
+		for _, dInList := range dList {
+			d.ID = dInList.ID
+			d.Name = dInList.Name
 		}
-
-		return true, nil
-	})
-	if err != nil {
-		return 0, err
+	}
+	if d.ID == "" {
+		return nil, errors.New("domain not found")
 	}
 
-	return nameCount, nil
+	return d, nil
 }
 
-// find finds a project within a specific domain in the token scope. If no domain ID is specified then
-// it enumerates all the projects within the token scope and finds one in that list.
-// Use if project name is given instead of a UUID, or if not sure whether the given ID is a name or an UUID.
-func (p *Project) find(client *gophercloud.ServiceClient, findInDomain string) (int, error) {
-	var nameCount int
-	pager := projects.List(client, projects.ListOpts{})
-	if pager.Err != nil {
-		return 0, pager.Err
-	}
-	err := pager.EachPage(func(page pagination.Page) (bool, error) {
-		projectList, err := projects.ExtractProjects(page)
-		if err != nil {
-			return false, err
-		}
+// FindProject uses the user's input (name/UUID) to find a specific project within the token scope.
+func FindProject(userInputProject, userInputDomain string) (*Project, error) {
+	identityV3, _ := getServiceClients()
+	p := new(Project)
 
-		for _, pInList := range projectList {
-			if findInDomain == "" {
-				if pInList.ID == p.ID || pInList.Name == p.ID {
-					p.ID = pInList.ID
-					p.Name = pInList.Name
-					p.DomainID = pInList.DomainID
-				}
-				if pInList.Name == p.Name {
-					nameCount++
-				}
-			} else {
-				if (pInList.ID == p.ID || pInList.Name == p.ID) && pInList.DomainID == findInDomain {
-					p.ID = pInList.ID
-					p.Name = pInList.Name
+	// check if userInputProject is a UUID
+	tmpP, err := projects.Get(identityV3, userInputProject).Extract()
+	if err == nil {
+		p.ID = tmpP.ID
+		p.Name = tmpP.Name
+		p.DomainID = tmpP.DomainID
+	} else {
+		// userInputProject appears to be a name so we do project listing
+		// restricted to the name and domain ID (if given)
+		var page pagination.Page
+		if userInputDomain != "" {
+			d, err := FindDomain(userInputDomain)
+			if err != nil {
+				return nil, err
+			}
+			p.DomainName = d.Name
 
-					return false, nil
-				}
+			page, err = projects.List(identityV3, projects.ListOpts{
+				Name:     userInputProject,
+				DomainID: d.ID,
+			}).AllPages()
+			if err != nil {
+				return nil, err
+			}
+		} else {
+			page, err = projects.List(identityV3, projects.ListOpts{Name: userInputProject}).AllPages()
+			if err != nil {
+				return nil, err
 			}
 		}
 
-		return true, nil
-	})
-	if err != nil {
-		return 0, err
+		pList, err := projects.ExtractProjects(page)
+		if err != nil {
+			return nil, err
+		}
+		// no need to continue, if there are multiple projects in the list
+		if len(pList) > 1 {
+			return nil, errors.New("more than one project exists with the name " + userInputProject)
+		}
+
+		for _, pInList := range pList {
+			p.ID = pInList.ID
+			p.Name = pInList.Name
+			p.DomainID = pInList.DomainID
+		}
+	}
+	if p.ID == "" {
+		return nil, errors.New("project not found")
 	}
 
-	return nameCount, nil
+	// this is needed in case the user did not gave a domain ID at input
+	// which means we still don't have the domain name
+	if p.DomainName == "" {
+		d, err := domains.Get(identityV3, p.DomainID).Extract()
+		if err != nil {
+			return nil, err
+		}
+		p.DomainName = d.Name
+	}
+
+	return p, nil
 }

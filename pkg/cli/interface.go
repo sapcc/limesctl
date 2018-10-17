@@ -20,6 +20,7 @@
 package cli
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
 
@@ -30,7 +31,7 @@ import (
 	"github.com/sapcc/limes/pkg/limes"
 )
 
-// Cluster, initially, contains arguments and flags data for a cluster subcommand (e.g. $ limesctl cluster list).
+// Cluster contains information regarding a cluster(s).
 // As different methods are called on it, the fields within the structure are updated accordingly.
 // Call its appropriate method to get/list/update a Cluster.
 type Cluster struct {
@@ -40,7 +41,7 @@ type Cluster struct {
 	IsList bool
 }
 
-// Domain, initially, contains arguments and flags data for a domain subcommand (e.g. $ limesctl domain list).
+// Domain contains information regarding a domain(s).
 // As different methods are called on it, the fields within the structure are updated accordingly.
 // Call its appropriate method to get/list/update a Domain.
 type Domain struct {
@@ -51,7 +52,7 @@ type Domain struct {
 	IsList bool
 }
 
-// Project, initially, contains arguments and flags data for a project subcommand (e.g. $ limesctl project show my-project).
+// Project contains information regarding a project(s).
 // As different methods are called on it, the fields within the structure are updated accordingly.
 // Call its appropriate method to get/list/update a Project.
 type Project struct {
@@ -76,7 +77,7 @@ type Options struct {
 // GetTask is the interface type that abstracts a get operation.
 type GetTask interface {
 	get()
-	writeJSON()
+	getJSON() interface{}
 	renderCSV() *csvData
 }
 
@@ -86,7 +87,7 @@ func RunGetTask(t GetTask, outputFmt string) {
 	t.get()
 	switch outputFmt {
 	case "json":
-		t.writeJSON()
+		writeJSON(t.getJSON())
 	case "csv":
 		t.renderCSV().writeCSV()
 	default:
@@ -97,7 +98,7 @@ func RunGetTask(t GetTask, outputFmt string) {
 // ListTask is the interface type that abstracts a list operation.
 type ListTask interface {
 	list()
-	writeJSON()
+	getJSON() interface{}
 	renderCSV() *csvData
 }
 
@@ -107,7 +108,7 @@ func RunListTask(t ListTask, outputFmt string) {
 	t.list()
 	switch outputFmt {
 	case "json":
-		t.writeJSON()
+		writeJSON(t.getJSON())
 	case "csv":
 		t.renderCSV().writeCSV()
 	default:
@@ -130,14 +131,28 @@ type Quotas map[string][]Resource
 // SetTask is the interface type that abstracts a put operation.
 type SetTask interface {
 	set(*Quotas)
-	writeJSON()
-	renderCSV() *csvData
 }
 
 // RunSetTask is the function that operates on a SetTask and shows the output in the respective
 // format that is specified at the command line.
 func RunSetTask(t SetTask, q *Quotas) {
 	t.set(q)
+}
+
+// RunSyncTask schedules a sync job that pulls quota and usage data for a project from
+// the backing services into Limes' local database.
+func RunSyncTask(p *Project) {
+	_, limesV1 := getServiceClients()
+
+	err := projects.Sync(limesV1, p.DomainID, p.ID, projects.SyncOpts{})
+	handleError("could not sync project", err)
+}
+
+// writeJSON is a helper function that writes the JSON data to os.Stdout.
+func writeJSON(data interface{}) {
+	b, err := json.Marshal(data)
+	handleError("could not marshal JSON", err)
+	fmt.Println(string(b))
 }
 
 // writeCSV is a helper function that writes the CSV data to os.Stdout.

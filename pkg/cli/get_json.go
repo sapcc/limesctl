@@ -19,42 +19,17 @@
 
 package cli
 
-import (
-	"encoding/json"
-	"fmt"
-
-	"github.com/sapcc/go-bits/logg"
-)
-
-// writeJSON renders the result of a get/list/update in the JSON format
-// and writes it to os.Stdout.
-func (c *Cluster) writeJSON() {
-	b, err := json.Marshal(c.Result.Body)
-	if err != nil {
-		logg.Fatal(err.Error())
-	}
-
-	fmt.Println(string(b))
+// getJSON returns the result body of a get/list/update operation.
+func (c *Cluster) getJSON() interface{} {
+	return c.Result.Body
 }
 
-// writeJSON renders the result of a get/list/update in the JSON format
-// and writes it to os.Stdout.
-func (d *Domain) writeJSON() {
-	b, err := json.Marshal(d.Result.Body)
-	if err != nil {
-		logg.Fatal(err.Error())
-	}
-
-	fmt.Println(string(b))
+// getJSON returns the result body of a get/list/update operation.
+func (d *Domain) getJSON() interface{} {
+	return d.Result.Body
 }
 
-// writeJSON renders the result of a get/list/update in the JSON format
-// and writes it to os.Stdout.
-func (p *Project) writeJSON() {
-	b, err := json.Marshal(p.Result.Body)
-	if err != nil {
-		logg.Fatal(err.Error())
-	}
-
-	fmt.Println(string(b))
+// getJSON returns the result body of a get/list/update operation.
+func (p *Project) getJSON() interface{} {
+	return p.Result.Body
 }

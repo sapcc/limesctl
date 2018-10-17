@@ -51,11 +51,11 @@ var (
 	clusterListCmd = clusterCmd.Command("list", "Query data for all the clusters. Requires a cloud-admin token.")
 
 	clusterShowCmd = clusterCmd.Command("show", "Query data for a specific cluster, defaults to current cluster. Requires a cloud-admin token.")
-	clusterShowID  = clusterShowCmd.Arg("cluster-id", "Cluster ID.").Required().String()
+	clusterShowID  = clusterShowCmd.Arg("cluster-id", "Cluster ID.").Default("current").String()
 
-	clusterSetCmd  = clusterCmd.Command("set", "Change resource(s) quota for a cluster. Requires a cloud-admin token.")
-	clusterSetID   = clusterSetCmd.Arg("cluster-id", "Cluster ID.").Required().String()
-	clusterSetCaps = ParseQuotas(clusterSetCmd.Arg("quota", "Quota value(s) to change. Format: service/resource=value(unit)").Required())
+	clusterSetCmd  = clusterCmd.Command("set", "Change resource(s) quota for a cluster, defaults to current cluster. Requires a cloud-admin token.")
+	clusterSetID   = clusterSetCmd.Arg("cluster-id", "Cluster ID.").Default("current").String()
+	clusterSetCaps = ParseQuotas(clusterSetCmd.Arg("capacities", "Capacities to change. Format: service/resource=value(unit):\"comment\""))
 
 	domainListCmd = domainCmd.Command("list", "Query data for all the domains. Requires a cloud-admin token.")
 
@@ -64,7 +64,7 @@ var (
 
 	domainSetCmd    = domainCmd.Command("set", "Change resource(s) quota for a domain. Requires a cloud-admin token.")
 	domainSetID     = domainSetCmd.Arg("domain-id", "Domain ID (name/UUID).").Required().String()
-	domainSetQuotas = ParseQuotas(domainSetCmd.Arg("quota", "Quota value(s) to change. Format: service/resource=value(unit)").Required())
+	domainSetQuotas = ParseQuotas(domainSetCmd.Arg("quotas", "Quotas to change. Format: service/resource=value(unit)").Required())
 
 	projectListCmd    = projectCmd.Command("list", "Query data for all the projects in a domain. Requires a domain-admin token.")
 	projectListDomain = projectListCmd.Flag("domain", "Domain ID.").Short('d').Required().String()
@@ -76,7 +76,7 @@ var (
 	projectSetCmd    = projectCmd.Command("set", "Change resource(s) quota for a project. Requires a domain-admin token.")
 	projectSetDomain = projectSetCmd.Flag("domain", "Domain ID.").Short('d').String()
 	projectSetID     = projectSetCmd.Arg("project-id", "Project ID (name/UUID).").Required().String()
-	projectSetQuotas = ParseQuotas(projectSetCmd.Arg("quota", "Quota value(s) to change. Format: service/resource=value(unit)").Required())
+	projectSetQuotas = ParseQuotas(projectSetCmd.Arg("quotas", "Quotas to change. Format: service/resource=value(unit)").Required())
 
 	projectSyncCmd    = projectCmd.Command("sync", "Sync a project's quota and usage data from the backing services into Limes' local database. Requires a project-admin token.")
 	projectSyncDomain = projectSyncCmd.Flag("domain", "Domain ID.").Short('d').String()
@@ -90,7 +90,7 @@ func main() {
 
 	switch kingpin.MustParse(app.Parse(os.Args[1:])) {
 	case clusterListCmd.FullCommand():
-		c := cli.Cluster{
+		c := &cli.Cluster{
 			Opts: cli.Options{
 				Long:     *longOutput,
 				Area:     *area,
@@ -98,9 +98,9 @@ func main() {
 				Resource: *resource,
 			},
 		}
-		cli.RunListTask(&c, *outputFmt)
+		cli.RunListTask(c, *outputFmt)
 	case clusterShowCmd.FullCommand():
-		c := cli.Cluster{
+		c := &cli.Cluster{
 			ID: *clusterShowID,
 			Opts: cli.Options{
 				Long:     *longOutput,
@@ -109,15 +109,20 @@ func main() {
 				Resource: *resource,
 			},
 		}
-		cli.RunGetTask(&c, *outputFmt)
+		cli.RunGetTask(c, *outputFmt)
 	case clusterSetCmd.FullCommand():
-		c := cli.Cluster{
+		// this manual 'required' check is needed because clusterSetCaps is
+		// preceded by clusterSetID, which is a non-required Arg, the order of
+		// the Args and their requiredness matters
+		if len(*clusterSetCaps) == 0 {
+			kingpin.Fatalf("required argument 'capacities(s)' not provided, try --help")
+		}
+		c := &cli.Cluster{
 			ID: *clusterSetID,
 		}
-		cli.RunSetTask(&c, clusterSetCaps)
-
+		cli.RunSetTask(c, clusterSetCaps)
 	case domainListCmd.FullCommand():
-		d := cli.Domain{
+		d := &cli.Domain{
 			Opts: cli.Options{
 				Names:    *namesOutput,
 				Long:     *longOutput,
@@ -126,28 +131,34 @@ func main() {
 				Resource: *resource,
 			},
 		}
-		cli.RunListTask(&d, *outputFmt)
+		cli.RunListTask(d, *outputFmt)
 	case domainShowCmd.FullCommand():
-		d := cli.Domain{
-			ID: *domainShowID,
-			Opts: cli.Options{
-				Names:    *namesOutput,
-				Long:     *longOutput,
-				Area:     *area,
-				Service:  *service,
-				Resource: *resource,
-			},
+		d, err := cli.FindDomain(*domainShowID)
+		if err != nil {
+			kingpin.Fatalf(err.Error())
 		}
-		cli.RunGetTask(&d, *outputFmt)
+		d.Opts = cli.Options{
+			Names:    *namesOutput,
+			Long:     *longOutput,
+			Area:     *area,
+			Service:  *service,
+			Resource: *resource,
+		}
+		cli.RunGetTask(d, *outputFmt)
 	case domainSetCmd.FullCommand():
-		d := cli.Domain{
-			ID: *domainSetID,
+		d, err := cli.FindDomain(*domainSetID)
+		if err != nil {
+			kingpin.Fatalf(err.Error())
 		}
-		cli.RunSetTask(&d, domainSetQuotas)
-
+		cli.RunSetTask(d, domainSetQuotas)
 	case projectListCmd.FullCommand():
-		p := cli.Project{
-			DomainID: *projectListDomain,
+		d, err := cli.FindDomain(*projectListDomain)
+		if err != nil {
+			kingpin.Fatalf(err.Error())
+		}
+		p := &cli.Project{
+			DomainID:   d.ID,
+			DomainName: d.Name,
 			Opts: cli.Options{
 				Names:    *namesOutput,
 				Long:     *longOutput,
@@ -156,41 +167,42 @@ func main() {
 				Resource: *resource,
 			},
 		}
-		cli.RunListTask(&p, *outputFmt)
+		cli.RunListTask(p, *outputFmt)
 	case projectShowCmd.FullCommand():
-		p := cli.Project{
-			ID:       *projectShowID,
-			DomainID: *projectShowDomain,
-			Opts: cli.Options{
-				Names:    *namesOutput,
-				Long:     *longOutput,
-				Area:     *area,
-				Service:  *service,
-				Resource: *resource,
-			},
+		p, err := cli.FindProject(*projectShowID, *projectShowDomain)
+		if err != nil {
+			kingpin.Fatalf(err.Error())
 		}
-		cli.RunGetTask(&p, *outputFmt)
+		p.Opts = cli.Options{
+			Names:    *namesOutput,
+			Long:     *longOutput,
+			Area:     *area,
+			Service:  *service,
+			Resource: *resource,
+		}
+		cli.RunGetTask(p, *outputFmt)
 	case projectSetCmd.FullCommand():
-		p := cli.Project{
-			ID:       *projectSetID,
-			DomainID: *projectSetDomain,
+		p, err := cli.FindProject(*projectSetID, *projectSetDomain)
+		if err != nil {
+			kingpin.Fatalf(err.Error())
 		}
-		cli.RunSetTask(&p, projectSetQuotas)
+		cli.RunSetTask(p, projectSetQuotas)
 	case projectSyncCmd.FullCommand():
-		p := cli.Project{
-			ID:       *projectSyncID,
-			DomainID: *projectSyncDomain,
+		p, err := cli.FindProject(*projectSyncID, *projectSyncDomain)
+		if err != nil {
+			kingpin.Fatalf(err.Error())
 		}
-		cli.RunSyncTask(&p)
+		cli.RunSyncTask(p)
 	}
 }
 
+// quotas contains the aggregate parsed quota values.
 type quotas cli.Quotas
 
-// Set implements the kingpin.Value interface
+// Set implements the kingpin.Value interface.
 func (q *quotas) Set(value string) error {
 	value = strings.TrimSpace(value)
-	// tmp holds the different components of a single parsed quota value. This makes it easier to refer
+	// tmp contains the different components of a single parsed quota value. This makes it easier to refer
 	// to individual components and pass them to the cli.Quotas map
 	var tmp cli.Resource
 
@@ -253,15 +265,12 @@ func (q *quotas) Set(value string) error {
 		}
 	}
 
-	if _, exists := (*q)[srv]; !exists {
-		(*q)[srv] = make([]cli.Resource, 0)
-	}
 	(*q)[srv] = append((*q)[srv], tmp)
 
 	return nil
 }
 
-// String implements the kingpin.Value interface
+// String implements the kingpin.Value interface.
 func (q *quotas) String() string {
 	return ""
 }

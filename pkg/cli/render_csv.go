@@ -20,11 +20,11 @@
 package cli
 
 import (
+	"errors"
 	"sort"
 	"strconv"
 	"time"
 
-	"github.com/alecthomas/kingpin"
 	"github.com/sapcc/limes/pkg/reports"
 )
 
@@ -40,14 +40,12 @@ func (c *Cluster) renderCSV() *csvData {
 		labels = []string{"cluster id", "area", "service", "category", "resource", "capacity",
 			"domains quota", "usage", "unit", "comment", "scraped at (UTC)"}
 	default:
-		labels = []string{"cluster id", "service", "resource", "capacity", "domains quota", "usage"}
+		labels = []string{"cluster id", "service", "resource", "capacity", "domains quota", "usage", "unit"}
 	}
 
 	if c.IsList {
 		clusterList, err := c.Result.ExtractClusters()
-		if err != nil {
-			kingpin.Fatalf("could not render the CSV data for clusters: %v", err)
-		}
+		handleError("could not render the CSV data for clusters", err)
 
 		data = append(data, labels)
 		for _, cluster := range clusterList {
@@ -55,9 +53,7 @@ func (c *Cluster) renderCSV() *csvData {
 		}
 	} else {
 		cluster, err := c.Result.Extract()
-		if err != nil {
-			kingpin.Fatalf("could not render the CSV data for cluster: %v", err)
-		}
+		handleError("could not render the CSV data for cluster", err)
 
 		data = append(data, labels)
 		c.parseToCSV(cluster, &data)
@@ -72,24 +68,22 @@ func (d *Domain) renderCSV() *csvData {
 	var labels []string
 
 	if d.Opts.Names && d.Opts.Long {
-		kingpin.Fatalf("'--names' and '--long' can not be used together")
+		handleError("", errors.New("'--names' and '--long' can not be used together"))
 	}
 
 	switch {
 	case d.Opts.Names:
-		labels = []string{"domain name", "service", "resource", "quota", "projects quota", "usage"}
+		labels = []string{"domain name", "service", "resource", "quota", "projects quota", "usage", "unit"}
 	case d.Opts.Long:
 		labels = []string{"domain id", "domain name", "area", "service", "category", "resource",
 			"quota", "projects quota", "usage", "unit", "scraped at (UTC)"}
 	default:
-		labels = []string{"domain id", "service", "resource", "quota", "projects quota", "usage"}
+		labels = []string{"domain id", "service", "resource", "quota", "projects quota", "usage", "unit"}
 	}
 
 	if d.IsList {
 		domainList, err := d.Result.ExtractDomains()
-		if err != nil {
-			kingpin.Fatalf("could not render the CSV data for domains: %v", err)
-		}
+		handleError("could not render the CSV data for domains", err)
 
 		data = append(data, labels)
 		for _, domain := range domainList {
@@ -97,9 +91,7 @@ func (d *Domain) renderCSV() *csvData {
 		}
 	} else {
 		domain, err := d.Result.Extract()
-		if err != nil {
-			kingpin.Fatalf("could not render the CSV data for domain: %v", err)
-		}
+		handleError("could not render the CSV data for domain", err)
 
 		data = append(data, labels)
 		d.parseToCSV(domain, &data)
@@ -114,24 +106,22 @@ func (p *Project) renderCSV() *csvData {
 	var labels []string
 
 	if p.Opts.Names && p.Opts.Long {
-		kingpin.Fatalf("'--names' and '--long' can not be used together")
+		handleError("", errors.New("'--names' and '--long' can not be used together"))
 	}
 
 	switch {
 	case p.Opts.Names:
-		labels = []string{"domain name", "project name", "service", "resource", "quota", "usage"}
+		labels = []string{"domain name", "project name", "service", "resource", "quota", "usage", "unit"}
 	case p.Opts.Long:
 		labels = []string{"domain id", "domain name", "project id", "project name", "area",
 			"service", "category", "resource", "quota", "usage", "unit", "scraped at (UTC)"}
 	default:
-		labels = []string{"domain id", "project id", "service", "resource", "quota", "usage"}
+		labels = []string{"domain id", "project id", "service", "resource", "quota", "usage", "unit"}
 	}
 
 	if p.IsList {
 		projectList, err := p.Result.ExtractProjects()
-		if err != nil {
-			kingpin.Fatalf("could not render the CSV data for projects: %v", err)
-		}
+		handleError("could not render the CSV data for projects", err)
 
 		data = append(data, labels)
 		for _, project := range projectList {
@@ -139,9 +129,7 @@ func (p *Project) renderCSV() *csvData {
 		}
 	} else {
 		project, err := p.Result.Extract()
-		if err != nil {
-			kingpin.Fatalf("could not render the CSV data for project: %v", err)
-		}
+		handleError("could not render the CSV data for project", err)
 
 		data = append(data, labels)
 		p.parseToCSV(project, &data)
@@ -185,12 +173,12 @@ func (c *Cluster) parseToCSV(cluster *reports.Cluster, data *csvData) {
 				csvRecord = append(csvRecord, cluster.ID, cSrv.ServiceInfo.Area, cSrv.ServiceInfo.Type,
 					cSrvRes.ResourceInfo.Category, cSrvRes.ResourceInfo.Name, strconv.FormatUint(cap, 10),
 					strconv.FormatUint(cSrvRes.DomainsQuota, 10), strconv.FormatUint(cSrvRes.Usage, 10),
-					string(cSrvRes.ResourceInfo.Unit), cSrvRes.Comment, time.Unix(cSrv.MinScrapedAt, 0).Format("15:04:05 02-Jan-2006"),
+					string(cSrvRes.ResourceInfo.Unit), cSrvRes.Comment, time.Unix(cSrv.MinScrapedAt, 0).Format(time.RFC3339),
 				)
 			default:
 				csvRecord = append(csvRecord, cluster.ID, cSrv.ServiceInfo.Type, cSrvRes.ResourceInfo.Name,
 					strconv.FormatUint(cap, 10), strconv.FormatUint(cSrvRes.DomainsQuota, 10),
-					strconv.FormatUint(cSrvRes.Usage, 10),
+					strconv.FormatUint(cSrvRes.Usage, 10), string(cSrvRes.ResourceInfo.Unit),
 				)
 			}
 
@@ -227,18 +215,18 @@ func (d *Domain) parseToCSV(domain *reports.Domain, data *csvData) {
 			case d.Opts.Names:
 				csvRecord = append(csvRecord, domain.Name, dSrv.ServiceInfo.Type, dSrvRes.ResourceInfo.Name,
 					strconv.FormatUint(dSrvRes.DomainQuota, 10), strconv.FormatUint(dSrvRes.ProjectsQuota, 10),
-					strconv.FormatUint(dSrvRes.Usage, 10),
+					strconv.FormatUint(dSrvRes.Usage, 10), string(dSrvRes.ResourceInfo.Unit),
 				)
 			case d.Opts.Long:
 				csvRecord = append(csvRecord, domain.UUID, domain.Name, dSrv.ServiceInfo.Area, dSrv.ServiceInfo.Type,
 					dSrvRes.ResourceInfo.Category, dSrvRes.ResourceInfo.Name, strconv.FormatUint(dSrvRes.DomainQuota, 10),
 					strconv.FormatUint(dSrvRes.ProjectsQuota, 10), strconv.FormatUint(dSrvRes.Usage, 10),
-					string(dSrvRes.ResourceInfo.Unit), time.Unix(dSrv.MinScrapedAt, 0).Format("15:04:05 02-Jan-2006"),
+					string(dSrvRes.ResourceInfo.Unit), time.Unix(dSrv.MinScrapedAt, 0).Format(time.RFC3339),
 				)
 			default:
 				csvRecord = append(csvRecord, domain.UUID, dSrv.ServiceInfo.Type, dSrvRes.ResourceInfo.Name,
 					strconv.FormatUint(dSrvRes.DomainQuota, 10), strconv.FormatUint(dSrvRes.ProjectsQuota, 10),
-					strconv.FormatUint(dSrvRes.Usage, 10),
+					strconv.FormatUint(dSrvRes.Usage, 10), string(dSrvRes.ResourceInfo.Unit),
 				)
 			}
 
@@ -275,18 +263,18 @@ func (p *Project) parseToCSV(project *reports.Project, data *csvData) {
 			case p.Opts.Names:
 				csvRecord = append(csvRecord, p.DomainName, project.Name, pSrv.ServiceInfo.Type,
 					pSrvRes.ResourceInfo.Name, strconv.FormatUint(pSrvRes.Quota, 10),
-					strconv.FormatUint(pSrvRes.Usage, 10),
+					strconv.FormatUint(pSrvRes.Usage, 10), string(pSrvRes.ResourceInfo.Unit),
 				)
 			case p.Opts.Long:
 				csvRecord = append(csvRecord, p.DomainID, p.DomainName, project.UUID, project.Name, pSrv.ServiceInfo.Area,
 					pSrv.ServiceInfo.Type, pSrvRes.ResourceInfo.Category, pSrvRes.ResourceInfo.Name,
 					strconv.FormatUint(pSrvRes.Quota, 10), strconv.FormatUint(pSrvRes.Usage, 10),
-					string(pSrvRes.ResourceInfo.Unit), time.Unix(pSrv.ScrapedAt, 0).Format("15:04:05 02-Jan-2006"),
+					string(pSrvRes.ResourceInfo.Unit), time.Unix(pSrv.ScrapedAt, 0).Format(time.RFC3339),
 				)
 			default:
 				csvRecord = append(csvRecord, p.DomainID, project.UUID, pSrv.ServiceInfo.Type,
 					pSrvRes.ResourceInfo.Name, strconv.FormatUint(pSrvRes.Quota, 10),
-					strconv.FormatUint(pSrvRes.Usage, 10),
+					strconv.FormatUint(pSrvRes.Usage, 10), string(pSrvRes.ResourceInfo.Unit),
 				)
 			}
 
