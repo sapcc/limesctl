@@ -37,11 +37,15 @@ var (
 
 	// first-level commands and flags
 	clusterCmd = app.Command("cluster", "Do some action on cluster(s).")
-	domainCmd  = app.Command("domain", "Do some action on domain(s).")
-	projectCmd = app.Command("project", "Do some action on project(s).")
+
+	domainCmd     = app.Command("domain", "Do some action on domain(s).")
+	domainCluster = domainCmd.Flag("cluster", "Cluster ID.").Short('c').String()
+
+	projectCmd     = app.Command("project", "Do some action on project(s).")
+	projectCluster = projectCmd.Flag("cluster", "Cluster ID.").Short('c').String()
 
 	area        = app.Flag("area", "Resource area.").String()
-	service     = app.Flag("service", "Service type").String()
+	service     = app.Flag("service", "Service type.").String()
 	resource    = app.Flag("resource", "Resource name.").String()
 	namesOutput = app.Flag("names", "Show output with names instead of UUIDs.").Bool()
 	longOutput  = app.Flag("long", "Show detailed output.").Bool()
@@ -126,6 +130,7 @@ func main() {
 			Opts: cli.Options{
 				Names:    *namesOutput,
 				Long:     *longOutput,
+				Cluster:  *domainCluster,
 				Area:     *area,
 				Service:  *service,
 				Resource: *resource,
@@ -140,6 +145,7 @@ func main() {
 		d.Opts = cli.Options{
 			Names:    *namesOutput,
 			Long:     *longOutput,
+			Cluster:  *domainCluster,
 			Area:     *area,
 			Service:  *service,
 			Resource: *resource,
@@ -150,6 +156,7 @@ func main() {
 		if err != nil {
 			kingpin.Fatalf(err.Error())
 		}
+		d.Opts.Cluster = *domainCluster
 		cli.RunSetTask(d, domainSetQuotas)
 	case projectListCmd.FullCommand():
 		d, err := cli.FindDomain(*projectListDomain)
@@ -162,6 +169,7 @@ func main() {
 			Opts: cli.Options{
 				Names:    *namesOutput,
 				Long:     *longOutput,
+				Cluster:  *projectCluster,
 				Area:     *area,
 				Service:  *service,
 				Resource: *resource,
@@ -176,6 +184,7 @@ func main() {
 		p.Opts = cli.Options{
 			Names:    *namesOutput,
 			Long:     *longOutput,
+			Cluster:  *projectCluster,
 			Area:     *area,
 			Service:  *service,
 			Resource: *resource,
@@ -186,12 +195,14 @@ func main() {
 		if err != nil {
 			kingpin.Fatalf(err.Error())
 		}
+		p.Opts.Cluster = *projectCluster
 		cli.RunSetTask(p, projectSetQuotas)
 	case projectSyncCmd.FullCommand():
 		p, err := cli.FindProject(*projectSyncID, *projectSyncDomain)
 		if err != nil {
 			kingpin.Fatalf(err.Error())
 		}
+		p.Opts.Cluster = *projectCluster
 		cli.RunSyncTask(p)
 	}
 }

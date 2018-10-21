@@ -61,7 +61,10 @@ func (d *Domain) set(q *Quotas) {
 
 	sq := makeServiceQuotas(q)
 
-	err := domains.Update(limesV1, d.ID, domains.UpdateOpts{Services: sq})
+	err := domains.Update(limesV1, d.ID, domains.UpdateOpts{
+		Cluster:  d.Opts.Cluster,
+		Services: sq,
+	})
 	handleError("could not set new quota(s) for domain", err)
 }
 
@@ -71,7 +74,10 @@ func (p *Project) set(q *Quotas) {
 
 	sq := makeServiceQuotas(q)
 
-	respBody, err := projects.Update(limesV1, p.DomainID, p.ID, projects.UpdateOpts{Services: sq})
+	respBody, err := projects.Update(limesV1, p.DomainID, p.ID, projects.UpdateOpts{
+		Cluster:  p.Opts.Cluster,
+		Services: sq,
+	})
 	handleError("could not set new quota(s) for project", err)
 
 	if respBody != nil {

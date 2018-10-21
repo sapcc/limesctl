@@ -69,6 +69,7 @@ type Project struct {
 type Options struct {
 	Names    bool
 	Long     bool
+	Cluster  string
 	Area     string
 	Service  string
 	Resource string
@@ -144,7 +145,9 @@ func RunSetTask(t SetTask, q *Quotas) {
 func RunSyncTask(p *Project) {
 	_, limesV1 := getServiceClients()
 
-	err := projects.Sync(limesV1, p.DomainID, p.ID, projects.SyncOpts{})
+	err := projects.Sync(limesV1, p.DomainID, p.ID, projects.SyncOpts{
+		Cluster: p.Opts.Cluster,
+	})
 	handleError("could not sync project", err)
 }
 

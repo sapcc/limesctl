@@ -44,6 +44,7 @@ func (d *Domain) list() {
 
 	d.IsList = true
 	d.Result = domains.List(limesV1, domains.ListOpts{
+		Cluster:  d.Opts.Cluster,
 		Area:     d.Opts.Area,
 		Service:  d.Opts.Service,
 		Resource: d.Opts.Resource,
@@ -57,6 +58,7 @@ func (p *Project) list() {
 
 	p.IsList = true
 	p.Result = projects.List(limesV1, p.DomainID, projects.ListOpts{
+		Cluster:  p.Opts.Cluster,
 		Area:     p.Opts.Area,
 		Service:  p.Opts.Service,
 		Resource: p.Opts.Resource,

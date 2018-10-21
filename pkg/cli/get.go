@@ -42,6 +42,7 @@ func (d *Domain) get() {
 	_, limesV1 := getServiceClients()
 
 	d.Result = domains.Get(limesV1, d.ID, domains.GetOpts{
+		Cluster:  d.Opts.Cluster,
 		Area:     d.Opts.Area,
 		Service:  d.Opts.Service,
 		Resource: d.Opts.Resource,
@@ -54,6 +55,7 @@ func (p *Project) get() {
 	_, limesV1 := getServiceClients()
 
 	p.Result = projects.Get(limesV1, p.DomainID, p.ID, projects.GetOpts{
+		Cluster:  p.Opts.Cluster,
 		Area:     p.Opts.Area,
 		Service:  p.Opts.Service,
 		Resource: p.Opts.Resource,
