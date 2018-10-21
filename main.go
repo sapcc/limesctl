@@ -32,9 +32,10 @@ import (
 )
 
 var (
-	version = "1.0.0"
-	app     = kingpin.New("limesctl", "CLI client for Limes.")
+	// defined by the Makefile at compile time
+	version string
 
+	app = kingpin.New("limesctl", "CLI client for Limes.")
 	// first-level commands and flags
 	clusterCmd = app.Command("cluster", "Do some action on cluster(s).")
 
