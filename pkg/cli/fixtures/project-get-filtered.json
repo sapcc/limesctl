@@ -1,0 +1,23 @@
+{
+  "project": {
+    "id": "uuid-for-dresden",
+    "name": "dresden",
+    "parent_id": "uuid-for-germany",
+    "services": [
+      {
+        "type": "shared",
+        "area": "shared",
+        "resources": [
+          {
+            "name": "capacity",
+            "unit": "B",
+            "quota": 10,
+            "usage": 2,
+            "backend_quota": 100
+          }
+        ],
+        "scraped_at": 44
+      }
+    ]
+  }
+}

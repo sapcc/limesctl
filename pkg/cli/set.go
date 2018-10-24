@@ -25,33 +25,15 @@ import (
 	"github.com/sapcc/gophercloud-limes/resources/v1/clusters"
 	"github.com/sapcc/gophercloud-limes/resources/v1/domains"
 	"github.com/sapcc/gophercloud-limes/resources/v1/projects"
-	"github.com/sapcc/limes/pkg/api"
-	"github.com/sapcc/limes/pkg/limes"
 )
 
 // set updates the resource capacities for a cluster.
 func (c *Cluster) set(q *Quotas) {
 	_, limesV1 := getServiceClients()
 
-	srvCaps := make([]api.ServiceCapacities, 0, len(*q))
-	for srv, resList := range *q {
-		resCaps := make([]api.ResourceCapacity, 0, len(resList))
-		for _, r := range resList {
-			resCaps = append(resCaps, api.ResourceCapacity{
-				Name:     r.Name,
-				Capacity: r.Value,
-				Unit:     &r.Unit,
-				Comment:  r.Comment,
-			})
-		}
+	sc := makeServiceCapacities(q)
 
-		srvCaps = append(srvCaps, api.ServiceCapacities{
-			Type:      srv,
-			Resources: resCaps,
-		})
-	}
-
-	err := clusters.Update(limesV1, c.ID, clusters.UpdateOpts{Services: srvCaps})
+	err := clusters.Update(limesV1, c.ID, clusters.UpdateOpts{Services: sc})
 	handleError("could not set new capacities for cluster", err)
 }
 
@@ -83,21 +65,4 @@ func (p *Project) set(q *Quotas) {
 	if respBody != nil {
 		fmt.Println(string(respBody))
 	}
-}
-
-func makeServiceQuotas(q *Quotas) api.ServiceQuotas {
-	sq := make(api.ServiceQuotas)
-
-	for srv, resList := range *q {
-		sq[srv] = make(api.ResourceQuotas)
-
-		for _, r := range resList {
-			sq[srv][r.Name] = limes.ValueWithUnit{
-				Value: uint64(r.Value),
-				Unit:  r.Unit,
-			}
-		}
-	}
-
-	return sq
 }

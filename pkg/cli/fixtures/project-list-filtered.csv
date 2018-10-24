@@ -1,0 +1,3 @@
+"domain id";"domain name";"project id";"project name";"area";"service";"category";"resource";"quota";"usage";"unit";"scraped at (UTC)"
+"uuid-for-germany";"germany";"uuid-for-berlin";"berlin";"shared";"shared";"";"things";10;2;"";"1970-01-01T01:00:22+01:00"
+"uuid-for-germany";"germany";"uuid-for-dresden";"dresden";"shared";"shared";"";"things";10;2;"";"1970-01-01T01:00:44+01:00"

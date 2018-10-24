@@ -1,0 +1,24 @@
+{
+  "domain": {
+    "id": "uuid-for-germany",
+    "name": "germany",
+    "services": [
+      {
+        "type": "shared",
+        "area": "shared",
+        "resources": [
+          {
+            "name": "capacity",
+            "unit": "B",
+            "quota": 25,
+            "projects_quota": 20,
+            "usage": 4,
+            "backend_quota": 110
+          }
+        ],
+        "max_scraped_at": 44,
+        "min_scraped_at": 22
+      }
+    ]
+  }
+}

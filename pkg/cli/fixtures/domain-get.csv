@@ -1,0 +1,6 @@
+"domain id";"service";"resource";"quota";"projects quota";"usage";"unit"
+"uuid-for-germany";"shared";"capacity";25;20;4;"B"
+"uuid-for-germany";"shared";"external_things";2;2;0;""
+"uuid-for-germany";"shared";"things";30;20;4;""
+"uuid-for-germany";"unshared";"capacity";45;20;4;"B"
+"uuid-for-germany";"unshared";"things";50;20;4;""
