@@ -173,7 +173,7 @@ func (c *Cluster) parseToCSV(cluster *reports.Cluster, data *csvData) {
 				csvRecord = append(csvRecord, cluster.ID, cSrv.ServiceInfo.Area, cSrv.ServiceInfo.Type,
 					cSrvRes.ResourceInfo.Category, cSrvRes.ResourceInfo.Name, strconv.FormatUint(cap, 10),
 					strconv.FormatUint(cSrvRes.DomainsQuota, 10), strconv.FormatUint(cSrvRes.Usage, 10),
-					string(cSrvRes.ResourceInfo.Unit), cSrvRes.Comment, time.Unix(cSrv.MinScrapedAt, 0).Format(time.RFC3339),
+					string(cSrvRes.ResourceInfo.Unit), cSrvRes.Comment, time.Unix(cSrv.MinScrapedAt, 0).UTC().Format(time.RFC3339),
 				)
 			default:
 				csvRecord = append(csvRecord, cluster.ID, cSrv.ServiceInfo.Type, cSrvRes.ResourceInfo.Name,
@@ -221,7 +221,7 @@ func (d *Domain) parseToCSV(domain *reports.Domain, data *csvData) {
 				csvRecord = append(csvRecord, domain.UUID, domain.Name, dSrv.ServiceInfo.Area, dSrv.ServiceInfo.Type,
 					dSrvRes.ResourceInfo.Category, dSrvRes.ResourceInfo.Name, strconv.FormatUint(dSrvRes.DomainQuota, 10),
 					strconv.FormatUint(dSrvRes.ProjectsQuota, 10), strconv.FormatUint(dSrvRes.Usage, 10),
-					string(dSrvRes.ResourceInfo.Unit), time.Unix(dSrv.MinScrapedAt, 0).Format(time.RFC3339),
+					string(dSrvRes.ResourceInfo.Unit), time.Unix(dSrv.MinScrapedAt, 0).UTC().Format(time.RFC3339),
 				)
 			default:
 				csvRecord = append(csvRecord, domain.UUID, dSrv.ServiceInfo.Type, dSrvRes.ResourceInfo.Name,
@@ -269,7 +269,7 @@ func (p *Project) parseToCSV(project *reports.Project, data *csvData) {
 				csvRecord = append(csvRecord, p.DomainID, p.DomainName, project.UUID, project.Name, pSrv.ServiceInfo.Area,
 					pSrv.ServiceInfo.Type, pSrvRes.ResourceInfo.Category, pSrvRes.ResourceInfo.Name,
 					strconv.FormatUint(pSrvRes.Quota, 10), strconv.FormatUint(pSrvRes.Usage, 10),
-					string(pSrvRes.ResourceInfo.Unit), time.Unix(pSrv.ScrapedAt, 0).Format(time.RFC3339),
+					string(pSrvRes.ResourceInfo.Unit), time.Unix(pSrv.ScrapedAt, 0).UTC().Format(time.RFC3339),
 				)
 			default:
 				csvRecord = append(csvRecord, p.DomainID, project.UUID, pSrv.ServiceInfo.Type,
