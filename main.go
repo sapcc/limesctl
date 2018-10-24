@@ -21,6 +21,7 @@ package main
 
 import (
 	"os"
+	"strings"
 
 	"github.com/alecthomas/kingpin"
 	"github.com/sapcc/limesctl/pkg/cli"
@@ -50,12 +51,12 @@ var (
 	// second-level subcommands and their flags/args
 	clusterListCmd = clusterCmd.Command("list", "Query data for all the clusters. Requires a cloud-admin token.")
 
-	clusterShowCmd = clusterCmd.Command("show", "Query data for a specific cluster, defaults to current cluster. Requires a cloud-admin token.")
-	clusterShowID  = clusterShowCmd.Arg("cluster-id", "Cluster ID.").Default("current").String()
+	clusterShowCmd = clusterCmd.Command("show", "Query data for a specific cluster. Use 'current' to show information regarding the current cluster. Requires a cloud-admin token.")
+	clusterShowID  = clusterShowCmd.Arg("cluster-id", "Cluster ID.").Required().String()
 
-	clusterSetCmd  = clusterCmd.Command("set", "Change resource(s) quota for a cluster, defaults to current cluster. Requires a cloud-admin token.")
-	clusterSetID   = clusterSetCmd.Arg("cluster-id", "Cluster ID.").Default("current").String()
-	clusterSetCaps = cli.ParseQuotas(clusterSetCmd.Arg("capacities", "Capacities to change. Format: service/resource=value(unit):\"comment\""))
+	clusterSetCmd  = clusterCmd.Command("set", "Change resource(s) quota for a cluster. Use 'current' to show information regarding the current cluster. Requires a cloud-admin token.")
+	clusterSetID   = clusterSetCmd.Arg("cluster-id", "Cluster ID.").Required().String()
+	clusterSetCaps = cli.ParseQuotas(clusterSetCmd.Arg("capacities", "Capacities to change. Format: service/resource=value(unit):\"comment\"").Required())
 
 	domainListCmd = domainCmd.Command("list", "Query data for all the domains. Requires a cloud-admin token.")
 
@@ -111,11 +112,11 @@ func main() {
 		}
 		cli.RunGetTask(c, *outputFmt)
 	case clusterSetCmd.FullCommand():
-		// this manual 'required' check is needed because clusterSetCaps is
-		// preceded by clusterSetID, which is a non-required Arg, the order of
-		// the Args and their requiredness matters
-		if len(*clusterSetCaps) == 0 {
-			kingpin.Fatalf("required argument 'capacities(s)' not provided, try --help")
+		// this manual check is required due to the order of the Args.
+		// If the ID is not provided then the capacities get interpreted
+		// as the ID and the error shown is not relevant to the context
+		if strings.Contains(*clusterSetID, "=") {
+			kingpin.Fatalf("required argument 'cluster-id' not provided, try --help")
 		}
 		c := &cli.Cluster{
 			ID: *clusterSetID,
@@ -148,6 +149,9 @@ func main() {
 		}
 		cli.RunGetTask(d, *outputFmt)
 	case domainSetCmd.FullCommand():
+		if strings.Contains(*domainSetID, "=") {
+			kingpin.Fatalf("required argument 'domain-id' not provided, try --help")
+		}
 		d, err := cli.FindDomain(*domainSetID)
 		if err != nil {
 			kingpin.Fatalf(err.Error())
@@ -187,6 +191,9 @@ func main() {
 		}
 		cli.RunGetTask(p, *outputFmt)
 	case projectSetCmd.FullCommand():
+		if strings.Contains(*projectSetID, "=") {
+			kingpin.Fatalf("required argument 'project-id' not provided, try --help")
+		}
 		p, err := cli.FindProject(*projectSetID, *projectSetDomain)
 		if err != nil {
 			kingpin.Fatalf(err.Error())
