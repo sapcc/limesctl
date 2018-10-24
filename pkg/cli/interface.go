@@ -23,6 +23,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"regexp"
+	"strings"
 
 	"github.com/olekukonko/tablewriter"
 	"github.com/sapcc/gophercloud-limes/resources/v1/clusters"
@@ -163,13 +165,19 @@ func (data *csvData) writeCSV() {
 	for _, record := range *data {
 		var str string
 		for i, v := range record {
-			// replace empty values with proper CSV null values ("")
-			if v == "" {
-				v = "\"\""
+			// preceed double-quotes with a double-quote
+			v = strings.Replace(v, "\"", "\"\"", -1)
+
+			// double-quote non-number values
+			rx := regexp.MustCompile(`^([0-9]+)$`)
+			match := rx.MatchString(v)
+			if !match {
+				v = fmt.Sprintf("\"%v\"", v)
 			}
-			// add delimiter for all values except the last one
+
+			// delimit values
 			if i != (len(record) - 1) {
-				v = fmt.Sprintf("%v,", v)
+				v = fmt.Sprintf("%v;", v)
 			}
 			str += v
 		}
