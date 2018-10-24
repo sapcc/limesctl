@@ -165,7 +165,7 @@ func (data *csvData) writeCSV() {
 	for _, record := range *data {
 		var str string
 		for i, v := range record {
-			// preceed double-quotes with a double-quote
+			// precede double-quotes with a double-quote
 			v = strings.Replace(v, "\"", "\"\"", -1)
 
 			// double-quote non-number values

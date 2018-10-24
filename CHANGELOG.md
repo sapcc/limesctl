@@ -1,3 +1,3 @@
-# v1.0.0 (TBD)
+# v1.0.0 (2018-10-24)
 
 Initial release.
