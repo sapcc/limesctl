@@ -36,13 +36,12 @@ release: release/$(BINARY64)
 else 
 release: release/$(BINARY64)
 	cd release && cp -f $(BINARY64) limesctl && tar -czf $(RELEASE64).tgz limesctl
-	cd release && cp -f $(BINARY64) limesctl && tar -czf $(RELEASE64).tgz limesctl
 	cd release && rm -f limesctl
 endif
 
 release-all: FORCE clean 
-	GOOS=darwin  make release
-	GOOS=linux   make release
+	GOOS=darwin make release
+	GOOS=linux  make release
 
 release/$(BINARY64): FORCE
 	GOARCH=amd64 $(GO) build $(BUILD_FLAGS) -o $@ -ldflags '$(LD_FLAGS)' '$(PKG)'
