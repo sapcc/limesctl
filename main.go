@@ -41,12 +41,13 @@ var (
 	projectCmd     = app.Command("project", "Do some action on project(s).")
 	projectCluster = projectCmd.Flag("cluster", "Cluster ID.").Short('c').String()
 
-	area        = app.Flag("area", "Resource area.").String()
-	service     = app.Flag("service", "Service type.").String()
-	resource    = app.Flag("resource", "Resource name.").String()
-	namesOutput = app.Flag("names", "Show output with names instead of UUIDs.").Bool()
-	longOutput  = app.Flag("long", "Show detailed output.").Bool()
-	outputFmt   = app.Flag("format", "Output format (table, json, csv).").PlaceHolder("table").Short('f').Enum("table", "json", "csv")
+	area              = app.Flag("area", "Resource area.").String()
+	service           = app.Flag("service", "Service type.").String()
+	resource          = app.Flag("resource", "Resource name.").String()
+	namesOutput       = app.Flag("names", "Show output with names instead of UUIDs.").Bool()
+	longOutput        = app.Flag("long", "Show detailed output.").Bool()
+	humanReadableVals = app.Flag("human-readable", "Show detailed output.").Bool()
+	outputFmt         = app.Flag("format", "Output format (table, json, csv).").PlaceHolder("table").Short('f').Enum("table", "json", "csv")
 
 	// second-level subcommands and their flags/args
 	clusterListCmd = clusterCmd.Command("list", "Query data for all the clusters. Requires a cloud-admin token.")
@@ -93,10 +94,11 @@ func main() {
 	case clusterListCmd.FullCommand():
 		c := &cli.Cluster{
 			Opts: cli.Options{
-				Long:     *longOutput,
-				Area:     *area,
-				Service:  *service,
-				Resource: *resource,
+				Long:          *longOutput,
+				HumanReadable: *humanReadableVals,
+				Area:          *area,
+				Service:       *service,
+				Resource:      *resource,
 			},
 		}
 		cli.RunListTask(c, *outputFmt)
@@ -104,10 +106,11 @@ func main() {
 		c := &cli.Cluster{
 			ID: *clusterShowID,
 			Opts: cli.Options{
-				Long:     *longOutput,
-				Area:     *area,
-				Service:  *service,
-				Resource: *resource,
+				Long:          *longOutput,
+				HumanReadable: *humanReadableVals,
+				Area:          *area,
+				Service:       *service,
+				Resource:      *resource,
 			},
 		}
 		cli.RunGetTask(c, *outputFmt)
@@ -125,12 +128,13 @@ func main() {
 	case domainListCmd.FullCommand():
 		d := &cli.Domain{
 			Opts: cli.Options{
-				Names:    *namesOutput,
-				Long:     *longOutput,
-				Cluster:  *domainCluster,
-				Area:     *area,
-				Service:  *service,
-				Resource: *resource,
+				Names:         *namesOutput,
+				Long:          *longOutput,
+				HumanReadable: *humanReadableVals,
+				Cluster:       *domainCluster,
+				Area:          *area,
+				Service:       *service,
+				Resource:      *resource,
 			},
 		}
 		cli.RunListTask(d, *outputFmt)
@@ -140,12 +144,13 @@ func main() {
 			kingpin.Fatalf(err.Error())
 		}
 		d.Opts = cli.Options{
-			Names:    *namesOutput,
-			Long:     *longOutput,
-			Cluster:  *domainCluster,
-			Area:     *area,
-			Service:  *service,
-			Resource: *resource,
+			Names:         *namesOutput,
+			Long:          *longOutput,
+			HumanReadable: *humanReadableVals,
+			Cluster:       *domainCluster,
+			Area:          *area,
+			Service:       *service,
+			Resource:      *resource,
 		}
 		cli.RunGetTask(d, *outputFmt)
 	case domainSetCmd.FullCommand():
@@ -167,12 +172,13 @@ func main() {
 			DomainID:   d.ID,
 			DomainName: d.Name,
 			Opts: cli.Options{
-				Names:    *namesOutput,
-				Long:     *longOutput,
-				Cluster:  *projectCluster,
-				Area:     *area,
-				Service:  *service,
-				Resource: *resource,
+				Names:         *namesOutput,
+				Long:          *longOutput,
+				HumanReadable: *humanReadableVals,
+				Cluster:       *projectCluster,
+				Area:          *area,
+				Service:       *service,
+				Resource:      *resource,
 			},
 		}
 		cli.RunListTask(p, *outputFmt)
@@ -182,12 +188,13 @@ func main() {
 			kingpin.Fatalf(err.Error())
 		}
 		p.Opts = cli.Options{
-			Names:    *namesOutput,
-			Long:     *longOutput,
-			Cluster:  *projectCluster,
-			Area:     *area,
-			Service:  *service,
-			Resource: *resource,
+			Names:         *namesOutput,
+			Long:          *longOutput,
+			HumanReadable: *humanReadableVals,
+			Cluster:       *projectCluster,
+			Area:          *area,
+			Service:       *service,
+			Resource:      *resource,
 		}
 		cli.RunGetTask(p, *outputFmt)
 	case projectSetCmd.FullCommand():

@@ -69,12 +69,13 @@ type Project struct {
 
 // Options contains different options that affect the output of a get/list/update operation.
 type Options struct {
-	Names    bool
-	Long     bool
-	Cluster  string
-	Area     string
-	Service  string
-	Resource string
+	Names         bool
+	Long          bool
+	HumanReadable bool
+	Cluster       string
+	Area          string
+	Service       string
+	Resource      string
 }
 
 // GetTask is the interface type that abstracts a get operation.

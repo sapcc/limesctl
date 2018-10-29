@@ -21,10 +21,12 @@ package cli
 
 import (
 	"errors"
+	"math"
 	"sort"
 	"strconv"
 	"time"
 
+	"github.com/sapcc/limes/pkg/limes"
 	"github.com/sapcc/limes/pkg/reports"
 )
 
@@ -162,23 +164,27 @@ func (c *Cluster) parseToCSV(cluster *reports.Cluster, data *csvData) {
 			cSrv := cluster.Services[srv]
 			cSrvRes := cluster.Services[srv].Resources[res]
 
-			// need to do this check, otherwise we get a nil pointer dereference error
+			// need to do this check to avoid nil pointers
 			var cap uint64
-			if tmp := cluster.Services[srv].Resources[res].Capacity; tmp != nil {
+			if tmp := cSrvRes.Capacity; tmp != nil {
 				cap = *tmp
 			}
+
+			unit, val := humanReadable(c.Opts.HumanReadable, cSrvRes.ResourceInfo.Unit, rawValues{
+				"capacity":     cap,
+				"domainsQuota": cSrvRes.DomainsQuota,
+				"usage":        cSrvRes.Usage,
+			})
 
 			switch {
 			case c.Opts.Long:
 				csvRecord = append(csvRecord, cluster.ID, cSrv.ServiceInfo.Area, cSrv.ServiceInfo.Type,
-					cSrvRes.ResourceInfo.Category, cSrvRes.ResourceInfo.Name, strconv.FormatUint(cap, 10),
-					strconv.FormatUint(cSrvRes.DomainsQuota, 10), strconv.FormatUint(cSrvRes.Usage, 10),
-					string(cSrvRes.ResourceInfo.Unit), cSrvRes.Comment, time.Unix(cSrv.MinScrapedAt, 0).UTC().Format(time.RFC3339),
+					cSrvRes.ResourceInfo.Category, cSrvRes.ResourceInfo.Name, val["capacity"], val["domainsQuota"],
+					val["usage"], unit, cSrvRes.Comment, time.Unix(cSrv.MinScrapedAt, 0).UTC().Format(time.RFC3339),
 				)
 			default:
 				csvRecord = append(csvRecord, cluster.ID, cSrv.ServiceInfo.Type, cSrvRes.ResourceInfo.Name,
-					strconv.FormatUint(cap, 10), strconv.FormatUint(cSrvRes.DomainsQuota, 10),
-					strconv.FormatUint(cSrvRes.Usage, 10), string(cSrvRes.ResourceInfo.Unit),
+					val["capacity"], val["domainsQuota"], val["usage"], unit,
 				)
 			}
 
@@ -211,22 +217,25 @@ func (d *Domain) parseToCSV(domain *reports.Domain, data *csvData) {
 			dSrv := domain.Services[srv]
 			dSrvRes := domain.Services[srv].Resources[res]
 
+			unit, val := humanReadable(d.Opts.HumanReadable, dSrvRes.ResourceInfo.Unit, rawValues{
+				"domainQuota":   dSrvRes.DomainQuota,
+				"projectsQuota": dSrvRes.ProjectsQuota,
+				"usage":         dSrvRes.Usage,
+			})
+
 			switch {
 			case d.Opts.Names:
 				csvRecord = append(csvRecord, domain.Name, dSrv.ServiceInfo.Type, dSrvRes.ResourceInfo.Name,
-					strconv.FormatUint(dSrvRes.DomainQuota, 10), strconv.FormatUint(dSrvRes.ProjectsQuota, 10),
-					strconv.FormatUint(dSrvRes.Usage, 10), string(dSrvRes.ResourceInfo.Unit),
+					val["domainQuota"], val["projectsQuota"], val["usage"], unit,
 				)
 			case d.Opts.Long:
 				csvRecord = append(csvRecord, domain.UUID, domain.Name, dSrv.ServiceInfo.Area, dSrv.ServiceInfo.Type,
-					dSrvRes.ResourceInfo.Category, dSrvRes.ResourceInfo.Name, strconv.FormatUint(dSrvRes.DomainQuota, 10),
-					strconv.FormatUint(dSrvRes.ProjectsQuota, 10), strconv.FormatUint(dSrvRes.Usage, 10),
-					string(dSrvRes.ResourceInfo.Unit), time.Unix(dSrv.MinScrapedAt, 0).UTC().Format(time.RFC3339),
+					dSrvRes.ResourceInfo.Category, dSrvRes.ResourceInfo.Name, val["domainQuota"], val["projectsQuota"],
+					val["usage"], unit, time.Unix(dSrv.MinScrapedAt, 0).UTC().Format(time.RFC3339),
 				)
 			default:
 				csvRecord = append(csvRecord, domain.UUID, dSrv.ServiceInfo.Type, dSrvRes.ResourceInfo.Name,
-					strconv.FormatUint(dSrvRes.DomainQuota, 10), strconv.FormatUint(dSrvRes.ProjectsQuota, 10),
-					strconv.FormatUint(dSrvRes.Usage, 10), string(dSrvRes.ResourceInfo.Unit),
+					val["domainQuota"], val["projectsQuota"], val["usage"], unit,
 				)
 			}
 
@@ -259,26 +268,90 @@ func (p *Project) parseToCSV(project *reports.Project, data *csvData) {
 			pSrv := project.Services[srv]
 			pSrvRes := project.Services[srv].Resources[res]
 
+			unit, val := humanReadable(p.Opts.HumanReadable, pSrvRes.ResourceInfo.Unit, rawValues{
+				"quota": pSrvRes.Quota,
+				"usage": pSrvRes.Usage,
+			})
+
 			switch {
 			case p.Opts.Names:
 				csvRecord = append(csvRecord, p.DomainName, project.Name, pSrv.ServiceInfo.Type,
-					pSrvRes.ResourceInfo.Name, strconv.FormatUint(pSrvRes.Quota, 10),
-					strconv.FormatUint(pSrvRes.Usage, 10), string(pSrvRes.ResourceInfo.Unit),
+					pSrvRes.ResourceInfo.Name, val["quota"], val["usage"], unit,
 				)
 			case p.Opts.Long:
 				csvRecord = append(csvRecord, p.DomainID, p.DomainName, project.UUID, project.Name, pSrv.ServiceInfo.Area,
 					pSrv.ServiceInfo.Type, pSrvRes.ResourceInfo.Category, pSrvRes.ResourceInfo.Name,
-					strconv.FormatUint(pSrvRes.Quota, 10), strconv.FormatUint(pSrvRes.Usage, 10),
-					string(pSrvRes.ResourceInfo.Unit), time.Unix(pSrv.ScrapedAt, 0).UTC().Format(time.RFC3339),
+					val["quota"], val["usage"], unit, time.Unix(pSrv.ScrapedAt, 0).UTC().Format(time.RFC3339),
 				)
 			default:
 				csvRecord = append(csvRecord, p.DomainID, project.UUID, pSrv.ServiceInfo.Type,
-					pSrvRes.ResourceInfo.Name, strconv.FormatUint(pSrvRes.Quota, 10),
-					strconv.FormatUint(pSrvRes.Usage, 10), string(pSrvRes.ResourceInfo.Unit),
+					pSrvRes.ResourceInfo.Name, val["quota"], val["usage"], unit,
 				)
 			}
 
 			*data = append(*data, csvRecord)
 		}
 	}
+}
+
+type rawValues map[string]uint64
+type convertedValues map[string]string
+
+// unitExp is map of limes.Unit to x, such that base-2 exponential of x
+// is the number of bytes for some specific unit.
+var unitExp = map[limes.Unit]float64{
+	limes.UnitKibibytes: 10,
+	limes.UnitMebibytes: 20,
+	limes.UnitGibibytes: 30,
+	limes.UnitTebibytes: 40,
+	limes.UnitPebibytes: 50,
+	limes.UnitExbibytes: 60,
+}
+
+func humanReadable(convert bool, unit limes.Unit, rv rawValues) (string, convertedValues) {
+	cv := make(convertedValues, len(rv))
+
+	// 'usage' is used to determine conversion suitability because it is common
+	// in all three hierarchies and is the lowest value amongst its counterparts
+	if unit == limes.UnitNone || rv["usage"] < 1024 {
+		convert = false
+	}
+	if !convert {
+		for k, v := range rv {
+			cv[k] = strconv.FormatUint(v, 10)
+		}
+		return string(unit), cv
+	}
+
+	oldExp := unitExp[unit]
+	usage := rv["usage"]
+
+	var diffInExp float64
+	// 2^60 bytes (exbibytes) is the maximum supported unit
+	for diffInExp = 10; diffInExp <= (60 - oldExp); diffInExp += 10 {
+		usageScaled := usage / uint64(math.Exp2(diffInExp))
+
+		if usageScaled < 1024 {
+			break
+		}
+	}
+
+	// determine the new unit
+	var newUnit limes.Unit
+	for k, v := range unitExp {
+		if v == (oldExp + diffInExp) {
+			newUnit = k
+		}
+	}
+
+	// convert values to the new unit
+	for k, v := range rv {
+		v := float64(v)
+		v = v / math.Exp2(diffInExp)
+		// round to second decimal place
+		v = math.Round(v*100) / 100
+		cv[k] = strconv.FormatFloat(v, 'f', -1, 64)
+	}
+
+	return string(newUnit), cv
 }
