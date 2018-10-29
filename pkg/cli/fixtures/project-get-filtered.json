@@ -11,9 +11,9 @@
           {
             "name": "capacity",
             "unit": "B",
-            "quota": 10,
-            "usage": 2,
-            "backend_quota": 100
+            "quota": 16492674416640,
+            "usage": 3004120411540,
+            "backend_quota": 16492674416640
           }
         ],
         "scraped_at": 44

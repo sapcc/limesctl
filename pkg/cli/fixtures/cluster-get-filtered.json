@@ -9,11 +9,11 @@
         "resources": [
           {
             "name": "capacity",
-            "unit": "B",
-            "capacity": 185,
+            "unit": "GiB",
+            "capacity": 10485760,
             "comment": "hand-counted",
-            "domains_quota": 50,
-            "usage": 8
+            "domains_quota": 3145728,
+            "usage": 1572864
           }
         ],
         "max_scraped_at": 66,

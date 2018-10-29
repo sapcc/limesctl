@@ -9,10 +9,10 @@
         "resources": [
           {
             "name": "capacity",
-            "unit": "B",
-            "quota": 25,
-            "projects_quota": 20,
-            "usage": 4,
+            "unit": "MiB",
+            "quota": 30128200000,
+            "projects_quota": 10128200000,
+            "usage": 524288000,
             "backend_quota": 110
           }
         ],

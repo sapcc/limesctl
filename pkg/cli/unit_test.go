@@ -120,10 +120,11 @@ func TestRenderClusterCSV(t *testing.T) {
 	c, err = makeMockCluster("./fixtures/cluster-get-filtered.json")
 	th.AssertNoErr(t, err)
 	c.Opts = Options{
-		Long:     true,
-		Area:     "shared",
-		Service:  "shared",
-		Resource: "capacity",
+		HumanReadable: true,
+		Long:          true,
+		Area:          "shared",
+		Service:       "shared",
+		Resource:      "capacity",
 	}
 
 	actual, err = captureOutput(func() { c.renderCSV().writeCSV() })
@@ -180,10 +181,11 @@ func TestRenderDomainCSV(t *testing.T) {
 	d, err = makeMockDomain("./fixtures/domain-get-filtered.json")
 	th.AssertNoErr(t, err)
 	d.Opts = Options{
-		Names:    true,
-		Area:     "shared",
-		Service:  "shared",
-		Resource: "capacity",
+		HumanReadable: true,
+		Names:         true,
+		Area:          "shared",
+		Service:       "shared",
+		Resource:      "capacity",
 	}
 
 	actual, err = captureOutput(func() { d.renderCSV().writeCSV() })
@@ -240,10 +242,11 @@ func TestRenderProjectCSV(t *testing.T) {
 	p, err = makeMockProject("./fixtures/project-get-filtered.json")
 	th.AssertNoErr(t, err)
 	p.Opts = Options{
-		Names:    true,
-		Area:     "shared",
-		Service:  "shared",
-		Resource: "capacity",
+		HumanReadable: true,
+		Names:         true,
+		Area:          "shared",
+		Service:       "shared",
+		Resource:      "capacity",
 	}
 
 	actual, err = captureOutput(func() { p.renderCSV().writeCSV() })
