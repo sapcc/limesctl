@@ -31,9 +31,9 @@ func (c *Cluster) list() {
 
 	c.IsList = true
 	c.Result = clusters.List(limesV1, clusters.ListOpts{
-		Area:     c.Opts.Area,
-		Service:  c.Opts.Service,
-		Resource: c.Opts.Resource,
+		Area:     c.Filter.Area,
+		Service:  c.Filter.Service,
+		Resource: c.Filter.Resource,
 	})
 	handleError("could not list clusters", c.Result.Err)
 }
@@ -44,10 +44,10 @@ func (d *Domain) list() {
 
 	d.IsList = true
 	d.Result = domains.List(limesV1, domains.ListOpts{
-		Cluster:  d.Opts.Cluster,
-		Area:     d.Opts.Area,
-		Service:  d.Opts.Service,
-		Resource: d.Opts.Resource,
+		Cluster:  d.Filter.Cluster,
+		Area:     d.Filter.Area,
+		Service:  d.Filter.Service,
+		Resource: d.Filter.Resource,
 	})
 	handleError("could not list domains", d.Result.Err)
 }
@@ -58,10 +58,10 @@ func (p *Project) list() {
 
 	p.IsList = true
 	p.Result = projects.List(limesV1, p.DomainID, projects.ListOpts{
-		Cluster:  p.Opts.Cluster,
-		Area:     p.Opts.Area,
-		Service:  p.Opts.Service,
-		Resource: p.Opts.Resource,
+		Cluster:  p.Filter.Cluster,
+		Area:     p.Filter.Area,
+		Service:  p.Filter.Service,
+		Resource: p.Filter.Resource,
 	})
 	handleError("could not list projects", p.Result.Err)
 }

@@ -38,7 +38,7 @@ func (c *Cluster) renderCSV() *csvData {
 	var labels []string
 
 	switch {
-	case c.Opts.Long:
+	case c.Output.Long:
 		labels = []string{"cluster id", "area", "service", "category", "resource", "capacity",
 			"domains quota", "usage", "unit", "comment", "scraped at (UTC)"}
 	default:
@@ -69,14 +69,14 @@ func (d *Domain) renderCSV() *csvData {
 	var data csvData
 	var labels []string
 
-	if d.Opts.Names && d.Opts.Long {
+	if d.Output.Names && d.Output.Long {
 		handleError("", errors.New("'--names' and '--long' can not be used together"))
 	}
 
 	switch {
-	case d.Opts.Names:
+	case d.Output.Names:
 		labels = []string{"domain name", "service", "resource", "quota", "projects quota", "usage", "unit"}
-	case d.Opts.Long:
+	case d.Output.Long:
 		labels = []string{"domain id", "domain name", "area", "service", "category", "resource",
 			"quota", "projects quota", "usage", "unit", "scraped at (UTC)"}
 	default:
@@ -107,14 +107,14 @@ func (p *Project) renderCSV() *csvData {
 	var data csvData
 	var labels []string
 
-	if p.Opts.Names && p.Opts.Long {
+	if p.Output.Names && p.Output.Long {
 		handleError("", errors.New("'--names' and '--long' can not be used together"))
 	}
 
 	switch {
-	case p.Opts.Names:
+	case p.Output.Names:
 		labels = []string{"domain name", "project name", "service", "resource", "quota", "usage", "unit"}
-	case p.Opts.Long:
+	case p.Output.Long:
 		labels = []string{"domain id", "domain name", "project id", "project name", "area",
 			"service", "category", "resource", "quota", "usage", "unit", "scraped at (UTC)"}
 	default:
@@ -170,14 +170,14 @@ func (c *Cluster) parseToCSV(cluster *reports.Cluster, data *csvData) {
 				cap = *tmp
 			}
 
-			unit, val := humanReadable(c.Opts.HumanReadable, cSrvRes.ResourceInfo.Unit, rawValues{
+			unit, val := humanReadable(c.Output.HumanReadable, cSrvRes.ResourceInfo.Unit, rawValues{
 				"capacity":     cap,
 				"domainsQuota": cSrvRes.DomainsQuota,
 				"usage":        cSrvRes.Usage,
 			})
 
 			switch {
-			case c.Opts.Long:
+			case c.Output.Long:
 				csvRecord = append(csvRecord, cluster.ID, cSrv.ServiceInfo.Area, cSrv.ServiceInfo.Type,
 					cSrvRes.ResourceInfo.Category, cSrvRes.ResourceInfo.Name, val["capacity"], val["domainsQuota"],
 					val["usage"], unit, cSrvRes.Comment, time.Unix(cSrv.MinScrapedAt, 0).UTC().Format(time.RFC3339),
@@ -217,18 +217,18 @@ func (d *Domain) parseToCSV(domain *reports.Domain, data *csvData) {
 			dSrv := domain.Services[srv]
 			dSrvRes := domain.Services[srv].Resources[res]
 
-			unit, val := humanReadable(d.Opts.HumanReadable, dSrvRes.ResourceInfo.Unit, rawValues{
+			unit, val := humanReadable(d.Output.HumanReadable, dSrvRes.ResourceInfo.Unit, rawValues{
 				"domainQuota":   dSrvRes.DomainQuota,
 				"projectsQuota": dSrvRes.ProjectsQuota,
 				"usage":         dSrvRes.Usage,
 			})
 
 			switch {
-			case d.Opts.Names:
+			case d.Output.Names:
 				csvRecord = append(csvRecord, domain.Name, dSrv.ServiceInfo.Type, dSrvRes.ResourceInfo.Name,
 					val["domainQuota"], val["projectsQuota"], val["usage"], unit,
 				)
-			case d.Opts.Long:
+			case d.Output.Long:
 				csvRecord = append(csvRecord, domain.UUID, domain.Name, dSrv.ServiceInfo.Area, dSrv.ServiceInfo.Type,
 					dSrvRes.ResourceInfo.Category, dSrvRes.ResourceInfo.Name, val["domainQuota"], val["projectsQuota"],
 					val["usage"], unit, time.Unix(dSrv.MinScrapedAt, 0).UTC().Format(time.RFC3339),
@@ -268,17 +268,17 @@ func (p *Project) parseToCSV(project *reports.Project, data *csvData) {
 			pSrv := project.Services[srv]
 			pSrvRes := project.Services[srv].Resources[res]
 
-			unit, val := humanReadable(p.Opts.HumanReadable, pSrvRes.ResourceInfo.Unit, rawValues{
+			unit, val := humanReadable(p.Output.HumanReadable, pSrvRes.ResourceInfo.Unit, rawValues{
 				"quota": pSrvRes.Quota,
 				"usage": pSrvRes.Usage,
 			})
 
 			switch {
-			case p.Opts.Names:
+			case p.Output.Names:
 				csvRecord = append(csvRecord, p.DomainName, project.Name, pSrv.ServiceInfo.Type,
 					pSrvRes.ResourceInfo.Name, val["quota"], val["usage"], unit,
 				)
-			case p.Opts.Long:
+			case p.Output.Long:
 				csvRecord = append(csvRecord, p.DomainID, p.DomainName, project.UUID, project.Name, pSrv.ServiceInfo.Area,
 					pSrv.ServiceInfo.Type, pSrvRes.ResourceInfo.Category, pSrvRes.ResourceInfo.Name,
 					val["quota"], val["usage"], unit, time.Unix(pSrv.ScrapedAt, 0).UTC().Format(time.RFC3339),

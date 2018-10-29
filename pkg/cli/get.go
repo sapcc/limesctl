@@ -30,9 +30,9 @@ func (c *Cluster) get() {
 	_, limesV1 := getServiceClients()
 
 	c.Result = clusters.Get(limesV1, c.ID, clusters.GetOpts{
-		Area:     c.Opts.Area,
-		Service:  c.Opts.Service,
-		Resource: c.Opts.Resource,
+		Area:     c.Filter.Area,
+		Service:  c.Filter.Service,
+		Resource: c.Filter.Resource,
 	})
 	handleError("could not get cluster", c.Result.Err)
 }
@@ -42,10 +42,10 @@ func (d *Domain) get() {
 	_, limesV1 := getServiceClients()
 
 	d.Result = domains.Get(limesV1, d.ID, domains.GetOpts{
-		Cluster:  d.Opts.Cluster,
-		Area:     d.Opts.Area,
-		Service:  d.Opts.Service,
-		Resource: d.Opts.Resource,
+		Cluster:  d.Filter.Cluster,
+		Area:     d.Filter.Area,
+		Service:  d.Filter.Service,
+		Resource: d.Filter.Resource,
 	})
 	handleError("could not get domain", d.Result.Err)
 }
@@ -55,10 +55,10 @@ func (p *Project) get() {
 	_, limesV1 := getServiceClients()
 
 	p.Result = projects.Get(limesV1, p.DomainID, p.ID, projects.GetOpts{
-		Cluster:  p.Opts.Cluster,
-		Area:     p.Opts.Area,
-		Service:  p.Opts.Service,
-		Resource: p.Opts.Resource,
+		Cluster:  p.Filter.Cluster,
+		Area:     p.Filter.Area,
+		Service:  p.Filter.Service,
+		Resource: p.Filter.Resource,
 	})
 	handleError("could not get project", p.Result.Err)
 }

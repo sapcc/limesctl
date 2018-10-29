@@ -131,3 +131,57 @@ func FindProject(userInputProject, userInputDomain string) (*Project, error) {
 
 	return p, nil
 }
+
+// FindDomainInCluster finds a specific domain in a Cluster.
+func FindDomainInCluster(domainID, clusterID string) (*Domain, error) {
+	tmp := &Domain{
+		ID: domainID,
+		Filter: Filter{
+			Cluster: clusterID,
+		},
+	}
+	tmp.get()
+
+	tmpDomain, err := tmp.Result.Extract()
+	if err != nil {
+		return nil, err
+	}
+
+	d := &Domain{
+		ID:   tmpDomain.UUID,
+		Name: tmpDomain.Name,
+	}
+
+	return d, nil
+}
+
+// FindProjectInCluster finds a specific project in a Cluster.
+func FindProjectInCluster(projectID, domainID, clusterID string) (*Project, error) {
+	tmpDomain, err := FindDomainInCluster(domainID, clusterID)
+	if err != nil {
+		return nil, err
+	}
+
+	tmp := &Project{
+		ID:       projectID,
+		DomainID: tmpDomain.ID,
+		Filter: Filter{
+			Cluster: clusterID,
+		},
+	}
+	tmp.get()
+
+	tmpProject, err := tmp.Result.Extract()
+	if err != nil {
+		return nil, err
+	}
+
+	p := &Project{
+		ID:         tmpProject.UUID,
+		Name:       tmpProject.Name,
+		DomainID:   tmpDomain.ID,
+		DomainName: tmpDomain.Name,
+	}
+
+	return p, nil
+}

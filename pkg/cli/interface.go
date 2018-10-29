@@ -38,9 +38,10 @@ import (
 // Call its appropriate method to get/list/update a Cluster.
 type Cluster struct {
 	ID     string
-	Opts   Options
 	Result clusters.CommonResult
 	IsList bool
+	Filter Filter
+	Output Output
 }
 
 // Domain contains information regarding a domain(s).
@@ -49,9 +50,10 @@ type Cluster struct {
 type Domain struct {
 	ID     string
 	Name   string
-	Opts   Options
 	Result domains.CommonResult
 	IsList bool
+	Filter Filter
+	Output Output
 }
 
 // Project contains information regarding a project(s).
@@ -62,20 +64,25 @@ type Project struct {
 	Name       string
 	DomainID   string
 	DomainName string
-	Opts       Options
 	Result     projects.CommonResult
 	IsList     bool
+	Filter     Filter
+	Output     Output
 }
 
-// Options contains different options that affect the output of a get/list/update operation.
-type Options struct {
+// Filter contains different parameters for filtering a get/list/update operation.
+type Filter struct {
+	Cluster  string
+	Area     string
+	Service  string
+	Resource string
+}
+
+// Output contains different options that affect the output of a get/list operation.
+type Output struct {
 	Names         bool
 	Long          bool
 	HumanReadable bool
-	Cluster       string
-	Area          string
-	Service       string
-	Resource      string
 }
 
 // GetTask is the interface type that abstracts a get operation.
@@ -149,7 +156,7 @@ func RunSyncTask(p *Project) {
 	_, limesV1 := getServiceClients()
 
 	err := projects.Sync(limesV1, p.DomainID, p.ID, projects.SyncOpts{
-		Cluster: p.Opts.Cluster,
+		Cluster: p.Filter.Cluster,
 	})
 	handleError("could not sync project", err)
 }
