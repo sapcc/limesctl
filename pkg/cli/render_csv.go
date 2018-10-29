@@ -313,12 +313,12 @@ func humanReadable(convert bool, unit limes.Unit, rv rawValues) (string, convert
 
 	// 'usage' is used to determine conversion suitability because it is common
 	// in all three hierarchies and is the lowest value amongst its counterparts
-	if unit == limes.UnitNone || lenUint(rv["usage"]) < 4 {
+	if unit == limes.UnitNone || rv["usage"] < 1024 {
 		convert = false
 	}
 	if !convert {
-		for i, v := range rv {
-			cv[i] = strconv.FormatUint(v, 10)
+		for k, v := range rv {
+			cv[k] = strconv.FormatUint(v, 10)
 		}
 		return string(unit), cv
 	}
@@ -329,38 +329,29 @@ func humanReadable(convert bool, unit limes.Unit, rv rawValues) (string, convert
 	var diffInExp float64
 	// 2^60 bytes (exbibytes) is the maximum supported unit
 	for diffInExp = 10; diffInExp <= (60 - oldExp); diffInExp += 10 {
-		// take a copy of usage inside the loop
-		usage := usage
+		usageScaled := usage / uint64(math.Exp2(diffInExp))
 
-		usage = usage / uint64(math.Exp2(diffInExp))
-
-		if lenUint(usage) < 4 {
+		if usageScaled < 1024 {
 			break
 		}
 	}
 
 	// determine the new unit
 	var newUnit limes.Unit
-	for i, v := range unitExp {
+	for k, v := range unitExp {
 		if v == (oldExp + diffInExp) {
-			newUnit = i
+			newUnit = k
 		}
 	}
 
 	// convert values to the new unit
-	for i, v := range rv {
+	for k, v := range rv {
 		v := float64(v)
 		v = v / math.Exp2(diffInExp)
 		// round to second decimal place
 		v = math.Round(v*100) / 100
-		cv[i] = strconv.FormatFloat(v, 'f', -1, 64)
+		cv[k] = strconv.FormatFloat(v, 'f', -1, 64)
 	}
 
 	return string(newUnit), cv
-}
-
-// lenUint is a helper function that returns
-// the length (digit count) of a uint64.
-func lenUint(val uint64) int {
-	return len(strconv.FormatUint(val, 10))
 }
