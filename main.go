@@ -36,15 +36,19 @@ var (
 	clusterCmd = app.Command("cluster", "Do some action on cluster(s).")
 
 	domainCmd     = app.Command("domain", "Do some action on domain(s).")
-	domainCluster = domainCmd.Flag("cluster", "Cluster ID. This flag requires a domain ID, domain name will not work.").Short('c').String()
+	domainCluster = domainCmd.Flag("cluster", "Cluster ID. When this option is given, the domain must be identified by ID. Specifiying a domain name will not work.").Short('c').String()
 
 	projectCmd     = app.Command("project", "Do some action on project(s).")
-	projectCluster = projectCmd.Flag("cluster", "Cluster ID. This flag requires a project/domain ID, project/domain name will not work.").Short('c').String()
+	projectCluster = projectCmd.Flag("cluster", "Cluster ID. When this option is given, the domain/project must be identified by ID. Specifiying a domain/project name will not work.").Short('c').String()
 
 	osAuthURL           = app.Flag("os-auth-url", "Authentication URL.").PlaceHolder("OS_AUTH_URL").String()
 	osUsername          = app.Flag("os-username", "Username").PlaceHolder("OS_USERNAME").String()
+	osPassword          = app.Flag("os-password", "User's Password").PlaceHolder("OS_PASSWORD").String()
+	osUserDomainID      = app.Flag("os-user-domain-name", "User's domain ID.").PlaceHolder("OS_USER_DOMAIN_ID").String()
 	osUserDomainName    = app.Flag("os-user-domain-name", "User's domain name.").PlaceHolder("OS_USER_DOMAIN_NAME").String()
+	osProjectID         = app.Flag("os-project-id", "Project ID to scope to.").PlaceHolder("OS_PROJECT_ID").String()
 	osProjectName       = app.Flag("os-project-name", "Project name to scope to.").PlaceHolder("OS_PROJECT_NAME").String()
+	osProjectDomainID   = app.Flag("os-project-domain-ID", "Domain ID containing project to scope to.").PlaceHolder("OS_PROJECT_DOMAIN_ID").String()
 	osProjectDomainName = app.Flag("os-project-domain-name", "Domain name containing project to scope to.").PlaceHolder("OS_PROJECT_DOMAIN_NAME").String()
 
 	area              = app.Flag("area", "Resource area.").String()
@@ -100,21 +104,15 @@ func main() {
 	cmdString := kingpin.MustParse(app.Parse(os.Args[1:]))
 
 	// overwrite OpenStack variables
-	if *osAuthURL != "" {
-		os.Setenv("OS_AUTH_URL", *osAuthURL)
-	}
-	if *osUsername != "" {
-		os.Setenv("OS_USERNAME", *osUsername)
-	}
-	if *osUserDomainName != "" {
-		os.Setenv("OS_USER_DOMAIN_NAME", *osUserDomainName)
-	}
-	if *osProjectName != "" {
-		os.Setenv("OS_PROJECT_NAME", *osProjectName)
-	}
-	if *osProjectDomainName != "" {
-		os.Setenv("OS_PROJECT_DOMAIN_NAME", *osProjectDomainName)
-	}
+	setEnvUnlessEmpty("OS_AUTH_URL", *osAuthURL)
+	setEnvUnlessEmpty("OS_USERNAME", *osUsername)
+	setEnvUnlessEmpty("OS_PASSWORD", *osPassword)
+	setEnvUnlessEmpty("OS_USER_DOMAIN_ID", *osUserDomainID)
+	setEnvUnlessEmpty("OS_USER_DOMAIN_NAME", *osUserDomainName)
+	setEnvUnlessEmpty("OS_PROJECT_ID", *osProjectID)
+	setEnvUnlessEmpty("OS_PROJECT_NAME", *osProjectName)
+	setEnvUnlessEmpty("OS_PROJECT_DOMAIN_ID", *osProjectDomainID)
+	setEnvUnlessEmpty("OS_PROJECT_DOMAIN_NAME", *osProjectDomainName)
 
 	// output and filter are initialized in advance with values that were provided
 	// at the command-line. Later, we pass only the specific information that
@@ -261,6 +259,14 @@ func main() {
 		p.Filter.Cluster = *projectCluster
 		cli.RunSyncTask(p)
 	}
+}
+
+func setEnvUnlessEmpty(env, val string) {
+	if val == "" {
+		return
+	}
+
+	os.Setenv(env, val)
 }
 
 func fatalIfErr(err error) {
