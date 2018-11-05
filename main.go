@@ -36,10 +36,20 @@ var (
 	clusterCmd = app.Command("cluster", "Do some action on cluster(s).")
 
 	domainCmd     = app.Command("domain", "Do some action on domain(s).")
-	domainCluster = domainCmd.Flag("cluster", "Cluster ID.").Short('c').String()
+	domainCluster = domainCmd.Flag("cluster", "Cluster ID. When this option is given, the domain must be identified by ID. Specifiying a domain name will not work.").Short('c').String()
 
 	projectCmd     = app.Command("project", "Do some action on project(s).")
-	projectCluster = projectCmd.Flag("cluster", "Cluster ID.").Short('c').String()
+	projectCluster = projectCmd.Flag("cluster", "Cluster ID. When this option is given, the domain/project must be identified by ID. Specifiying a domain/project name will not work.").Short('c').String()
+
+	osAuthURL           = app.Flag("os-auth-url", "Authentication URL.").PlaceHolder("OS_AUTH_URL").String()
+	osUsername          = app.Flag("os-username", "Username").PlaceHolder("OS_USERNAME").String()
+	osPassword          = app.Flag("os-password", "User's Password").PlaceHolder("OS_PASSWORD").String()
+	osUserDomainID      = app.Flag("os-user-domain-name", "User's domain ID.").PlaceHolder("OS_USER_DOMAIN_ID").String()
+	osUserDomainName    = app.Flag("os-user-domain-name", "User's domain name.").PlaceHolder("OS_USER_DOMAIN_NAME").String()
+	osProjectID         = app.Flag("os-project-id", "Project ID to scope to.").PlaceHolder("OS_PROJECT_ID").String()
+	osProjectName       = app.Flag("os-project-name", "Project name to scope to.").PlaceHolder("OS_PROJECT_NAME").String()
+	osProjectDomainID   = app.Flag("os-project-domain-ID", "Domain ID containing project to scope to.").PlaceHolder("OS_PROJECT_DOMAIN_ID").String()
+	osProjectDomainName = app.Flag("os-project-domain-name", "Domain name containing project to scope to.").PlaceHolder("OS_PROJECT_DOMAIN_NAME").String()
 
 	area              = app.Flag("area", "Resource area.").String()
 	service           = app.Flag("service", "Service type.").String()
@@ -90,30 +100,50 @@ func main() {
 	app.VersionFlag.Short('v')
 	app.HelpFlag.Short('h')
 
-	switch kingpin.MustParse(app.Parse(os.Args[1:])) {
+	// parse all command-line args and flags
+	cmdString := kingpin.MustParse(app.Parse(os.Args[1:]))
+
+	// overwrite OpenStack variables
+	setEnvUnlessEmpty("OS_AUTH_URL", *osAuthURL)
+	setEnvUnlessEmpty("OS_USERNAME", *osUsername)
+	setEnvUnlessEmpty("OS_PASSWORD", *osPassword)
+	setEnvUnlessEmpty("OS_USER_DOMAIN_ID", *osUserDomainID)
+	setEnvUnlessEmpty("OS_USER_DOMAIN_NAME", *osUserDomainName)
+	setEnvUnlessEmpty("OS_PROJECT_ID", *osProjectID)
+	setEnvUnlessEmpty("OS_PROJECT_NAME", *osProjectName)
+	setEnvUnlessEmpty("OS_PROJECT_DOMAIN_ID", *osProjectDomainID)
+	setEnvUnlessEmpty("OS_PROJECT_DOMAIN_NAME", *osProjectDomainName)
+
+	// output and filter are initialized in advance with values that were provided
+	// at the command-line. Later, we pass only the specific information that
+	// is required by the operation
+	filter := cli.Filter{
+		Area:     *area,
+		Service:  *service,
+		Resource: *resource,
+	}
+	output := cli.Output{
+		Names:         *namesOutput,
+		Long:          *longOutput,
+		HumanReadable: *humanReadableVals,
+	}
+
+	switch cmdString {
 	case clusterListCmd.FullCommand():
 		c := &cli.Cluster{
-			Opts: cli.Options{
-				Long:          *longOutput,
-				HumanReadable: *humanReadableVals,
-				Area:          *area,
-				Service:       *service,
-				Resource:      *resource,
-			},
+			Filter: filter,
+			Output: output,
 		}
 		cli.RunListTask(c, *outputFmt)
+
 	case clusterShowCmd.FullCommand():
 		c := &cli.Cluster{
-			ID: *clusterShowID,
-			Opts: cli.Options{
-				Long:          *longOutput,
-				HumanReadable: *humanReadableVals,
-				Area:          *area,
-				Service:       *service,
-				Resource:      *resource,
-			},
+			ID:     *clusterShowID,
+			Filter: filter,
+			Output: output,
 		}
 		cli.RunGetTask(c, *outputFmt)
+
 	case clusterSetCmd.FullCommand():
 		// this manual check is required due to the order of the Args.
 		// If the ID is not provided then the capacities get interpreted
@@ -121,98 +151,128 @@ func main() {
 		if strings.Contains(*clusterSetID, "=") {
 			kingpin.Fatalf("required argument 'cluster-id' not provided, try --help")
 		}
-		c := &cli.Cluster{
-			ID: *clusterSetID,
-		}
+		c := &cli.Cluster{ID: *clusterSetID}
 		cli.RunSetTask(c, clusterSetCaps)
+
 	case domainListCmd.FullCommand():
 		d := &cli.Domain{
-			Opts: cli.Options{
-				Names:         *namesOutput,
-				Long:          *longOutput,
-				HumanReadable: *humanReadableVals,
-				Cluster:       *domainCluster,
-				Area:          *area,
-				Service:       *service,
-				Resource:      *resource,
-			},
+			Filter: filter,
+			Output: output,
 		}
+		d.Filter.Cluster = *domainCluster
 		cli.RunListTask(d, *outputFmt)
+
 	case domainShowCmd.FullCommand():
-		d, err := cli.FindDomain(*domainShowID)
-		if err != nil {
-			kingpin.Fatalf(err.Error())
+		// since gophercloud does not allow domain listing across
+		// different clusters therefore we skip FindDomain(), if a cluster
+		// was provided at the command-line
+		var d *cli.Domain
+		if *domainCluster == "" {
+			var err error
+			d, err = cli.FindDomain(*domainShowID)
+			fatalIfErr(err)
+		} else {
+			d = &cli.Domain{ID: *domainShowID}
 		}
-		d.Opts = cli.Options{
-			Names:         *namesOutput,
-			Long:          *longOutput,
-			HumanReadable: *humanReadableVals,
-			Cluster:       *domainCluster,
-			Area:          *area,
-			Service:       *service,
-			Resource:      *resource,
-		}
+
+		d.Filter = filter
+		d.Filter.Cluster = *domainCluster
+		d.Output = output
 		cli.RunGetTask(d, *outputFmt)
+
 	case domainSetCmd.FullCommand():
 		if strings.Contains(*domainSetID, "=") {
 			kingpin.Fatalf("required argument 'domain-id' not provided, try --help")
 		}
-		d, err := cli.FindDomain(*domainSetID)
-		if err != nil {
-			kingpin.Fatalf(err.Error())
+		var d *cli.Domain
+		if *domainCluster == "" {
+			var err error
+			d, err = cli.FindDomain(*domainSetID)
+			fatalIfErr(err)
+		} else {
+			d = &cli.Domain{ID: *domainSetID}
 		}
-		d.Opts.Cluster = *domainCluster
+
+		d.Filter.Cluster = *domainCluster
 		cli.RunSetTask(d, domainSetQuotas)
+
 	case projectListCmd.FullCommand():
-		d, err := cli.FindDomain(*projectListDomain)
-		if err != nil {
-			kingpin.Fatalf(err.Error())
+		var d *cli.Domain
+		var err error
+		if *projectCluster == "" {
+			d, err = cli.FindDomain(*projectListDomain)
+		} else {
+			d, err = cli.FindDomainInCluster(*projectListDomain, *projectCluster)
 		}
+		fatalIfErr(err)
+
 		p := &cli.Project{
 			DomainID:   d.ID,
 			DomainName: d.Name,
-			Opts: cli.Options{
-				Names:         *namesOutput,
-				Long:          *longOutput,
-				HumanReadable: *humanReadableVals,
-				Cluster:       *projectCluster,
-				Area:          *area,
-				Service:       *service,
-				Resource:      *resource,
-			},
+			Filter:     filter,
+			Output:     output,
 		}
+		p.Filter.Cluster = *projectCluster
 		cli.RunListTask(p, *outputFmt)
+
 	case projectShowCmd.FullCommand():
-		p, err := cli.FindProject(*projectShowID, *projectShowDomain)
-		if err != nil {
-			kingpin.Fatalf(err.Error())
+		var p *cli.Project
+		var err error
+		if *projectCluster == "" {
+			p, err = cli.FindProject(*projectShowID, *projectShowDomain)
+		} else {
+			p, err = cli.FindProjectInCluster(*projectShowID, *projectShowDomain, *projectCluster)
 		}
-		p.Opts = cli.Options{
-			Names:         *namesOutput,
-			Long:          *longOutput,
-			HumanReadable: *humanReadableVals,
-			Cluster:       *projectCluster,
-			Area:          *area,
-			Service:       *service,
-			Resource:      *resource,
-		}
+		fatalIfErr(err)
+
+		p.Filter = filter
+		p.Filter.Cluster = *projectCluster
+		p.Output = output
 		cli.RunGetTask(p, *outputFmt)
+
 	case projectSetCmd.FullCommand():
 		if strings.Contains(*projectSetID, "=") {
 			kingpin.Fatalf("required argument 'project-id' not provided, try --help")
 		}
-		p, err := cli.FindProject(*projectSetID, *projectSetDomain)
-		if err != nil {
-			kingpin.Fatalf(err.Error())
+		var p *cli.Project
+		var err error
+		if *projectCluster == "" {
+			p, err = cli.FindProject(*projectSetID, *projectSetDomain)
+		} else {
+			p, err = cli.FindProjectInCluster(*projectSetID, *projectSetDomain, *projectCluster)
 		}
-		p.Opts.Cluster = *projectCluster
+		fatalIfErr(err)
+
+		p.Filter.Cluster = *projectCluster
 		cli.RunSetTask(p, projectSetQuotas)
+
 	case projectSyncCmd.FullCommand():
-		p, err := cli.FindProject(*projectSyncID, *projectSyncDomain)
-		if err != nil {
-			kingpin.Fatalf(err.Error())
+		var p *cli.Project
+		var err error
+		if *projectCluster == "" {
+			p, err = cli.FindProject(*projectSyncID, *projectSyncDomain)
+		} else {
+			p, err = cli.FindProjectInCluster(*projectSyncID, *projectSyncDomain, *projectCluster)
 		}
-		p.Opts.Cluster = *projectCluster
+		fatalIfErr(err)
+
+		p.Filter.Cluster = *projectCluster
 		cli.RunSyncTask(p)
 	}
+}
+
+func setEnvUnlessEmpty(env, val string) {
+	if val == "" {
+		return
+	}
+
+	os.Setenv(env, val)
+}
+
+func fatalIfErr(err error) {
+	if err == nil {
+		return
+	}
+
+	kingpin.Fatalf(err.Error())
 }
