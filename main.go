@@ -44,7 +44,7 @@ var (
 	osAuthURL           = app.Flag("os-auth-url", "Authentication URL.").PlaceHolder("OS_AUTH_URL").String()
 	osUsername          = app.Flag("os-username", "Username").PlaceHolder("OS_USERNAME").String()
 	osPassword          = app.Flag("os-password", "User's Password").PlaceHolder("OS_PASSWORD").String()
-	osUserDomainID      = app.Flag("os-user-domain-name", "User's domain ID.").PlaceHolder("OS_USER_DOMAIN_ID").String()
+	osUserDomainID      = app.Flag("os-user-domain-id", "User's domain ID.").PlaceHolder("OS_USER_DOMAIN_ID").String()
 	osUserDomainName    = app.Flag("os-user-domain-name", "User's domain name.").PlaceHolder("OS_USER_DOMAIN_NAME").String()
 	osProjectID         = app.Flag("os-project-id", "Project ID to scope to.").PlaceHolder("OS_PROJECT_ID").String()
 	osProjectName       = app.Flag("os-project-name", "Project name to scope to.").PlaceHolder("OS_PROJECT_NAME").String()
