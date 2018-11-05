@@ -1,3 +1,15 @@
+# v1.2.0 (2018-11-05)
+
+New features:
+- Users can manually overwrite the OpenStack environment variables by providing them as command-line flags.
+
+Changes:
+- For the `--cluster` flag, the domain/project must be identified by ID. Specifiying a domain/project name will not work.
+
+Bugfixes:
+- `--cluster` flag now works as expected.
+
+
 # v1.1.0 (2018-10-29)
 
 New features:

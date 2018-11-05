@@ -5,7 +5,7 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/sapcc/limesctl)](https://goreportcard.com/report/github.com/sapcc/limesctl)
 [![GoDoc](https://godoc.org/github.com/sapcc/limesctl?status.svg)](https://godoc.org/github.com/sapcc/limesctl)
 
-limesctl is the CLI client for [Limes](limes).
+limesctl is the CLI client for [Limes][limes].
 
 ## Installation
 

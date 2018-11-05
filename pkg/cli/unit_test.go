@@ -119,16 +119,14 @@ func TestRenderClusterCSV(t *testing.T) {
 	// filtered get
 	c, err = makeMockCluster("./fixtures/cluster-get-filtered.json")
 	th.AssertNoErr(t, err)
-	c.Opts = Options{
-		Output: Output{
-			HumanReadable: true,
-			Long:          true,
-		},
-		Filter: Filter{
-			Area:     "shared",
-			Service:  "shared",
-			Resource: "capacity",
-		},
+	c.Output = Output{
+		HumanReadable: true,
+		Long:          true,
+	}
+	c.Filter = Filter{
+		Area:     "shared",
+		Service:  "shared",
+		Resource: "capacity",
 	}
 
 	actual, err = captureOutput(func() { c.renderCSV().writeCSV() })
@@ -154,15 +152,13 @@ func TestRenderClusterCSV(t *testing.T) {
 	c, err = makeMockCluster("./fixtures/cluster-list-filtered.json")
 	th.AssertNoErr(t, err)
 	c.IsList = true
-	c.Opts = Options{
-		Output: Output{
-			Long: true,
-		},
-		Filter: Filter{
-			Area:     "shared",
-			Service:  "shared",
-			Resource: "capacity",
-		},
+	c.Output = Output{
+		Long: true,
+	}
+	c.Filter = Filter{
+		Area:     "shared",
+		Service:  "shared",
+		Resource: "capacity",
 	}
 
 	actual, err = captureOutput(func() { c.renderCSV().writeCSV() })
@@ -188,16 +184,14 @@ func TestRenderDomainCSV(t *testing.T) {
 	// filtered get
 	d, err = makeMockDomain("./fixtures/domain-get-filtered.json")
 	th.AssertNoErr(t, err)
-	d.Opts = Options{
-		Output: Output{
-			HumanReadable: true,
-			Names:         true,
-		},
-		Filter: Filter{
-			Area:     "shared",
-			Service:  "shared",
-			Resource: "capacity",
-		},
+	d.Output = Output{
+		HumanReadable: true,
+		Names:         true,
+	}
+	d.Filter = Filter{
+		Area:     "shared",
+		Service:  "shared",
+		Resource: "capacity",
 	}
 
 	actual, err = captureOutput(func() { d.renderCSV().writeCSV() })
@@ -223,15 +217,13 @@ func TestRenderDomainCSV(t *testing.T) {
 	d, err = makeMockDomain("./fixtures/domain-list-filtered.json")
 	th.AssertNoErr(t, err)
 	d.IsList = true
-	d.Opts = Options{
-		Output: Output{
-			Long: true,
-		},
-		Filter: Filter{
-			Area:     "shared",
-			Service:  "shared",
-			Resource: "things",
-		},
+	d.Output = Output{
+		Long: true,
+	}
+	d.Filter = Filter{
+		Area:     "shared",
+		Service:  "shared",
+		Resource: "things",
 	}
 
 	actual, err = captureOutput(func() { d.renderCSV().writeCSV() })
@@ -257,16 +249,14 @@ func TestRenderProjectCSV(t *testing.T) {
 	// filtered get
 	p, err = makeMockProject("./fixtures/project-get-filtered.json")
 	th.AssertNoErr(t, err)
-	p.Opts = Options{
-		Output: Output{
-			HumanReadable: true,
-			Names:         true,
-		},
-		Filter: Filter{
-			Area:     "shared",
-			Service:  "shared",
-			Resource: "capacity",
-		},
+	p.Output = Output{
+		HumanReadable: true,
+		Names:         true,
+	}
+	p.Filter = Filter{
+		Area:     "shared",
+		Service:  "shared",
+		Resource: "capacity",
 	}
 
 	actual, err = captureOutput(func() { p.renderCSV().writeCSV() })
@@ -292,15 +282,13 @@ func TestRenderProjectCSV(t *testing.T) {
 	p, err = makeMockProject("./fixtures/project-list-filtered.json")
 	th.AssertNoErr(t, err)
 	p.IsList = true
-	p.Opts = Options{
-		Output: Output{
-			Long: true,
-		},
-		Filter: Filter{
-			Area:     "shared",
-			Service:  "shared",
-			Resource: "things",
-		},
+	p.Output = Output{
+		Long: true,
+	}
+	p.Filter = Filter{
+		Area:     "shared",
+		Service:  "shared",
+		Resource: "things",
 	}
 
 	actual, err = captureOutput(func() { p.renderCSV().writeCSV() })
