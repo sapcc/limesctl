@@ -27,8 +27,7 @@ import (
 	"strings"
 
 	"github.com/alecthomas/kingpin"
-	"github.com/sapcc/limes/pkg/api"
-	"github.com/sapcc/limes/pkg/limes"
+	"github.com/sapcc/limes"
 )
 
 // Set implements the kingpin.Value interface.
@@ -121,8 +120,8 @@ func ParseQuotas(s kingpin.Settings) (target *Quotas) {
 }
 
 // makeServiceCapacities is a helper function that converts a Quotas type to
-// a slice of api.ServiceCapacities for use with cluster set operations.
-func makeServiceCapacities(q *Quotas) []api.ServiceCapacities {
+// a slice of limes.ServiceCapacityRequest for use with cluster set operations.
+func makeServiceCapacities(q *Quotas) []limes.ServiceCapacityRequest {
 	//serialize service types with ordered keys for consistent test results
 	types := make([]string, 0, len(*q))
 	for typeStr := range *q {
@@ -130,16 +129,16 @@ func makeServiceCapacities(q *Quotas) []api.ServiceCapacities {
 	}
 	sort.Strings(types)
 
-	sc := make([]api.ServiceCapacities, 0, len(types))
+	sc := make([]limes.ServiceCapacityRequest, 0, len(types))
 	for _, srv := range types {
 		resList := (*q)[srv]
-		rc := make([]api.ResourceCapacity, 0, len(resList))
+		rc := make([]limes.ResourceCapacityRequest, 0, len(resList))
 		for _, r := range resList {
 			// take a copy of the loop variable (it will be updated by the loop, so if
 			// we didn't take a copy manually, the 'r' inside the list would
 			// contain only identical pointers)
 			r := r
-			rc = append(rc, api.ResourceCapacity{
+			rc = append(rc, limes.ResourceCapacityRequest{
 				Name:     r.Name,
 				Capacity: r.Value,
 				Unit:     &r.Unit,
@@ -147,7 +146,7 @@ func makeServiceCapacities(q *Quotas) []api.ServiceCapacities {
 			})
 		}
 
-		sc = append(sc, api.ServiceCapacities{
+		sc = append(sc, limes.ServiceCapacityRequest{
 			Type:      srv,
 			Resources: rc,
 		})
@@ -157,12 +156,12 @@ func makeServiceCapacities(q *Quotas) []api.ServiceCapacities {
 }
 
 // makeServiceQuotas is a helper function that converts a Quotas type to
-// api.ServiceQuotas for use with domain/project set operations.
-func makeServiceQuotas(q *Quotas) api.ServiceQuotas {
-	sq := make(api.ServiceQuotas)
+// limes.QuotaRequest for use with domain/project set operations.
+func makeServiceQuotas(q *Quotas) limes.QuotaRequest {
+	sq := make(limes.QuotaRequest)
 
 	for srv, resList := range *q {
-		sq[srv] = make(api.ResourceQuotas)
+		sq[srv] = make(limes.ServiceQuotaRequest)
 
 		for _, r := range resList {
 			sq[srv][r.Name] = limes.ValueWithUnit{

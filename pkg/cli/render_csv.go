@@ -26,8 +26,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/sapcc/limes/pkg/limes"
-	"github.com/sapcc/limes/pkg/reports"
+	"github.com/sapcc/limes"
 )
 
 type csvData [][]string
@@ -140,9 +139,9 @@ func (p *Project) renderCSV() *csvData {
 	return &data
 }
 
-// parseToCSV parses a reports.Cluster to CSV depending on the output format and assigns it
+// parseToCSV parses a limes.ClusterReport to CSV depending on the output format and assigns it
 // to the aggregate csvData.
-func (c *Cluster) parseToCSV(cluster *reports.Cluster, data *csvData) {
+func (c *Cluster) parseToCSV(cluster *limes.ClusterReport, data *csvData) {
 	//serialize service types with ordered keys
 	types := make([]string, 0, len(cluster.Services))
 	for typeStr := range cluster.Services {
@@ -180,7 +179,7 @@ func (c *Cluster) parseToCSV(cluster *reports.Cluster, data *csvData) {
 			case c.Output.Long:
 				csvRecord = append(csvRecord, cluster.ID, cSrv.ServiceInfo.Area, cSrv.ServiceInfo.Type,
 					cSrvRes.ResourceInfo.Category, cSrvRes.ResourceInfo.Name, val["capacity"], val["domainsQuota"],
-					val["usage"], unit, cSrvRes.Comment, time.Unix(cSrv.MinScrapedAt, 0).UTC().Format(time.RFC3339),
+					val["usage"], unit, cSrvRes.Comment, timestampToString(cSrv.MinScrapedAt),
 				)
 			default:
 				csvRecord = append(csvRecord, cluster.ID, cSrv.ServiceInfo.Type, cSrvRes.ResourceInfo.Name,
@@ -193,9 +192,9 @@ func (c *Cluster) parseToCSV(cluster *reports.Cluster, data *csvData) {
 	}
 }
 
-// parseToCSV parses a reports.Domain to CSV depending on the output format and assigns it
+// parseToCSV parses a limes.DomainReport to CSV depending on the output format and assigns it
 // to the aggregate csvData.
-func (d *Domain) parseToCSV(domain *reports.Domain, data *csvData) {
+func (d *Domain) parseToCSV(domain *limes.DomainReport, data *csvData) {
 	//serialize service types with ordered keys
 	types := make([]string, 0, len(domain.Services))
 	for typeStr := range domain.Services {
@@ -231,7 +230,7 @@ func (d *Domain) parseToCSV(domain *reports.Domain, data *csvData) {
 			case d.Output.Long:
 				csvRecord = append(csvRecord, domain.UUID, domain.Name, dSrv.ServiceInfo.Area, dSrv.ServiceInfo.Type,
 					dSrvRes.ResourceInfo.Category, dSrvRes.ResourceInfo.Name, val["domainQuota"], val["projectsQuota"],
-					val["usage"], unit, time.Unix(dSrv.MinScrapedAt, 0).UTC().Format(time.RFC3339),
+					val["usage"], unit, timestampToString(dSrv.MinScrapedAt),
 				)
 			default:
 				csvRecord = append(csvRecord, domain.UUID, dSrv.ServiceInfo.Type, dSrvRes.ResourceInfo.Name,
@@ -244,9 +243,9 @@ func (d *Domain) parseToCSV(domain *reports.Domain, data *csvData) {
 	}
 }
 
-// parseToCSV parses a reports.Project to CSV depending on the output format and assigns it
+// parseToCSV parses a limes.ProjectReport to CSV depending on the output format and assigns it
 // to the aggregate csvData.
-func (p *Project) parseToCSV(project *reports.Project, data *csvData) {
+func (p *Project) parseToCSV(project *limes.ProjectReport, data *csvData) {
 	//serialize service types with ordered keys
 	types := make([]string, 0, len(project.Services))
 	for typeStr := range project.Services {
@@ -281,7 +280,7 @@ func (p *Project) parseToCSV(project *reports.Project, data *csvData) {
 			case p.Output.Long:
 				csvRecord = append(csvRecord, p.DomainID, p.DomainName, project.UUID, project.Name, pSrv.ServiceInfo.Area,
 					pSrv.ServiceInfo.Type, pSrvRes.ResourceInfo.Category, pSrvRes.ResourceInfo.Name,
-					val["quota"], val["usage"], unit, time.Unix(pSrv.ScrapedAt, 0).UTC().Format(time.RFC3339),
+					val["quota"], val["usage"], unit, timestampToString(pSrv.ScrapedAt),
 				)
 			default:
 				csvRecord = append(csvRecord, p.DomainID, project.UUID, pSrv.ServiceInfo.Type,
@@ -292,6 +291,13 @@ func (p *Project) parseToCSV(project *reports.Project, data *csvData) {
 			*data = append(*data, csvRecord)
 		}
 	}
+}
+
+func timestampToString(timestamp *int64) string {
+	if timestamp == nil {
+		return ""
+	}
+	return time.Unix(*timestamp, 0).UTC().Format(time.RFC3339)
 }
 
 type rawValues map[string]uint64

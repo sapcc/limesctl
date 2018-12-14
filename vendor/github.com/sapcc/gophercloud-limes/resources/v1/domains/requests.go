@@ -3,7 +3,7 @@ package domains
 
 import (
 	"github.com/gophercloud/gophercloud"
-	"github.com/sapcc/limes/pkg/api"
+	"github.com/sapcc/limes"
 )
 
 // ListOptsBuilder allows extensions to add additional parameters to the List request.
@@ -109,8 +109,8 @@ type UpdateOptsBuilder interface {
 
 // UpdateOpts contains parameters to update a domain.
 type UpdateOpts struct {
-	Cluster  string            `h:"X-Limes-Cluster-Id"`
-	Services api.ServiceQuotas `json:"services"`
+	Cluster  string             `h:"X-Limes-Cluster-Id"`
+	Services limes.QuotaRequest `json:"services"`
 }
 
 // ToDomainUpdateMap formats a UpdateOpts into a map of headers and a request body.
