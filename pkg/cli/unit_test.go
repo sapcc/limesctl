@@ -28,8 +28,7 @@ import (
 	"testing"
 
 	th "github.com/gophercloud/gophercloud/testhelper"
-	"github.com/sapcc/limes/pkg/api"
-	"github.com/sapcc/limes/pkg/limes"
+	"github.com/sapcc/limes"
 )
 
 var mockRawCapacities = []string{
@@ -57,8 +56,8 @@ func TestParseCapacities(t *testing.T) {
 	unitB := limes.UnitBytes
 	unitMiB := limes.UnitMebibytes
 	unitNone := limes.UnitNone
-	expected := []api.ServiceCapacities{
-		{Type: "compute", Resources: []api.ResourceCapacity{
+	expected := []limes.ServiceCapacityRequest{
+		{Type: "compute", Resources: []limes.ResourceCapacityRequest{
 			{
 				Name:     "cores",
 				Capacity: 10,
@@ -70,7 +69,7 @@ func TestParseCapacities(t *testing.T) {
 				Unit:     &unitMiB,
 			},
 		}},
-		{Type: "object-store", Resources: []api.ResourceCapacity{
+		{Type: "object-store", Resources: []limes.ResourceCapacityRequest{
 			{
 				Name:     "capacity",
 				Capacity: 30,
@@ -92,12 +91,12 @@ func TestParseQuotas(t *testing.T) {
 	}
 	actual := makeServiceQuotas(q)
 
-	expected := api.ServiceQuotas{
-		"compute": api.ResourceQuotas{
+	expected := limes.QuotaRequest{
+		"compute": limes.ServiceQuotaRequest{
 			"cores": limes.ValueWithUnit{10, limes.UnitNone},
 			"ram":   limes.ValueWithUnit{20, limes.UnitMebibytes},
 		},
-		"object-store": api.ResourceQuotas{
+		"object-store": limes.ServiceQuotaRequest{
 			"capacity": limes.ValueWithUnit{30, limes.UnitBytes},
 		},
 	}

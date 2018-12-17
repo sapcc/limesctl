@@ -2,7 +2,7 @@ package clusters
 
 import (
 	"github.com/gophercloud/gophercloud"
-	"github.com/sapcc/limes/pkg/reports"
+	"github.com/sapcc/limes"
 )
 
 // CommonResult is the result of a Get/List operation. Call its appropriate
@@ -12,9 +12,9 @@ type CommonResult struct {
 }
 
 // ExtractClusters interprets a CommonResult as a slice of Clusters.
-func (r CommonResult) ExtractClusters() ([]reports.Cluster, error) {
+func (r CommonResult) ExtractClusters() ([]limes.ClusterReport, error) {
 	var s struct {
-		Clusters []reports.Cluster `json:"clusters"`
+		Clusters []limes.ClusterReport `json:"clusters"`
 	}
 
 	err := r.ExtractInto(&s)
@@ -22,9 +22,9 @@ func (r CommonResult) ExtractClusters() ([]reports.Cluster, error) {
 }
 
 // Extract interprets a CommonResult as a Cluster.
-func (r CommonResult) Extract() (*reports.Cluster, error) {
+func (r CommonResult) Extract() (*limes.ClusterReport, error) {
 	var s struct {
-		Cluster *reports.Cluster `json:"cluster"`
+		Cluster *limes.ClusterReport `json:"cluster"`
 	}
 	err := r.ExtractInto(&s)
 	return s.Cluster, err

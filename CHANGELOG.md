@@ -1,3 +1,8 @@
+# v1.2.1 (TBD)
+
+Changes:
+- Optimize library dependencies. Binary size has been reduced by over 20%.
+
 # v1.2.0 (2018-11-05)
 
 New features:

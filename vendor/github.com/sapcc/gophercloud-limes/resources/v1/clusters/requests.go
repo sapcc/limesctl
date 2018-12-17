@@ -3,7 +3,7 @@ package clusters
 
 import (
 	"github.com/gophercloud/gophercloud"
-	"github.com/sapcc/limes/pkg/api"
+	"github.com/sapcc/limes"
 )
 
 // ListOptsBuilder allows extensions to add additional parameters to the List request.
@@ -83,7 +83,7 @@ type UpdateOptsBuilder interface {
 
 // UpdateOpts contains parameters to update a cluster.
 type UpdateOpts struct {
-	Services []api.ServiceCapacities `json:"services"`
+	Services []limes.ServiceCapacityRequest `json:"services"`
 }
 
 // ToClusterUpdateMap formats a UpdateOpts into a request body.
