@@ -30,16 +30,16 @@ install: FORCE all
 	install -m 0755 build/limesctl "$(DESTDIR)$(PREFIX)/bin/limesctl"
 
 ifeq ($(GOOS),windows)
-release: release/$(BINARY64)
+release: FORCE release/$(BINARY64)
 	cd release && cp -f $(BINARY64) limesctl.exe && zip $(RELEASE64).zip limesctl.exe
 	cd release && rm -f limesctl.exe
-else 
-release: release/$(BINARY64)
+else
+release: FORCE release/$(BINARY64)
 	cd release && cp -f $(BINARY64) limesctl && tar -czf $(RELEASE64).tgz limesctl
 	cd release && rm -f limesctl
 endif
 
-release-all: FORCE clean 
+release-all: FORCE clean
 	GOOS=darwin make release
 	GOOS=linux  make release
 
