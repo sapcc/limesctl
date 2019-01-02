@@ -20,13 +20,8 @@
 package cli
 
 import (
-	"encoding/json"
-	"fmt"
 	"os"
-	"regexp"
-	"strings"
 
-	"github.com/olekukonko/tablewriter"
 	"github.com/sapcc/gophercloud-limes/resources/v1/clusters"
 	"github.com/sapcc/gophercloud-limes/resources/v1/domains"
 	"github.com/sapcc/gophercloud-limes/resources/v1/projects"
@@ -86,11 +81,17 @@ type Output struct {
 	HumanReadable bool
 }
 
+// Renderer interface type contains different methods for rendering data in
+// different formats.
+type Renderer interface {
+	renderJSON() *jsonData
+	renderCSV() *csvData
+}
+
 // GetTask is the interface type that abstracts a get operation.
 type GetTask interface {
 	get()
-	getJSON() interface{}
-	renderCSV() *csvData
+	Renderer
 }
 
 // RunGetTask is the function that operates on a GetTask and shows the output in the respective
@@ -99,19 +100,18 @@ func RunGetTask(t GetTask, outputFmt string) {
 	t.get()
 	switch outputFmt {
 	case "json":
-		writeJSON(t.getJSON())
+		t.renderJSON().write(os.Stdout)
 	case "csv":
-		t.renderCSV().writeCSV()
+		t.renderCSV().write(os.Stdout)
 	default:
-		t.renderCSV().writeTable()
+		t.renderCSV().writeTable(os.Stdout)
 	}
 }
 
 // ListTask is the interface type that abstracts a list operation.
 type ListTask interface {
 	list()
-	getJSON() interface{}
-	renderCSV() *csvData
+	Renderer
 }
 
 // RunListTask is the function that operates on a ListTask and shows the output in the respective
@@ -120,11 +120,11 @@ func RunListTask(t ListTask, outputFmt string) {
 	t.list()
 	switch outputFmt {
 	case "json":
-		writeJSON(t.getJSON())
+		t.renderJSON().write(os.Stdout)
 	case "csv":
-		t.renderCSV().writeCSV()
+		t.renderCSV().write(os.Stdout)
 	default:
-		t.renderCSV().writeTable()
+		t.renderCSV().writeTable(os.Stdout)
 	}
 }
 
@@ -160,47 +160,4 @@ func RunSyncTask(p *Project) {
 		Cluster: p.Filter.Cluster,
 	})
 	errors.Handle(err, "could not sync project")
-}
-
-// writeJSON is a helper function that writes the JSON data to os.Stdout.
-func writeJSON(data interface{}) {
-	b, err := json.Marshal(data)
-	errors.Handle(err, "could not marshal JSON")
-	fmt.Println(string(b))
-}
-
-// writeCSV is a helper function that writes the CSV data to os.Stdout.
-func (data *csvData) writeCSV() {
-	for _, record := range *data {
-		var str string
-		for i, v := range record {
-			// precede double-quotes with a double-quote
-			v = strings.Replace(v, "\"", "\"\"", -1)
-
-			// double-quote non-number values
-			rx := regexp.MustCompile(`^([0-9]+)$`)
-			match := rx.MatchString(v)
-			if !match {
-				v = fmt.Sprintf("\"%v\"", v)
-			}
-
-			// delimit values
-			if i != (len(record) - 1) {
-				v = fmt.Sprintf("%v;", v)
-			}
-			str += v
-		}
-		fmt.Println(str)
-	}
-}
-
-// writeTable is a helper function that writes the CSV data to os.Stdout in an ASCII table format.
-func (data *csvData) writeTable() {
-	table := tablewriter.NewWriter(os.Stdout)
-	table.SetHeader((*data)[0])
-
-	for _, v := range (*data)[1:] {
-		table.Append(v)
-	}
-	table.Render()
 }

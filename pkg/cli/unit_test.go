@@ -22,9 +22,7 @@ package cli
 import (
 	"bytes"
 	"encoding/json"
-	"io"
 	"io/ioutil"
-	"os"
 	"testing"
 
 	th "github.com/gophercloud/gophercloud/testhelper"
@@ -104,16 +102,17 @@ func TestParseQuotas(t *testing.T) {
 }
 
 func TestRenderClusterCSV(t *testing.T) {
+	var actual bytes.Buffer
+
 	// get
 	c, err := makeMockCluster("./fixtures/cluster-get.json")
 	th.AssertNoErr(t, err)
 
-	actual, err := captureOutput(func() { c.renderCSV().writeCSV() })
-	th.AssertNoErr(t, err)
-
 	expected, err := ioutil.ReadFile("./fixtures/cluster-get.csv")
 	th.AssertNoErr(t, err)
-	th.AssertEquals(t, string(expected), actual)
+
+	c.renderCSV().write(&actual)
+	th.AssertEquals(t, string(expected), actual.String())
 
 	// filtered get
 	c, err = makeMockCluster("./fixtures/cluster-get-filtered.json")
@@ -128,24 +127,24 @@ func TestRenderClusterCSV(t *testing.T) {
 		Resource: "capacity",
 	}
 
-	actual, err = captureOutput(func() { c.renderCSV().writeCSV() })
-	th.AssertNoErr(t, err)
-
 	expected, err = ioutil.ReadFile("./fixtures/cluster-get-filtered.csv")
 	th.AssertNoErr(t, err)
-	th.AssertEquals(t, string(expected), actual)
+
+	actual.Reset()
+	c.renderCSV().write(&actual)
+	th.AssertEquals(t, string(expected), actual.String())
 
 	// list
 	c, err = makeMockCluster("./fixtures/cluster-list.json")
 	th.AssertNoErr(t, err)
 	c.IsList = true
 
-	actual, err = captureOutput(func() { c.renderCSV().writeCSV() })
-	th.AssertNoErr(t, err)
-
 	expected, err = ioutil.ReadFile("./fixtures/cluster-list.csv")
 	th.AssertNoErr(t, err)
-	th.AssertEquals(t, string(expected), actual)
+
+	actual.Reset()
+	c.renderCSV().write(&actual)
+	th.AssertEquals(t, string(expected), actual.String())
 
 	// filtered list
 	c, err = makeMockCluster("./fixtures/cluster-list-filtered.json")
@@ -160,25 +159,26 @@ func TestRenderClusterCSV(t *testing.T) {
 		Resource: "capacity",
 	}
 
-	actual, err = captureOutput(func() { c.renderCSV().writeCSV() })
-	th.AssertNoErr(t, err)
-
 	expected, err = ioutil.ReadFile("./fixtures/cluster-list-filtered.csv")
 	th.AssertNoErr(t, err)
-	th.AssertEquals(t, string(expected), actual)
+
+	actual.Reset()
+	c.renderCSV().write(&actual)
+	th.AssertEquals(t, string(expected), actual.String())
 }
 
 func TestRenderDomainCSV(t *testing.T) {
+	var actual bytes.Buffer
+
 	// get
 	d, err := makeMockDomain("./fixtures/domain-get.json")
 	th.AssertNoErr(t, err)
 
-	actual, err := captureOutput(func() { d.renderCSV().writeCSV() })
-	th.AssertNoErr(t, err)
-
 	expected, err := ioutil.ReadFile("./fixtures/domain-get.csv")
 	th.AssertNoErr(t, err)
-	th.AssertEquals(t, string(expected), actual)
+
+	d.renderCSV().write(&actual)
+	th.AssertEquals(t, string(expected), actual.String())
 
 	// filtered get
 	d, err = makeMockDomain("./fixtures/domain-get-filtered.json")
@@ -193,24 +193,24 @@ func TestRenderDomainCSV(t *testing.T) {
 		Resource: "capacity",
 	}
 
-	actual, err = captureOutput(func() { d.renderCSV().writeCSV() })
-	th.AssertNoErr(t, err)
-
 	expected, err = ioutil.ReadFile("./fixtures/domain-get-filtered.csv")
 	th.AssertNoErr(t, err)
-	th.AssertEquals(t, string(expected), actual)
+
+	actual.Reset()
+	d.renderCSV().write(&actual)
+	th.AssertEquals(t, string(expected), actual.String())
 
 	// list
 	d, err = makeMockDomain("./fixtures/domain-list.json")
 	th.AssertNoErr(t, err)
 	d.IsList = true
 
-	actual, err = captureOutput(func() { d.renderCSV().writeCSV() })
-	th.AssertNoErr(t, err)
-
 	expected, err = ioutil.ReadFile("./fixtures/domain-list.csv")
 	th.AssertNoErr(t, err)
-	th.AssertEquals(t, string(expected), actual)
+
+	actual.Reset()
+	d.renderCSV().write(&actual)
+	th.AssertEquals(t, string(expected), actual.String())
 
 	// filtered list
 	d, err = makeMockDomain("./fixtures/domain-list-filtered.json")
@@ -225,25 +225,26 @@ func TestRenderDomainCSV(t *testing.T) {
 		Resource: "things",
 	}
 
-	actual, err = captureOutput(func() { d.renderCSV().writeCSV() })
-	th.AssertNoErr(t, err)
-
 	expected, err = ioutil.ReadFile("./fixtures/domain-list-filtered.csv")
 	th.AssertNoErr(t, err)
-	th.AssertEquals(t, string(expected), actual)
+
+	actual.Reset()
+	d.renderCSV().write(&actual)
+	th.AssertEquals(t, string(expected), actual.String())
 }
 
 func TestRenderProjectCSV(t *testing.T) {
+	var actual bytes.Buffer
+
 	// get
 	p, err := makeMockProject("./fixtures/project-get.json")
 	th.AssertNoErr(t, err)
 
-	actual, err := captureOutput(func() { p.renderCSV().writeCSV() })
-	th.AssertNoErr(t, err)
-
 	expected, err := ioutil.ReadFile("./fixtures/project-get.csv")
 	th.AssertNoErr(t, err)
-	th.AssertEquals(t, string(expected), actual)
+
+	p.renderCSV().write(&actual)
+	th.AssertEquals(t, string(expected), actual.String())
 
 	// filtered get
 	p, err = makeMockProject("./fixtures/project-get-filtered.json")
@@ -258,24 +259,24 @@ func TestRenderProjectCSV(t *testing.T) {
 		Resource: "capacity",
 	}
 
-	actual, err = captureOutput(func() { p.renderCSV().writeCSV() })
-	th.AssertNoErr(t, err)
-
 	expected, err = ioutil.ReadFile("./fixtures/project-get-filtered.csv")
 	th.AssertNoErr(t, err)
-	th.AssertEquals(t, string(expected), actual)
+
+	actual.Reset()
+	p.renderCSV().write(&actual)
+	th.AssertEquals(t, string(expected), actual.String())
 
 	// list
 	p, err = makeMockProject("./fixtures/project-list.json")
 	th.AssertNoErr(t, err)
 	p.IsList = true
 
-	actual, err = captureOutput(func() { p.renderCSV().writeCSV() })
-	th.AssertNoErr(t, err)
-
 	expected, err = ioutil.ReadFile("./fixtures/project-list.csv")
 	th.AssertNoErr(t, err)
-	th.AssertEquals(t, string(expected), actual)
+
+	actual.Reset()
+	p.renderCSV().write(&actual)
+	th.AssertEquals(t, string(expected), actual.String())
 
 	// filtered list
 	p, err = makeMockProject("./fixtures/project-list-filtered.json")
@@ -290,12 +291,12 @@ func TestRenderProjectCSV(t *testing.T) {
 		Resource: "things",
 	}
 
-	actual, err = captureOutput(func() { p.renderCSV().writeCSV() })
-	th.AssertNoErr(t, err)
-
 	expected, err = ioutil.ReadFile("./fixtures/project-list-filtered.csv")
 	th.AssertNoErr(t, err)
-	th.AssertEquals(t, string(expected), actual)
+
+	actual.Reset()
+	p.renderCSV().write(&actual)
+	th.AssertEquals(t, string(expected), actual.String())
 }
 
 // makeMockCluster is a helper function that uses a JSON file to create a mock
@@ -352,34 +353,4 @@ func makeMockProject(pathToJSON string) (*Project, error) {
 	}
 
 	return p, nil
-}
-
-// captureOutput is a helper function that returns the output
-// of os.Stdout as a string.
-func captureOutput(do func()) (string, error) {
-	// make a copy of Stdout
-	old := os.Stdout
-	// pipe Stdout...
-	r, w, err := os.Pipe()
-	if err != nil {
-		return "", err
-	}
-	os.Stdout = w
-
-	do()
-	outC := make(chan bytes.Buffer)
-	// make separate goroutine so that Copy
-	// doesn't block indefinitely
-	go func() {
-		var b bytes.Buffer
-		io.Copy(&b, r)
-		outC <- b
-	}()
-
-	// restore Stdout
-	w.Close()
-	os.Stdout = old
-	out := <-outC
-
-	return out.String(), nil
 }
