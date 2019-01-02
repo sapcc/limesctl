@@ -53,7 +53,7 @@ GO_ALLPKGS := $(PKG) $(shell go list $(PKG)/pkg/...)
 # which packages to test with `go test`?
 GO_TESTPKGS := $(shell go list -f '{{if .TestGoFiles}}{{.ImportPath}}{{end}}' $(PKG)/pkg/...)
 # which packages to measure coverage for?
-GO_COVERPKGS := $(shell go list $(PKG)/pkg/... | grep -v plugins)
+GO_COVERPKGS := $(shell go list $(PKG)/pkg/...)
 # output files from `go test`
 GO_COVERFILES := $(patsubst %,build/%.cover.out,$(subst /,_,$(GO_TESTPKGS)))
 
@@ -76,7 +76,7 @@ build/%.cover.out: FORCE
 	@echo '>> go test $*'
 	$(GO) test $(GO_BUILDFLAGS) -ldflags '$(GO_LDFLAGS)' -coverprofile=$@ -covermode=count -coverpkg=$(subst $(space),$(comma),$(GO_COVERPKGS)) $(subst _,/,$*)
 build/cover.out: $(GO_COVERFILES)
-	pkg/test/util/gocovcat.go $(GO_COVERFILES) > $@
+	util/gocovcat/main.go $(GO_COVERFILES) > $@
 build/cover.html: build/cover.out
 	$(GO) tool cover -html $< -o $@
 
