@@ -23,6 +23,7 @@ import (
 	"github.com/sapcc/gophercloud-limes/resources/v1/clusters"
 	"github.com/sapcc/gophercloud-limes/resources/v1/domains"
 	"github.com/sapcc/gophercloud-limes/resources/v1/projects"
+	"github.com/sapcc/limesctl/pkg/errors"
 )
 
 // get retrieves information about a single cluster.
@@ -34,7 +35,7 @@ func (c *Cluster) get() {
 		Service:  c.Filter.Service,
 		Resource: c.Filter.Resource,
 	})
-	handleError("could not get cluster", c.Result.Err)
+	errors.Handle(c.Result.Err, "could not get cluster")
 }
 
 // get retrieves information about a single domain.
@@ -47,7 +48,7 @@ func (d *Domain) get() {
 		Service:  d.Filter.Service,
 		Resource: d.Filter.Resource,
 	})
-	handleError("could not get domain", d.Result.Err)
+	errors.Handle(d.Result.Err, "could not get domain")
 }
 
 // get retrieves information about a single project within a specific domain.
@@ -60,5 +61,5 @@ func (p *Project) get() {
 		Service:  p.Filter.Service,
 		Resource: p.Filter.Resource,
 	})
-	handleError("could not get project", p.Result.Err)
+	errors.Handle(p.Result.Err, "could not get project")
 }

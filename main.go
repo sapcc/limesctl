@@ -25,6 +25,7 @@ import (
 
 	"github.com/alecthomas/kingpin"
 	"github.com/sapcc/limesctl/pkg/cli"
+	"github.com/sapcc/limesctl/pkg/errors"
 )
 
 var (
@@ -149,7 +150,7 @@ func main() {
 		// If the ID is not provided then the capacities get interpreted
 		// as the ID and the error shown is not relevant to the context
 		if strings.Contains(*clusterSetID, "=") {
-			kingpin.Fatalf("required argument 'cluster-id' not provided, try --help")
+			errors.Handle(errors.New("required argument 'cluster-id' not provided, try --help"))
 		}
 		c := &cli.Cluster{ID: *clusterSetID}
 		cli.RunSetTask(c, clusterSetCaps)
@@ -170,7 +171,7 @@ func main() {
 		if *domainCluster == "" {
 			var err error
 			d, err = cli.FindDomain(*domainShowID)
-			fatalIfErr(err)
+			errors.Handle(err)
 		} else {
 			d = &cli.Domain{ID: *domainShowID}
 		}
@@ -182,13 +183,13 @@ func main() {
 
 	case domainSetCmd.FullCommand():
 		if strings.Contains(*domainSetID, "=") {
-			kingpin.Fatalf("required argument 'domain-id' not provided, try --help")
+			errors.Handle(errors.New("required argument 'domain-id' not provided, try --help"))
 		}
 		var d *cli.Domain
 		if *domainCluster == "" {
 			var err error
 			d, err = cli.FindDomain(*domainSetID)
-			fatalIfErr(err)
+			errors.Handle(err)
 		} else {
 			d = &cli.Domain{ID: *domainSetID}
 		}
@@ -204,7 +205,7 @@ func main() {
 		} else {
 			d, err = cli.FindDomainInCluster(*projectListDomain, *projectCluster)
 		}
-		fatalIfErr(err)
+		errors.Handle(err)
 
 		p := &cli.Project{
 			DomainID:   d.ID,
@@ -223,7 +224,7 @@ func main() {
 		} else {
 			p, err = cli.FindProjectInCluster(*projectShowID, *projectShowDomain, *projectCluster)
 		}
-		fatalIfErr(err)
+		errors.Handle(err)
 
 		p.Filter = filter
 		p.Filter.Cluster = *projectCluster
@@ -232,7 +233,7 @@ func main() {
 
 	case projectSetCmd.FullCommand():
 		if strings.Contains(*projectSetID, "=") {
-			kingpin.Fatalf("required argument 'project-id' not provided, try --help")
+			errors.Handle(errors.New("required argument 'project-id' not provided, try --help"))
 		}
 		var p *cli.Project
 		var err error
@@ -241,7 +242,7 @@ func main() {
 		} else {
 			p, err = cli.FindProjectInCluster(*projectSetID, *projectSetDomain, *projectCluster)
 		}
-		fatalIfErr(err)
+		errors.Handle(err)
 
 		p.Filter.Cluster = *projectCluster
 		cli.RunSetTask(p, projectSetQuotas)
@@ -254,7 +255,7 @@ func main() {
 		} else {
 			p, err = cli.FindProjectInCluster(*projectSyncID, *projectSyncDomain, *projectCluster)
 		}
-		fatalIfErr(err)
+		errors.Handle(err)
 
 		p.Filter.Cluster = *projectCluster
 		cli.RunSyncTask(p)
@@ -267,12 +268,4 @@ func setEnvUnlessEmpty(env, val string) {
 	}
 
 	os.Setenv(env, val)
-}
-
-func fatalIfErr(err error) {
-	if err == nil {
-		return
-	}
-
-	kingpin.Fatalf(err.Error())
 }

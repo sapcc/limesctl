@@ -20,13 +20,13 @@
 package cli
 
 import (
-	"errors"
 	"math"
 	"sort"
 	"strconv"
 	"time"
 
 	"github.com/sapcc/limes"
+	"github.com/sapcc/limesctl/pkg/errors"
 )
 
 type csvData [][]string
@@ -47,14 +47,14 @@ func (c *Cluster) renderCSV() *csvData {
 
 	if c.IsList {
 		clusterList, err := c.Result.ExtractClusters()
-		handleError("could not render the CSV data for clusters", err)
+		errors.Handle(err, "could not render the CSV data for clusters")
 
 		for _, cluster := range clusterList {
 			c.parseToCSV(&cluster, &data)
 		}
 	} else {
 		cluster, err := c.Result.Extract()
-		handleError("could not render the CSV data for cluster", err)
+		errors.Handle(err, "could not render the CSV data for cluster")
 
 		c.parseToCSV(cluster, &data)
 	}
@@ -68,7 +68,7 @@ func (d *Domain) renderCSV() *csvData {
 	var labels []string
 
 	if d.Output.Names && d.Output.Long {
-		handleError("", errors.New("'--names' and '--long' can not be used together"))
+		errors.Handle(errors.New("'--names' and '--long' can not be used together"))
 	}
 
 	switch {
@@ -84,14 +84,14 @@ func (d *Domain) renderCSV() *csvData {
 
 	if d.IsList {
 		domainList, err := d.Result.ExtractDomains()
-		handleError("could not render the CSV data for domains", err)
+		errors.Handle(err, "could not render the CSV data for domains")
 
 		for _, domain := range domainList {
 			d.parseToCSV(&domain, &data)
 		}
 	} else {
 		domain, err := d.Result.Extract()
-		handleError("could not render the CSV data for domain", err)
+		errors.Handle(err, "could not render the CSV data for domain")
 
 		d.parseToCSV(domain, &data)
 	}
@@ -105,7 +105,7 @@ func (p *Project) renderCSV() *csvData {
 	var labels []string
 
 	if p.Output.Names && p.Output.Long {
-		handleError("", errors.New("'--names' and '--long' can not be used together"))
+		errors.Handle(errors.New("'--names' and '--long' can not be used together"))
 	}
 
 	switch {
@@ -122,14 +122,14 @@ func (p *Project) renderCSV() *csvData {
 
 	if p.IsList {
 		projectList, err := p.Result.ExtractProjects()
-		handleError("could not render the CSV data for projects", err)
+		errors.Handle(err, "could not render the CSV data for projects")
 
 		for _, project := range projectList {
 			p.parseToCSV(&project, &data)
 		}
 	} else {
 		project, err := p.Result.Extract()
-		handleError("could not render the CSV data for project", err)
+		errors.Handle(err, "could not render the CSV data for project")
 
 		p.parseToCSV(project, &data)
 	}

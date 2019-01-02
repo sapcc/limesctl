@@ -31,6 +31,7 @@ import (
 	"github.com/sapcc/gophercloud-limes/resources/v1/domains"
 	"github.com/sapcc/gophercloud-limes/resources/v1/projects"
 	"github.com/sapcc/limes"
+	"github.com/sapcc/limesctl/pkg/errors"
 )
 
 // Cluster contains information regarding a cluster(s).
@@ -158,13 +159,13 @@ func RunSyncTask(p *Project) {
 	err := projects.Sync(limesV1, p.DomainID, p.ID, projects.SyncOpts{
 		Cluster: p.Filter.Cluster,
 	})
-	handleError("could not sync project", err)
+	errors.Handle(err, "could not sync project")
 }
 
 // writeJSON is a helper function that writes the JSON data to os.Stdout.
 func writeJSON(data interface{}) {
 	b, err := json.Marshal(data)
-	handleError("could not marshal JSON", err)
+	errors.Handle(err, "could not marshal JSON")
 	fmt.Println(string(b))
 }
 
