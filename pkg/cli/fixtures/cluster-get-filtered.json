@@ -13,7 +13,8 @@
             "capacity": 10485760,
             "comment": "hand-counted",
             "domains_quota": 3145728,
-            "usage": 1572864
+            "usage": 1572864,
+            "burst_usage": 2048
           }
         ],
         "max_scraped_at": 66,

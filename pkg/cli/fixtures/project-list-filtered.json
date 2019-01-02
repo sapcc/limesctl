@@ -1,6 +1,10 @@
 {
   "projects": [
     {
+      "bursting": {
+        "enabled": true,
+        "multiplier": 0.1
+      },
       "id": "uuid-for-berlin",
       "name": "berlin",
       "parent_id": "uuid-for-germany",
@@ -12,7 +16,8 @@
             {
               "name": "things",
               "quota": 10,
-              "usage": 2
+              "usage": 11,
+              "burst_usage": 1
             }
           ],
           "scraped_at": 22
@@ -20,6 +25,10 @@
       ]
     },
     {
+      "bursting": {
+        "enabled": true,
+        "multiplier": 0.2
+      },
       "id": "uuid-for-dresden",
       "name": "dresden",
       "parent_id": "uuid-for-berlin",
@@ -31,7 +40,8 @@
             {
               "name": "things",
               "quota": 10,
-              "usage": 2
+              "usage": 11,
+              "burst_usage": 1
             }
           ],
           "scraped_at": 44

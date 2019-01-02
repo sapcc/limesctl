@@ -15,7 +15,8 @@
               "capacity": 185,
               "comment": "hand-counted",
               "domains_quota": 50,
-              "usage": 8
+              "usage": 8,
+              "burst_usage": 1
             }
           ],
           "max_scraped_at": 88,
@@ -39,7 +40,8 @@
               "capacity": 185,
               "comment": "hand-counted",
               "domains_quota": 50,
-              "usage": 8
+              "usage": 8,
+              "burst_usage": 2
             }
           ],
           "max_scraped_at": 66,
