@@ -68,7 +68,7 @@ var (
 
 	clusterSetCmd  = clusterCmd.Command("set", "Change resource(s) quota for a cluster. Use 'current' to show information regarding the current cluster. Requires a cloud-admin token.")
 	clusterSetID   = clusterSetCmd.Arg("cluster-id", "Cluster ID.").Required().String()
-	clusterSetCaps = cli.ParseQuotas(clusterSetCmd.Arg("capacities", "Capacities to change. Format: service/resource=value(unit):\"comment\"").Required())
+	clusterSetCaps = QuotaList(clusterSetCmd.Arg("capacities", "Capacities to change. Format: service/resource=value(unit):\"comment\"").Required())
 
 	domainListCmd = domainCmd.Command("list", "Query data for all the domains. Requires a cloud-admin token.")
 
@@ -77,7 +77,7 @@ var (
 
 	domainSetCmd    = domainCmd.Command("set", "Change resource(s) quota for a domain. Requires a cloud-admin token.")
 	domainSetID     = domainSetCmd.Arg("domain-id", "Domain ID (name/UUID).").Required().String()
-	domainSetQuotas = cli.ParseQuotas(domainSetCmd.Arg("quotas", "Quotas to change. Format: service/resource=value(unit)").Required())
+	domainSetQuotas = QuotaList(domainSetCmd.Arg("quotas", "Quotas to change. Format: service/resource=value(unit)").Required())
 
 	projectListCmd    = projectCmd.Command("list", "Query data for all the projects in a domain. Requires a domain-admin token.")
 	projectListDomain = projectListCmd.Flag("domain", "Domain ID.").Short('d').Required().String()
@@ -89,7 +89,7 @@ var (
 	projectSetCmd    = projectCmd.Command("set", "Change resource(s) quota for a project. Requires a domain-admin token.")
 	projectSetDomain = projectSetCmd.Flag("domain", "Domain ID.").Short('d').String()
 	projectSetID     = projectSetCmd.Arg("project-id", "Project ID (name/UUID).").Required().String()
-	projectSetQuotas = cli.ParseQuotas(projectSetCmd.Arg("quotas", "Quotas to change. Format: service/resource=value(unit)").Required())
+	projectSetQuotas = QuotaList(projectSetCmd.Arg("quotas", "Quotas to change. Format: service/resource=value(unit)").Required())
 
 	projectSyncCmd    = projectCmd.Command("sync", "Sync a project's quota and usage data from the backing services into Limes' local database. Requires a project-admin token.")
 	projectSyncDomain = projectSyncCmd.Flag("domain", "Domain ID.").Short('d').String()
@@ -152,8 +152,11 @@ func main() {
 		if strings.Contains(*clusterSetID, "=") {
 			errors.Handle(errors.New("required argument 'cluster-id' not provided, try --help"))
 		}
+
 		c := &cli.Cluster{ID: *clusterSetID}
-		cli.RunSetTask(c, clusterSetCaps)
+		q, err := cli.ParseRawQuotas(c, clusterSetCaps, false)
+		errors.Handle(err)
+		cli.RunSetTask(c, q)
 
 	case domainListCmd.FullCommand():
 		d := &cli.Domain{
@@ -195,7 +198,9 @@ func main() {
 		}
 
 		d.Filter.Cluster = *domainCluster
-		cli.RunSetTask(d, domainSetQuotas)
+		q, err := cli.ParseRawQuotas(d, domainSetQuotas, false)
+		errors.Handle(err)
+		cli.RunSetTask(d, q)
 
 	case projectListCmd.FullCommand():
 		var d *cli.Domain
@@ -245,7 +250,9 @@ func main() {
 		errors.Handle(err)
 
 		p.Filter.Cluster = *projectCluster
-		cli.RunSetTask(p, projectSetQuotas)
+		q, err := cli.ParseRawQuotas(p, projectSetQuotas, false)
+		errors.Handle(err)
+		cli.RunSetTask(p, q)
 
 	case projectSyncCmd.FullCommand():
 		var p *cli.Project
@@ -268,4 +275,30 @@ func setEnvUnlessEmpty(env, val string) {
 	}
 
 	os.Setenv(env, val)
+}
+
+type rawQuotas cli.RawQuotas
+
+// Set implements the kingpin.Value interface.
+func (rq *rawQuotas) Set(value string) error {
+	*rq = append(*rq, strings.TrimSpace(value))
+	return nil
+}
+
+// String implements the kingpin.Value interface.
+func (rq *rawQuotas) String() string {
+	return ""
+}
+
+// IsCumulative allows consumption of remaining command line arguments.
+func (rq *rawQuotas) IsCumulative() bool {
+	return true
+}
+
+// QuotaList appends the raw quota values given at the command line to the
+// aggregate cli.RawQuotas list.
+func QuotaList(s kingpin.Settings) (target *cli.RawQuotas) {
+	target = new(cli.RawQuotas)
+	s.SetValue((*rawQuotas)(target))
+	return
 }
