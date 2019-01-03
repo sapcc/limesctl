@@ -23,6 +23,7 @@ import (
 	"github.com/sapcc/gophercloud-limes/resources/v1/clusters"
 	"github.com/sapcc/gophercloud-limes/resources/v1/domains"
 	"github.com/sapcc/gophercloud-limes/resources/v1/projects"
+	"github.com/sapcc/limesctl/pkg/errors"
 )
 
 // list retrieves information about all the clusters within the token scope.
@@ -35,7 +36,7 @@ func (c *Cluster) list() {
 		Service:  c.Filter.Service,
 		Resource: c.Filter.Resource,
 	})
-	handleError("could not list clusters", c.Result.Err)
+	errors.Handle(c.Result.Err, "could not list clusters")
 }
 
 // list retrieves information about all the domains within the token scope.
@@ -49,7 +50,7 @@ func (d *Domain) list() {
 		Service:  d.Filter.Service,
 		Resource: d.Filter.Resource,
 	})
-	handleError("could not list domains", d.Result.Err)
+	errors.Handle(d.Result.Err, "could not list domains")
 }
 
 // list retrieves information about all the projects within a specific domain.
@@ -63,5 +64,5 @@ func (p *Project) list() {
 		Service:  p.Filter.Service,
 		Resource: p.Filter.Resource,
 	})
-	handleError("could not list projects", p.Result.Err)
+	errors.Handle(p.Result.Err, "could not list projects")
 }

@@ -19,17 +19,32 @@
 
 package cli
 
+import (
+	"encoding/json"
+
+	"github.com/sapcc/limesctl/pkg/errors"
+)
+
+type jsonData []byte
+
 // getJSON returns the result body of a get/list/update operation.
-func (c *Cluster) getJSON() interface{} {
-	return c.Result.Body
+func (c *Cluster) renderJSON() *jsonData {
+	return parseToJSON(c.Result.Body)
 }
 
 // getJSON returns the result body of a get/list/update operation.
-func (d *Domain) getJSON() interface{} {
-	return d.Result.Body
+func (d *Domain) renderJSON() *jsonData {
+	return parseToJSON(d.Result.Body)
 }
 
 // getJSON returns the result body of a get/list/update operation.
-func (p *Project) getJSON() interface{} {
-	return p.Result.Body
+func (p *Project) renderJSON() *jsonData {
+	return parseToJSON(p.Result.Body)
+}
+
+func parseToJSON(data interface{}) *jsonData {
+	var jd jsonData
+	jd, err := json.Marshal(data)
+	errors.Handle(err, "could not marshal JSON")
+	return &jd
 }

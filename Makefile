@@ -30,16 +30,16 @@ install: FORCE all
 	install -m 0755 build/limesctl "$(DESTDIR)$(PREFIX)/bin/limesctl"
 
 ifeq ($(GOOS),windows)
-release: release/$(BINARY64)
+release: FORCE release/$(BINARY64)
 	cd release && cp -f $(BINARY64) limesctl.exe && zip $(RELEASE64).zip limesctl.exe
 	cd release && rm -f limesctl.exe
-else 
-release: release/$(BINARY64)
+else
+release: FORCE release/$(BINARY64)
 	cd release && cp -f $(BINARY64) limesctl && tar -czf $(RELEASE64).tgz limesctl
 	cd release && rm -f limesctl
 endif
 
-release-all: FORCE clean 
+release-all: FORCE clean
 	GOOS=darwin make release
 	GOOS=linux  make release
 
@@ -53,7 +53,7 @@ GO_ALLPKGS := $(PKG) $(shell go list $(PKG)/pkg/...)
 # which packages to test with `go test`?
 GO_TESTPKGS := $(shell go list -f '{{if .TestGoFiles}}{{.ImportPath}}{{end}}' $(PKG)/pkg/...)
 # which packages to measure coverage for?
-GO_COVERPKGS := $(shell go list $(PKG)/pkg/... | grep -v plugins)
+GO_COVERPKGS := $(shell go list $(PKG)/pkg/...)
 # output files from `go test`
 GO_COVERFILES := $(patsubst %,build/%.cover.out,$(subst /,_,$(GO_TESTPKGS)))
 
@@ -76,7 +76,7 @@ build/%.cover.out: FORCE
 	@echo '>> go test $*'
 	$(GO) test $(GO_BUILDFLAGS) -ldflags '$(GO_LDFLAGS)' -coverprofile=$@ -covermode=count -coverpkg=$(subst $(space),$(comma),$(GO_COVERPKGS)) $(subst _,/,$*)
 build/cover.out: $(GO_COVERFILES)
-	pkg/test/util/gocovcat.go $(GO_COVERFILES) > $@
+	util/gocovcat/main.go $(GO_COVERFILES) > $@
 build/cover.html: build/cover.out
 	$(GO) tool cover -html $< -o $@
 

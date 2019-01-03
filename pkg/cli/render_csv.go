@@ -20,13 +20,13 @@
 package cli
 
 import (
-	"errors"
 	"math"
 	"sort"
 	"strconv"
 	"time"
 
 	"github.com/sapcc/limes"
+	"github.com/sapcc/limesctl/pkg/errors"
 )
 
 type csvData [][]string
@@ -39,24 +39,23 @@ func (c *Cluster) renderCSV() *csvData {
 	switch {
 	case c.Output.Long:
 		labels = []string{"cluster id", "area", "service", "category", "resource", "capacity",
-			"domains quota", "usage", "unit", "comment", "scraped at (UTC)"}
+			"domains quota", "usage", "burst usage", "unit", "comment", "scraped at (UTC)"}
 	default:
 		labels = []string{"cluster id", "service", "resource", "capacity", "domains quota", "usage", "unit"}
 	}
+	data = append(data, labels)
 
 	if c.IsList {
 		clusterList, err := c.Result.ExtractClusters()
-		handleError("could not render the CSV data for clusters", err)
+		errors.Handle(err, "could not render the CSV data for clusters")
 
-		data = append(data, labels)
 		for _, cluster := range clusterList {
 			c.parseToCSV(&cluster, &data)
 		}
 	} else {
 		cluster, err := c.Result.Extract()
-		handleError("could not render the CSV data for cluster", err)
+		errors.Handle(err, "could not render the CSV data for cluster")
 
-		data = append(data, labels)
 		c.parseToCSV(cluster, &data)
 	}
 
@@ -69,7 +68,7 @@ func (d *Domain) renderCSV() *csvData {
 	var labels []string
 
 	if d.Output.Names && d.Output.Long {
-		handleError("", errors.New("'--names' and '--long' can not be used together"))
+		errors.Handle(errors.New("'--names' and '--long' can not be used together"))
 	}
 
 	switch {
@@ -77,24 +76,23 @@ func (d *Domain) renderCSV() *csvData {
 		labels = []string{"domain name", "service", "resource", "quota", "projects quota", "usage", "unit"}
 	case d.Output.Long:
 		labels = []string{"domain id", "domain name", "area", "service", "category", "resource",
-			"quota", "projects quota", "usage", "unit", "scraped at (UTC)"}
+			"quota", "projects quota", "usage", "burst usage", "unit", "scraped at (UTC)"}
 	default:
 		labels = []string{"domain id", "service", "resource", "quota", "projects quota", "usage", "unit"}
 	}
+	data = append(data, labels)
 
 	if d.IsList {
 		domainList, err := d.Result.ExtractDomains()
-		handleError("could not render the CSV data for domains", err)
+		errors.Handle(err, "could not render the CSV data for domains")
 
-		data = append(data, labels)
 		for _, domain := range domainList {
 			d.parseToCSV(&domain, &data)
 		}
 	} else {
 		domain, err := d.Result.Extract()
-		handleError("could not render the CSV data for domain", err)
+		errors.Handle(err, "could not render the CSV data for domain")
 
-		data = append(data, labels)
 		d.parseToCSV(domain, &data)
 	}
 
@@ -107,32 +105,32 @@ func (p *Project) renderCSV() *csvData {
 	var labels []string
 
 	if p.Output.Names && p.Output.Long {
-		handleError("", errors.New("'--names' and '--long' can not be used together"))
+		errors.Handle(errors.New("'--names' and '--long' can not be used together"))
 	}
 
 	switch {
 	case p.Output.Names:
 		labels = []string{"domain name", "project name", "service", "resource", "quota", "usage", "unit"}
 	case p.Output.Long:
-		labels = []string{"domain id", "domain name", "project id", "project name", "area",
-			"service", "category", "resource", "quota", "usage", "unit", "scraped at (UTC)"}
+		labels = []string{"domain id", "domain name", "project id", "project name",
+			"area", "service", "category", "resource", "quota", "burst quota", "usage",
+			"burst usage", "unit", "scraped at (UTC)"}
 	default:
 		labels = []string{"domain id", "project id", "service", "resource", "quota", "usage", "unit"}
 	}
+	data = append(data, labels)
 
 	if p.IsList {
 		projectList, err := p.Result.ExtractProjects()
-		handleError("could not render the CSV data for projects", err)
+		errors.Handle(err, "could not render the CSV data for projects")
 
-		data = append(data, labels)
 		for _, project := range projectList {
 			p.parseToCSV(&project, &data)
 		}
 	} else {
 		project, err := p.Result.Extract()
-		handleError("could not render the CSV data for project", err)
+		errors.Handle(err, "could not render the CSV data for project")
 
-		data = append(data, labels)
 		p.parseToCSV(project, &data)
 	}
 
@@ -165,21 +163,22 @@ func (c *Cluster) parseToCSV(cluster *limes.ClusterReport, data *csvData) {
 
 			// need to do this check to avoid nil pointers
 			var cap uint64
-			if tmp := cSrvRes.Capacity; tmp != nil {
-				cap = *tmp
+			if cSrvRes.Capacity != nil {
+				cap = *cSrvRes.Capacity
 			}
 
 			unit, val := humanReadable(c.Output.HumanReadable, cSrvRes.ResourceInfo.Unit, rawValues{
 				"capacity":     cap,
 				"domainsQuota": cSrvRes.DomainsQuota,
 				"usage":        cSrvRes.Usage,
+				"burstUsage":   cSrvRes.BurstUsage,
 			})
 
 			switch {
 			case c.Output.Long:
 				csvRecord = append(csvRecord, cluster.ID, cSrv.ServiceInfo.Area, cSrv.ServiceInfo.Type,
 					cSrvRes.ResourceInfo.Category, cSrvRes.ResourceInfo.Name, val["capacity"], val["domainsQuota"],
-					val["usage"], unit, cSrvRes.Comment, timestampToString(cSrv.MinScrapedAt),
+					val["usage"], val["burstUsage"], unit, cSrvRes.Comment, timestampToString(cSrv.MinScrapedAt),
 				)
 			default:
 				csvRecord = append(csvRecord, cluster.ID, cSrv.ServiceInfo.Type, cSrvRes.ResourceInfo.Name,
@@ -220,6 +219,7 @@ func (d *Domain) parseToCSV(domain *limes.DomainReport, data *csvData) {
 				"domainQuota":   dSrvRes.DomainQuota,
 				"projectsQuota": dSrvRes.ProjectsQuota,
 				"usage":         dSrvRes.Usage,
+				"burstUsage":    dSrvRes.BurstUsage,
 			})
 
 			switch {
@@ -230,7 +230,7 @@ func (d *Domain) parseToCSV(domain *limes.DomainReport, data *csvData) {
 			case d.Output.Long:
 				csvRecord = append(csvRecord, domain.UUID, domain.Name, dSrv.ServiceInfo.Area, dSrv.ServiceInfo.Type,
 					dSrvRes.ResourceInfo.Category, dSrvRes.ResourceInfo.Name, val["domainQuota"], val["projectsQuota"],
-					val["usage"], unit, timestampToString(dSrv.MinScrapedAt),
+					val["usage"], val["burstUsage"], unit, timestampToString(dSrv.MinScrapedAt),
 				)
 			default:
 				csvRecord = append(csvRecord, domain.UUID, dSrv.ServiceInfo.Type, dSrvRes.ResourceInfo.Name,
@@ -267,9 +267,22 @@ func (p *Project) parseToCSV(project *limes.ProjectReport, data *csvData) {
 			pSrv := project.Services[srv]
 			pSrvRes := project.Services[srv].Resources[res]
 
+			var burstQuota, burstUsage uint64
+			if project.Bursting != nil {
+				if project.Bursting.Enabled {
+					burstQuota = project.Bursting.Multiplier.ApplyTo(pSrvRes.Quota)
+
+					if pSrvRes.Usage > pSrvRes.Quota {
+						burstUsage = pSrvRes.Usage - pSrvRes.Quota
+					}
+				}
+			}
+
 			unit, val := humanReadable(p.Output.HumanReadable, pSrvRes.ResourceInfo.Unit, rawValues{
-				"quota": pSrvRes.Quota,
-				"usage": pSrvRes.Usage,
+				"quota":      pSrvRes.Quota,
+				"burstQuota": burstQuota,
+				"usage":      pSrvRes.Usage,
+				"burstUsage": burstUsage,
 			})
 
 			switch {
@@ -279,8 +292,8 @@ func (p *Project) parseToCSV(project *limes.ProjectReport, data *csvData) {
 				)
 			case p.Output.Long:
 				csvRecord = append(csvRecord, p.DomainID, p.DomainName, project.UUID, project.Name, pSrv.ServiceInfo.Area,
-					pSrv.ServiceInfo.Type, pSrvRes.ResourceInfo.Category, pSrvRes.ResourceInfo.Name,
-					val["quota"], val["usage"], unit, timestampToString(pSrv.ScrapedAt),
+					pSrv.ServiceInfo.Type, pSrvRes.ResourceInfo.Category, pSrvRes.ResourceInfo.Name, val["quota"],
+					val["burstQuota"], val["usage"], val["burstUsage"], unit, timestampToString(pSrv.ScrapedAt),
 				)
 			default:
 				csvRecord = append(csvRecord, p.DomainID, project.UUID, pSrv.ServiceInfo.Type,
@@ -318,8 +331,14 @@ func humanReadable(convert bool, unit limes.Unit, rv rawValues) (string, convert
 	cv := make(convertedValues, len(rv))
 
 	// 'usage' is used to determine conversion suitability because it is common
-	// in all three hierarchies and is the lowest value amongst its counterparts
-	if unit == limes.UnitNone || rv["usage"] < 1024 {
+	// in all three hierarchies and is the lowest value amongst its counterparts,
+	// unless 'burstUsage > 0' then that is used instead.
+	computeAgainst := rv["usage"]
+	if rv["burstUsage"] > 0 {
+		computeAgainst = rv["burstUsage"]
+	}
+
+	if unit == limes.UnitNone || computeAgainst < 1024 {
 		convert = false
 	}
 	if !convert {
@@ -330,7 +349,7 @@ func humanReadable(convert bool, unit limes.Unit, rv rawValues) (string, convert
 	}
 
 	oldExp := unitExp[unit]
-	usage := rv["usage"]
+	usage := computeAgainst
 
 	var diffInExp float64
 	// 2^60 bytes (exbibytes) is the maximum supported unit

@@ -13,7 +13,8 @@
             "quota": 30128200000,
             "projects_quota": 10128200000,
             "usage": 524288000,
-            "backend_quota": 110
+            "backend_quota": 110,
+            "burst_usage": 100000
           }
         ],
         "max_scraped_at": 44,
