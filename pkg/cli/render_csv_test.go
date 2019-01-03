@@ -41,7 +41,7 @@ func TestRenderClusterCSV(t *testing.T) {
 	c.renderCSV().write(&actual)
 	th.AssertEquals(t, string(expected), actual.String())
 
-	// filtered get
+	// filtered get with quota bursting
 	c, err = makeMockCluster("./fixtures/cluster-get-filtered.json")
 	th.AssertNoErr(t, err)
 	c.Output = Output{
@@ -107,7 +107,7 @@ func TestRenderDomainCSV(t *testing.T) {
 	d.renderCSV().write(&actual)
 	th.AssertEquals(t, string(expected), actual.String())
 
-	// filtered get
+	// filtered get with quota bursting
 	d, err = makeMockDomain("./fixtures/domain-get-filtered.json")
 	th.AssertNoErr(t, err)
 	d.Output = Output{
@@ -173,7 +173,7 @@ func TestRenderProjectCSV(t *testing.T) {
 	p.renderCSV().write(&actual)
 	th.AssertEquals(t, string(expected), actual.String())
 
-	// filtered get
+	// filtered get with quota bursting
 	p, err = makeMockProject("./fixtures/project-get-filtered.json")
 	th.AssertNoErr(t, err)
 	p.Output = Output{

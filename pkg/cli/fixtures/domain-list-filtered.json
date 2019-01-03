@@ -12,8 +12,7 @@
               "name": "things",
               "quota": 0,
               "projects_quota": 10,
-              "usage": 2,
-              "burst_usage": 1
+              "usage": 2
             }
           ],
           "max_scraped_at": 66,
@@ -33,8 +32,7 @@
               "name": "things",
               "quota": 30,
               "projects_quota": 20,
-              "usage": 4,
-              "burst_usage": 1
+              "usage": 4
             }
           ],
           "max_scraped_at": 44,
