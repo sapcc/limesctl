@@ -21,102 +21,253 @@ package cli
 
 import (
 	"fmt"
+	"math"
 	"regexp"
 	"sort"
 	"strconv"
 	"strings"
 
-	"github.com/alecthomas/kingpin"
+	"github.com/sapcc/gophercloud-limes/resources/v1/clusters"
+	"github.com/sapcc/gophercloud-limes/resources/v1/domains"
+	"github.com/sapcc/gophercloud-limes/resources/v1/projects"
 	"github.com/sapcc/limes"
+	"github.com/sapcc/limesctl/pkg/errors"
 )
 
-// Set implements the kingpin.Value interface.
-func (q *Quotas) Set(value string) error {
-	value = strings.TrimSpace(value)
-	// tmp contains the different components of a single parsed quota value. This makes it easier to refer
-	// to individual components and pass them to the cli.Quotas map
-	var tmp Resource
+// quotaUnits is map of limes.Unit to x, such that base-2 exponential of x is
+// the number of bytes for some specific unit.
+var quotaUnits = map[limes.Unit]float64{
+	limes.UnitBytes:     0,
+	limes.UnitKibibytes: 10,
+	limes.UnitMebibytes: 20,
+	limes.UnitGibibytes: 30,
+	limes.UnitTebibytes: 40,
+	limes.UnitPebibytes: 50,
+	limes.UnitExbibytes: 60,
+}
 
-	// separate the quota value from its identifier
-	idfVal := strings.SplitN(value, "=", 2)
-	if len(idfVal) != 2 {
-		return fmt.Errorf("expected a quota in the format: service/resource=value(unit), got '%s'", value)
+// RawQuotas contains the quota values provided at the command line.
+type RawQuotas []string
+
+// Resource contains quota information about a single resource.
+type Resource struct {
+	Name    string
+	Value   int64
+	Unit    limes.Unit
+	Comment string
+}
+
+// Quotas is a map of service name to a list of resources. It contains the
+// aggregate quota values used by the set methods to update a single
+// cluster/domain/project.
+type Quotas map[string][]Resource
+
+// resourceUnits type contains the respective units for different resources.
+type resourceUnits map[string]map[string]limes.Unit
+
+// baseUnitsSetter is the interface type that is implemented by different
+// hierarchies.
+type baseUnitsSetter interface {
+	setBaseUnits(*resourceUnits, bool)
+}
+
+var quotaValueRx = regexp.MustCompile(`^([0-9]*\.?[0-9]+)([A-Za-z]+)?$`)
+
+// ParseRawQuotas parses the raw quota values given at the command line to a
+// Quotas map.
+func ParseRawQuotas(s baseUnitsSetter, rq *RawQuotas, isTest bool) (*Quotas, error) {
+	q := &Quotas{}
+
+	type userInput struct {
+		service  string
+		resource string
+		value    string
+		unit     limes.Unit
+		comment  string
 	}
 
-	// separate service and resource
-	srvRes := strings.SplitN(idfVal[0], "/", 2)
-	if len(srvRes) != 2 {
-		return fmt.Errorf("expected service/resource, got '%s'", idfVal[0])
-	}
-	srv := srvRes[0]
-	tmp.Name = srvRes[1]
+	userInputs := make([]userInput, 0, len(*rq))
+	resUnits := make(resourceUnits)
 
-	// separate quota value and comment (if one was given)
-	valCom := strings.SplitN(idfVal[1], ":", 2)
-	if len(valCom) > 1 {
-		if valCom[1] != "" {
-			tmp.Comment = strings.TrimSpace(valCom[1])
+	// validate raw quota values
+	for _, rqInList := range *rq {
+		var input userInput
+
+		// separate the quota value from its identifier
+		idfVal := strings.SplitN(rqInList, "=", 2)
+		if len(idfVal) != 2 {
+			return nil, fmt.Errorf("expected a quota in the format: service/resource=value(unit), got '%s'", rqInList)
+		}
+
+		// separate service and resource
+		srvRes := strings.SplitN(idfVal[0], "/", 2)
+		if len(srvRes) != 2 {
+			return nil, fmt.Errorf("expected service/resource, got '%s'", idfVal[0])
+		}
+		input.service = srvRes[0]
+		input.resource = srvRes[1]
+
+		// separate quota value and comment (if one was given)
+		valCom := strings.SplitN(idfVal[1], ":", 2)
+		if len(valCom) > 1 {
+			if valCom[1] != "" {
+				input.comment = strings.TrimSpace(valCom[1])
+			}
+		}
+
+		// separate quota's value from its unit (if one was given)
+		match := quotaValueRx.MatchString(valCom[0])
+		if !match {
+			return nil, fmt.Errorf("expected a quota value with optional unit in the format: 12.3Unit, got '%s'", valCom[0])
+		}
+
+		// rxMatchedList contains ["entire regex matched string", "quota value", "unit (empty, if no unit given)"]
+		rxMatchedList := quotaValueRx.FindStringSubmatch(valCom[0])
+		input.value = rxMatchedList[1]
+
+		if rxMatchedList[2] == "" {
+			input.unit = limes.UnitNone
+
+			if strings.Contains(input.value, ".") {
+				return nil, fmt.Errorf("counted values must be an integer, got '%s'", input.value)
+			}
+		} else {
+			input.unit = limes.Unit(rxMatchedList[2])
+
+			_, unitIsValid := quotaUnits[input.unit]
+			if !unitIsValid {
+				return nil, fmt.Errorf("acceptable units: ['B', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB'], got '%s'", rxMatchedList[2])
+			}
+		}
+
+		if input.unit == limes.UnitNone {
+		}
+
+		_, exists := resUnits[input.service]
+		if !exists {
+			resUnits[input.service] = make(map[string]limes.Unit)
+		}
+
+		resUnits[input.service][input.resource] = input.unit
+
+		userInputs = append(userInputs, input)
+	}
+
+	s.setBaseUnits(&resUnits, isTest)
+
+	for _, input := range userInputs {
+		var intQuotaVal int64
+
+		if strings.Contains(input.value, ".") {
+			diffInExp := quotaUnits[input.unit] - quotaUnits[resUnits[input.service][input.resource]]
+			// fractional values are only possible when the given unit is
+			// greater than the base unit
+			if diffInExp < 0 {
+				return nil, fmt.Errorf("minimum accepted unit for '%s/%s' is '%v', got '%v'",
+					input.service, input.resource, resUnits[input.service][input.resource], input.unit)
+			}
+
+			// convert input.value to its base unit
+			inputValue, err := strconv.ParseFloat(input.value, 64)
+			if err != nil {
+				return nil, err
+			}
+			inputValue = math.Floor(inputValue * math.Exp2(diffInExp))
+
+			intQuotaVal = int64(inputValue)
+			input.unit = resUnits[input.service][input.resource]
+		} else {
+			tmp, err := strconv.ParseInt(input.value, 10, 64)
+			if err != nil {
+				return nil, err
+			}
+
+			intQuotaVal = tmp
+		}
+
+		(*q)[input.service] = append((*q)[input.service], Resource{
+			Name:    input.resource,
+			Value:   intQuotaVal,
+			Unit:    input.unit,
+			Comment: input.comment,
+		})
+	}
+
+	return q, nil
+}
+
+// setBaseUnits (re)sets the resourceUnits map to the respective base units for
+// resources.
+func (c *Cluster) setBaseUnits(ru *resourceUnits, isTest bool) {
+	// no need to make a GET request if `isTest = true` because in that case
+	// the c.Result would already be populated with the necessary mock test
+	// data
+	if !isTest {
+		_, limesV1 := getServiceClients()
+		c.Result = clusters.Get(limesV1, c.ID, clusters.GetOpts{})
+	}
+
+	cluster, err := c.Result.Extract()
+	errors.Handle(err, "cluster does not exist")
+
+	for srv, resMap := range *ru {
+		for res := range resMap {
+			srvRes, exists := cluster.Services[srv].Resources[res]
+			if exists {
+				(*ru)[srv][res] = srvRes.ResourceInfo.Unit
+			}
 		}
 	}
+}
 
-	// separate quota's value from its unit (if one was given)
-	rx := regexp.MustCompile(`^([0-9]+)([A-Za-z]+)?$`)
-	match := rx.MatchString(valCom[0])
-	if !match {
-		return fmt.Errorf("expected a quota value with optional unit in the format: 123Unit, got '%s'", valCom[0])
+// setBaseUnits (re)sets the resourceUnits map to the respective base units for
+// resources.
+func (d *Domain) setBaseUnits(ru *resourceUnits, isTest bool) {
+	// no need to make a GET request if `isTest = true` because in that case
+	// the d.Result would already be populated with the necessary mock test
+	// data
+	if !isTest {
+		_, limesV1 := getServiceClients()
+		d.Result = domains.Get(limesV1, d.ID, domains.GetOpts{
+			Cluster: d.Filter.Cluster})
 	}
 
-	// rxMatchedList: []string{"entire regex matched string", "quota value", "unit (empty, if no unit given)"}
-	rxMatchedList := rx.FindStringSubmatch(valCom[0])
-	intVal, err := strconv.ParseInt(rxMatchedList[1], 10, 64)
-	if err != nil {
-		return fmt.Errorf("could not parse quota value: '%s'", rxMatchedList[1])
-	}
-	tmp.Value = intVal
+	domain, err := d.Result.Extract()
+	errors.Handle(err, "domain does not exist")
 
-	tmp.Unit = limes.UnitNone
-	if rxMatchedList[2] != "" {
-		switch rxMatchedList[2] {
-		case "B":
-			tmp.Unit = limes.UnitBytes
-		case "KiB":
-			tmp.Unit = limes.UnitKibibytes
-		case "MiB":
-			tmp.Unit = limes.UnitMebibytes
-		case "GiB":
-			tmp.Unit = limes.UnitGibibytes
-		case "TiB":
-			tmp.Unit = limes.UnitTebibytes
-		case "PiB":
-			tmp.Unit = limes.UnitPebibytes
-		case "EiB":
-			tmp.Unit = limes.UnitExbibytes
-		default:
-			return fmt.Errorf("acceptable units: ['B', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB'], got '%s'", rxMatchedList[2])
+	for srv, resMap := range *ru {
+		for res := range resMap {
+			srvRes, exists := domain.Services[srv].Resources[res]
+			if exists {
+				(*ru)[srv][res] = srvRes.ResourceInfo.Unit
+			}
 		}
 	}
-
-	(*q)[srv] = append((*q)[srv], tmp)
-
-	return nil
 }
 
-// String implements the kingpin.Value interface.
-func (q *Quotas) String() string {
-	return ""
-}
+// setBaseUnits (re)sets the resourceUnits map to the respective base units for
+// resources.
+func (p *Project) setBaseUnits(ru *resourceUnits, isTest bool) {
+	// no need to make a GET request if `isTest = true` because in that case
+	// the p.Result would already be populated with the necessary mock test
+	// data
+	if !isTest {
+		_, limesV1 := getServiceClients()
+		p.Result = projects.Get(limesV1, p.DomainID, p.ID, projects.GetOpts{
+			Cluster: p.Filter.Cluster})
+	}
 
-// IsCumulative allows consumption of remaining command line arguments.
-func (q *Quotas) IsCumulative() bool {
-	return true
-}
+	project, err := p.Result.Extract()
+	errors.Handle(err, "project does not exist")
 
-// ParseQuotas parses a command line argument to a quota value and assigns it to the
-// aggregate cli.Quotas map.
-func ParseQuotas(s kingpin.Settings) (target *Quotas) {
-	target = &Quotas{}
-	s.SetValue((*Quotas)(target))
-	return
+	for srv, resMap := range *ru {
+		for res := range resMap {
+			srvRes, exists := project.Services[srv].Resources[res]
+			if exists {
+				(*ru)[srv][res] = srvRes.ResourceInfo.Unit
+			}
+		}
+	}
 }
 
 // makeServiceCapacities is a helper function that converts a Quotas type to

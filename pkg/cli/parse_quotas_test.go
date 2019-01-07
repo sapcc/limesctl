@@ -26,74 +26,108 @@ import (
 	"github.com/sapcc/limes"
 )
 
-var mockRawCapacities = []string{
-	"compute/cores=10",
-	"compute/ram=20MiB",
-	"object-store/capacity=30B:I got 99 problems, but a cluster ain't one.",
+// TestQuotaValueRx tests if the regular expression used to parse the quota
+// values given at the command line is correct.
+func TestQuotaValueRx(t *testing.T) {
+	acceptableMockQuotaValues := []string{
+		"123456",
+		"123456unit",
+		"123.456",
+		"123.456unit",
+		".456",
+		".456unit",
+	}
+
+	for _, v := range acceptableMockQuotaValues {
+		match := quotaValueRx.MatchString(v)
+		if !match {
+			t.Errorf("regular expression did not match the quota value: %s", v)
+		}
+	}
+
+	unacceptableMockQuotaValues := []string{
+		"g123",
+		"g123unit",
+		"123g456",
+		"123g456unit",
+	}
+
+	for _, v := range unacceptableMockQuotaValues {
+		match := quotaValueRx.MatchString(v)
+		if match {
+			t.Errorf("regular expression should not match the quota value: %s", v)
+		}
+	}
 }
 
 // TestParseCapacities tests if the service capacities given at the
 // command line are being correctly parsed.
 func TestParseCapacities(t *testing.T) {
-	q := &Quotas{}
-	for _, v := range mockRawCapacities {
-		err := q.Set(v)
-		th.AssertNoErr(t, err)
+	mockRawCapacities := RawQuotas{
+		"shared/capacity=1.1MiB",
+		"unshared/things=120:test comment.",
 	}
+
+	c, err := makeMockCluster("./fixtures/cluster-get.json")
+	th.AssertNoErr(t, err)
+
+	q, err := ParseRawQuotas(c, &mockRawCapacities, true)
+	th.AssertNoErr(t, err)
+
 	actual := makeServiceCapacities(q)
 
 	unitB := limes.UnitBytes
-	unitMiB := limes.UnitMebibytes
 	unitNone := limes.UnitNone
 	expected := []limes.ServiceCapacityRequest{
-		{Type: "compute", Resources: []limes.ResourceCapacityRequest{
-			{
-				Name:     "cores",
-				Capacity: 10,
-				Unit:     &unitNone,
-			},
-			{
-				Name:     "ram",
-				Capacity: 20,
-				Unit:     &unitMiB,
-			},
-		}},
-		{Type: "object-store", Resources: []limes.ResourceCapacityRequest{
+		{Type: "shared", Resources: []limes.ResourceCapacityRequest{
 			{
 				Name:     "capacity",
-				Capacity: 30,
+				Capacity: 1153433,
 				Unit:     &unitB,
-				Comment:  "I got 99 problems, but a cluster ain't one.",
+			},
+		}},
+		{Type: "unshared", Resources: []limes.ResourceCapacityRequest{
+			{
+				Name:     "things",
+				Capacity: 120,
+				Unit:     &unitNone,
+				Comment:  "test comment.",
 			},
 		}},
 	}
 	th.AssertDeepEquals(t, expected, actual)
-}
-
-var mockRawQuotas = []string{
-	"compute/cores=10",
-	"compute/ram=20MiB",
-	"object-store/capacity=30B:this comment should be ignored by the parser.",
 }
 
 // TestParseQuotas tests if the service quotas given at the command line
 // are being correctly parsed.
 func TestParseQuotas(t *testing.T) {
-	q := &Quotas{}
-	for _, v := range mockRawQuotas {
-		err := q.Set(v)
-		th.AssertNoErr(t, err)
+	mockRawQuotas := RawQuotas{
+		"shared/capacity=1.8KiB:this comment should be ignored by the parser.",
+		"unshared/things=12",
 	}
-	actual := makeServiceQuotas(q)
 
-	expected := limes.QuotaRequest{
-		"compute": limes.ServiceQuotaRequest{
-			"cores": limes.ValueWithUnit{10, limes.UnitNone},
-			"ram":   limes.ValueWithUnit{20, limes.UnitMebibytes},
-		},
-		"object-store": limes.ServiceQuotaRequest{
-			"capacity": limes.ValueWithUnit{30, limes.UnitBytes},
-		},
+	assertParseQuotas := func(s baseUnitsSetter, rq *RawQuotas) {
+		q, err := ParseRawQuotas(s, rq, true)
+		th.AssertNoErr(t, err)
+
+		actual := makeServiceQuotas(q)
+
+		expected := limes.QuotaRequest{
+			"shared": limes.ServiceQuotaRequest{
+				"capacity": limes.ValueWithUnit{1843, limes.UnitBytes},
+			},
+			"unshared": limes.ServiceQuotaRequest{
+				"things": limes.ValueWithUnit{12, limes.UnitNone},
+			},
+		}
+		th.AssertDeepEquals(t, expected, actual)
 	}
-	th.AssertDeepEquals(t, expected, actual)
+
+	d, err := makeMockDomain("./fixtures/domain-get.json")
+	th.AssertNoErr(t, err)
+	assertParseQuotas(d, &mockRawQuotas)
+
+	p, err := makeMockProject("./fixtures/project-get.json")
+	th.AssertNoErr(t, err)
+	assertParseQuotas(p, &mockRawQuotas)
 }

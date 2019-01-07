@@ -316,17 +316,6 @@ func timestampToString(timestamp *int64) string {
 type rawValues map[string]uint64
 type convertedValues map[string]string
 
-// unitExp is map of limes.Unit to x, such that base-2 exponential of x
-// is the number of bytes for some specific unit.
-var unitExp = map[limes.Unit]float64{
-	limes.UnitKibibytes: 10,
-	limes.UnitMebibytes: 20,
-	limes.UnitGibibytes: 30,
-	limes.UnitTebibytes: 40,
-	limes.UnitPebibytes: 50,
-	limes.UnitExbibytes: 60,
-}
-
 func humanReadable(convert bool, unit limes.Unit, rv rawValues) (string, convertedValues) {
 	cv := make(convertedValues, len(rv))
 
@@ -348,7 +337,7 @@ func humanReadable(convert bool, unit limes.Unit, rv rawValues) (string, convert
 		return string(unit), cv
 	}
 
-	oldExp := unitExp[unit]
+	oldExp := quotaUnits[unit]
 	usage := computeAgainst
 
 	var diffInExp float64
@@ -363,7 +352,7 @@ func humanReadable(convert bool, unit limes.Unit, rv rawValues) (string, convert
 
 	// determine the new unit
 	var newUnit limes.Unit
-	for k, v := range unitExp {
+	for k, v := range quotaUnits {
 		if v == (oldExp + diffInExp) {
 			newUnit = k
 		}
