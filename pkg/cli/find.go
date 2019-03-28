@@ -24,12 +24,40 @@ import (
 
 	"github.com/gophercloud/gophercloud/openstack/identity/v3/domains"
 	"github.com/gophercloud/gophercloud/openstack/identity/v3/projects"
+	"github.com/gophercloud/gophercloud/openstack/identity/v3/tokens"
 	"github.com/gophercloud/gophercloud/pagination"
 )
 
 // FindDomain uses the user's input (name/UUID) to find a specific domain within the token scope.
 func FindDomain(userInput string) (*Domain, error) {
 	identityV3, _ := getServiceClients()
+
+	//fast path: if the domain is mentioned in our token's scope, we can use that
+	//to avoid extra requests
+	var currentToken struct {
+		Domain struct {
+			Name string `json:"name"`
+			ID   string `json:"id"`
+		} `json:"domain"`
+		Project struct {
+			Domain struct {
+				Name string `json:"name"`
+				ID   string `json:"id"`
+			} `json:"domain"`
+		} `json:"project"`
+	}
+	err := identityV3.GetAuthResult().(tokens.CreateResult).ExtractInto(&currentToken)
+	if err == nil {
+		d1 := currentToken.Domain
+		if d1.ID != "" && (d1.Name == userInput || d1.ID == userInput) {
+			return &Domain{Name: d1.Name, ID: d1.ID}, nil
+		}
+		d2 := currentToken.Project.Domain
+		if d2.ID != "" && (d2.Name == userInput || d2.ID == userInput) {
+			return &Domain{Name: d2.Name, ID: d2.ID}, nil
+		}
+	}
+
 	d := new(Domain)
 
 	// check if userInput is a UUID
@@ -67,8 +95,8 @@ func FindDomain(userInput string) (*Domain, error) {
 // FindProject uses the user's input (name/UUID) to find a specific project within the token scope.
 func FindProject(userInputProject, userInputDomain string) (*Project, error) {
 	identityV3, _ := getServiceClients()
-	p := new(Project)
 
+	p := new(Project)
 	// check if userInputProject is a UUID
 	tmpP, err := projects.Get(identityV3, userInputProject).Extract()
 	if err == nil {
