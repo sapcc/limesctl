@@ -1,3 +1,10 @@
+# v1.4.0 (TBD)
+
+New features:
+
+- Avoid extra requests to Keystone to resolve a domain name into an ID, when
+  the token scope already contains the correct domain ID.
+
 # v1.3.0 (2019-01-07)
 
 New features:
