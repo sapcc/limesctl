@@ -109,6 +109,7 @@
     "github.com/gophercloud/gophercloud/openstack",
     "github.com/gophercloud/gophercloud/openstack/identity/v3/domains",
     "github.com/gophercloud/gophercloud/openstack/identity/v3/projects",
+    "github.com/gophercloud/gophercloud/openstack/identity/v3/tokens",
     "github.com/gophercloud/gophercloud/pagination",
     "github.com/gophercloud/gophercloud/testhelper",
     "github.com/gophercloud/utils/openstack/clientconfig",

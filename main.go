@@ -167,17 +167,8 @@ func main() {
 		core.RunListTask(d, *outputFmt)
 
 	case domainShowCmd.FullCommand():
-		// since gophercloud does not allow domain listing across
-		// different clusters therefore we skip FindDomain(), if a cluster
-		// was provided at the command-line
-		var d *core.Domain
-		if *domainCluster == "" {
-			var err error
-			d, err = core.FindDomain(*domainShowID)
-			errors.Handle(err)
-		} else {
-			d = &core.Domain{ID: *domainShowID}
-		}
+		d, err := core.FindDomain(*domainShowID, *domainCluster)
+		errors.Handle(err)
 
 		d.Filter = filter
 		d.Filter.Cluster = *domainCluster
@@ -188,14 +179,8 @@ func main() {
 		if strings.Contains(*domainSetID, "=") {
 			errors.Handle(errors.New("required argument 'domain-id' not provided, try --help"))
 		}
-		var d *core.Domain
-		if *domainCluster == "" {
-			var err error
-			d, err = core.FindDomain(*domainSetID)
-			errors.Handle(err)
-		} else {
-			d = &core.Domain{ID: *domainSetID}
-		}
+		d, err := core.FindDomain(*domainSetID, *domainCluster)
+		errors.Handle(err)
 
 		d.Filter.Cluster = *domainCluster
 		q, err := core.ParseRawQuotas(d, domainSetQuotas, false)
@@ -203,13 +188,7 @@ func main() {
 		core.RunSetTask(d, q)
 
 	case projectListCmd.FullCommand():
-		var d *core.Domain
-		var err error
-		if *projectCluster == "" {
-			d, err = core.FindDomain(*projectListDomain)
-		} else {
-			d, err = core.FindDomainInCluster(*projectListDomain, *projectCluster)
-		}
+		d, err := core.FindDomain(*projectListDomain, *projectCluster)
 		errors.Handle(err)
 
 		p := &core.Project{

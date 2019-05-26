@@ -21,77 +21,85 @@ package core
 
 import (
 	"errors"
+	"fmt"
 	"strings"
 
-	"github.com/gophercloud/gophercloud/openstack/identity/v3/domains"
+	"github.com/gophercloud/gophercloud"
+	gopherdomains "github.com/gophercloud/gophercloud/openstack/identity/v3/domains"
 	"github.com/gophercloud/gophercloud/openstack/identity/v3/projects"
-	"github.com/gophercloud/gophercloud/openstack/identity/v3/tokens"
 	"github.com/gophercloud/gophercloud/pagination"
+	"github.com/sapcc/gophercloud-limes/resources/v1/domains"
 	"github.com/sapcc/limesctl/internal/auth"
+	"github.com/sapcc/limesctl/internal/errors"
 )
 
-// FindDomain uses the user's input (name/UUID) to find a specific domain within the token scope.
-func FindDomain(userInput string) (*Domain, error) {
-	identityV3, _ := auth.ServiceClients()
+// FindDomain uses the user's input (name/UUID) to find a specific domain
+// within the token scope.
+// Different strategies are tried in a chronological order to find the relevant
+// domain in the most efficient way possible.
+func FindDomain(userInput, clusterID string) (*Domain, error) {
+	identityV3, limesV1 := auth.ServiceClients()
 
-	//fast path: if the domain is mentioned in our token's scope, we can use that
-	//to avoid extra requests
-	var currentToken struct {
-		Domain struct {
-			Name string `json:"name"`
-			ID   string `json:"id"`
-		} `json:"domain"`
-		Project struct {
-			Domain struct {
-				Name string `json:"name"`
-				ID   string `json:"id"`
-			} `json:"domain"`
-		} `json:"project"`
+	// Strategy 1: if clusterID is given then userInput is assumed to be an ID.
+	// gophercloud doesn't support domains across different clusters therefore
+	// gophercloud-limes is used here to get the domain name.
+	if clusterID != "" {
+		return findDomainInCluster(limesV1, userInput, clusterID)
 	}
-	err := identityV3.GetAuthResult().(tokens.CreateResult).ExtractInto(&currentToken)
+
+	// Strategy 2: check if the domain is mentioned in the current token scope
+	token, err := auth.CurrentToken(identityV3)
 	if err == nil {
-		d1 := currentToken.Domain
+		d1 := token.Domain
 		if d1.ID != "" && (d1.Name == userInput || d1.ID == userInput) {
 			return &Domain{Name: d1.Name, ID: d1.ID}, nil
 		}
-		d2 := currentToken.Project.Domain
+		d2 := token.Project.Domain
 		if d2.ID != "" && (d2.Name == userInput || d2.ID == userInput) {
 			return &Domain{Name: d2.Name, ID: d2.ID}, nil
 		}
 	}
 
-	d := new(Domain)
-
-	// check if userInput is a UUID
-	tmpD, err := domains.Get(identityV3, userInput).Extract()
+	// Strategy 3: assume that userInput is an ID
+	d, err := gopherdomains.Get(identityV3, userInput).Extract()
 	if err == nil {
-		d.ID = tmpD.ID
-		d.Name = tmpD.Name
-	} else {
-		// userInput appears to be a name so we do domain listing restricted to the name
-		page, err := domains.List(identityV3, domains.ListOpts{Name: userInput}).AllPages()
-		if err != nil {
-			return nil, err
-		}
-		dList, err := domains.ExtractDomains(page)
-		if err != nil {
-			return nil, err
-		}
-		// no need to continue, if there are multiple domains in the list
-		if len(dList) > 1 {
-			return nil, errors.New("more than one domain exists with the name " + userInput)
-		}
-
-		for _, dInList := range dList {
-			d.ID = dInList.ID
-			d.Name = dInList.Name
-		}
-	}
-	if d.ID == "" {
-		return nil, errors.New("domain not found")
+		return &Domain{Name: d.Name, ID: d.ID}, nil
 	}
 
-	return d, nil
+	// Strategy 4: assume userInput is a name and do a domain listing
+	// restricted to that specific name
+	page, err := gopherdomains.List(identityV3, gopherdomains.ListOpts{Name: userInput}).AllPages()
+	if err != nil {
+		return nil, err
+	}
+	dList, err := gopherdomains.ExtractDomains(page)
+	if err != nil {
+		return nil, err
+	}
+	if len(dList) > 1 {
+		return nil, fmt.Errorf("more than one domain exists with the name %q", userInput)
+	}
+	if len(dList) != 0 && dList[0].ID != "" {
+		return &Domain{Name: dList[0].Name, ID: dList[0].ID}, nil
+	}
+
+	// at this point all strategies have failed
+	return nil, errors.New("domain not found")
+}
+
+func findDomainInCluster(limesV1 *gophercloud.ServiceClient, domainID, clusterID string) (*Domain, error) {
+	var s struct {
+		Domain struct {
+			UUID string `json:"id"`
+			Name string `json:"name"`
+		} `json:"domain"`
+	}
+	err := domains.Get(limesV1, domainID, domains.GetOpts{Cluster: clusterID}).ExtractInto(&s)
+	if err != nil {
+		return nil, fmt.Errorf("could not find domain: %v", err)
+	}
+
+	return &Domain{ID: s.Domain.UUID, Name: s.Domain.Name}, nil
 }
 
 // FindProject uses the user's input (name/UUID) to find a specific project within the token scope.
@@ -110,7 +118,7 @@ func FindProject(userInputProject, userInputDomain string) (*Project, error) {
 		// restricted to the name and domain ID (if given)
 		var page pagination.Page
 		if userInputDomain != "" {
-			d, err := FindDomain(userInputDomain)
+			d, err := FindDomain(userInputDomain, "")
 			if err != nil {
 				return nil, err
 			}
@@ -170,32 +178,9 @@ func FindProject(userInputProject, userInputDomain string) (*Project, error) {
 	return p, nil
 }
 
-// FindDomainInCluster finds a specific domain in a Cluster.
-func FindDomainInCluster(domainID, clusterID string) (*Domain, error) {
-	tmp := &Domain{
-		ID: domainID,
-		Filter: Filter{
-			Cluster: clusterID,
-		},
-	}
-	tmp.get()
-
-	tmpDomain, err := tmp.Result.Extract()
-	if err != nil {
-		return nil, err
-	}
-
-	d := &Domain{
-		ID:   tmpDomain.UUID,
-		Name: tmpDomain.Name,
-	}
-
-	return d, nil
-}
-
 // FindProjectInCluster finds a specific project in a Cluster.
 func FindProjectInCluster(projectID, domainID, clusterID string) (*Project, error) {
-	tmpDomain, err := FindDomainInCluster(domainID, clusterID)
+	tmpDomain, err := FindDomain(domainID, clusterID)
 	if err != nil {
 		return nil, err
 	}
