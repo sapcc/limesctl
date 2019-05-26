@@ -25,6 +25,7 @@ import (
 	"github.com/sapcc/gophercloud-limes/resources/v1/clusters"
 	"github.com/sapcc/gophercloud-limes/resources/v1/domains"
 	"github.com/sapcc/gophercloud-limes/resources/v1/projects"
+	"github.com/sapcc/limesctl/internal/auth"
 	"github.com/sapcc/limesctl/internal/errors"
 )
 
@@ -141,7 +142,7 @@ func RunSetTask(t SetTask, q *Quotas) {
 // RunSyncTask schedules a sync job that pulls quota and usage data for a project from
 // the backing services into Limes' local database.
 func RunSyncTask(p *Project) {
-	_, limesV1 := getServiceClients()
+	_, limesV1 := auth.ServiceClients()
 
 	err := projects.Sync(limesV1, p.DomainID, p.ID, projects.SyncOpts{
 		Cluster: p.Filter.Cluster,

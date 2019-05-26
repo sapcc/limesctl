@@ -23,12 +23,13 @@ import (
 	"github.com/sapcc/gophercloud-limes/resources/v1/clusters"
 	"github.com/sapcc/gophercloud-limes/resources/v1/domains"
 	"github.com/sapcc/gophercloud-limes/resources/v1/projects"
+	"github.com/sapcc/limesctl/internal/auth"
 	"github.com/sapcc/limesctl/internal/errors"
 )
 
 // get retrieves information about a single cluster.
 func (c *Cluster) get() {
-	_, limesV1 := getServiceClients()
+	_, limesV1 := auth.ServiceClients()
 
 	c.Result = clusters.Get(limesV1, c.ID, clusters.GetOpts{
 		Area:     c.Filter.Area,
@@ -40,7 +41,7 @@ func (c *Cluster) get() {
 
 // get retrieves information about a single domain.
 func (d *Domain) get() {
-	_, limesV1 := getServiceClients()
+	_, limesV1 := auth.ServiceClients()
 
 	d.Result = domains.Get(limesV1, d.ID, domains.GetOpts{
 		Cluster:  d.Filter.Cluster,
@@ -53,7 +54,7 @@ func (d *Domain) get() {
 
 // get retrieves information about a single project within a specific domain.
 func (p *Project) get() {
-	_, limesV1 := getServiceClients()
+	_, limesV1 := auth.ServiceClients()
 
 	p.Result = projects.Get(limesV1, p.DomainID, p.ID, projects.GetOpts{
 		Cluster:  p.Filter.Cluster,

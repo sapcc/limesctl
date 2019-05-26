@@ -25,12 +25,13 @@ import (
 	"github.com/sapcc/gophercloud-limes/resources/v1/clusters"
 	"github.com/sapcc/gophercloud-limes/resources/v1/domains"
 	"github.com/sapcc/gophercloud-limes/resources/v1/projects"
+	"github.com/sapcc/limesctl/internal/auth"
 	"github.com/sapcc/limesctl/internal/errors"
 )
 
 // set updates the resource capacities for a cluster.
 func (c *Cluster) set(q *Quotas) {
-	_, limesV1 := getServiceClients()
+	_, limesV1 := auth.ServiceClients()
 
 	sc := makeServiceCapacities(q)
 
@@ -40,7 +41,7 @@ func (c *Cluster) set(q *Quotas) {
 
 // set updates the resource quota(s) for a domain.
 func (d *Domain) set(q *Quotas) {
-	_, limesV1 := getServiceClients()
+	_, limesV1 := auth.ServiceClients()
 
 	sq := makeServiceQuotas(q)
 
@@ -53,7 +54,7 @@ func (d *Domain) set(q *Quotas) {
 
 // set updates the resource quota(s) for a project within a specific domain.
 func (p *Project) set(q *Quotas) {
-	_, limesV1 := getServiceClients()
+	_, limesV1 := auth.ServiceClients()
 
 	sq := makeServiceQuotas(q)
 

@@ -27,11 +27,12 @@ import (
 	"github.com/gophercloud/gophercloud/openstack/identity/v3/projects"
 	"github.com/gophercloud/gophercloud/openstack/identity/v3/tokens"
 	"github.com/gophercloud/gophercloud/pagination"
+	"github.com/sapcc/limesctl/internal/auth"
 )
 
 // FindDomain uses the user's input (name/UUID) to find a specific domain within the token scope.
 func FindDomain(userInput string) (*Domain, error) {
-	identityV3, _ := getServiceClients()
+	identityV3, _ := auth.ServiceClients()
 
 	//fast path: if the domain is mentioned in our token's scope, we can use that
 	//to avoid extra requests
@@ -95,7 +96,7 @@ func FindDomain(userInput string) (*Domain, error) {
 
 // FindProject uses the user's input (name/UUID) to find a specific project within the token scope.
 func FindProject(userInputProject, userInputDomain string) (*Project, error) {
-	identityV3, _ := getServiceClients()
+	identityV3, _ := auth.ServiceClients()
 
 	p := new(Project)
 	// check if userInputProject is a UUID

@@ -31,6 +31,7 @@ import (
 	"github.com/sapcc/gophercloud-limes/resources/v1/domains"
 	"github.com/sapcc/gophercloud-limes/resources/v1/projects"
 	"github.com/sapcc/limes"
+	"github.com/sapcc/limesctl/internal/auth"
 	"github.com/sapcc/limesctl/internal/errors"
 )
 
@@ -203,7 +204,7 @@ func (c *Cluster) setBaseUnits(ru *resourceUnits, isTest bool) {
 	// the c.Result would already be populated with the necessary mock test
 	// data
 	if !isTest {
-		_, limesV1 := getServiceClients()
+		_, limesV1 := auth.ServiceClients()
 		c.Result = clusters.Get(limesV1, c.ID, clusters.GetOpts{})
 	}
 
@@ -227,7 +228,7 @@ func (d *Domain) setBaseUnits(ru *resourceUnits, isTest bool) {
 	// the d.Result would already be populated with the necessary mock test
 	// data
 	if !isTest {
-		_, limesV1 := getServiceClients()
+		_, limesV1 := auth.ServiceClients()
 		d.Result = domains.Get(limesV1, d.ID, domains.GetOpts{
 			Cluster: d.Filter.Cluster})
 	}
@@ -252,7 +253,7 @@ func (p *Project) setBaseUnits(ru *resourceUnits, isTest bool) {
 	// the p.Result would already be populated with the necessary mock test
 	// data
 	if !isTest {
-		_, limesV1 := getServiceClients()
+		_, limesV1 := auth.ServiceClients()
 		p.Result = projects.Get(limesV1, p.DomainID, p.ID, projects.GetOpts{
 			Cluster: p.Filter.Cluster})
 	}

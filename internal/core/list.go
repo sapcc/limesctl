@@ -23,12 +23,13 @@ import (
 	"github.com/sapcc/gophercloud-limes/resources/v1/clusters"
 	"github.com/sapcc/gophercloud-limes/resources/v1/domains"
 	"github.com/sapcc/gophercloud-limes/resources/v1/projects"
+	"github.com/sapcc/limesctl/internal/auth"
 	"github.com/sapcc/limesctl/internal/errors"
 )
 
 // list retrieves information about all the clusters within the token scope.
 func (c *Cluster) list() {
-	_, limesV1 := getServiceClients()
+	_, limesV1 := auth.ServiceClients()
 
 	c.IsList = true
 	c.Result = clusters.List(limesV1, clusters.ListOpts{
@@ -41,7 +42,7 @@ func (c *Cluster) list() {
 
 // list retrieves information about all the domains within the token scope.
 func (d *Domain) list() {
-	_, limesV1 := getServiceClients()
+	_, limesV1 := auth.ServiceClients()
 
 	d.IsList = true
 	d.Result = domains.List(limesV1, domains.ListOpts{
@@ -55,7 +56,7 @@ func (d *Domain) list() {
 
 // list retrieves information about all the projects within a specific domain.
 func (p *Project) list() {
-	_, limesV1 := getServiceClients()
+	_, limesV1 := auth.ServiceClients()
 
 	p.IsList = true
 	p.Result = projects.List(limesV1, p.DomainID, projects.ListOpts{
