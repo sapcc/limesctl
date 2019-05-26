@@ -24,8 +24,8 @@ import (
 	"strings"
 
 	"github.com/alecthomas/kingpin"
-	"github.com/sapcc/limesctl/pkg/cli"
-	"github.com/sapcc/limesctl/pkg/errors"
+	"github.com/sapcc/limesctl/internal/core"
+	"github.com/sapcc/limesctl/internal/errors"
 )
 
 var (
@@ -118,12 +118,12 @@ func main() {
 	// output and filter are initialized in advance with values that were provided
 	// at the command-line. Later, we pass only the specific information that
 	// is required by the operation
-	filter := cli.Filter{
+	filter := core.Filter{
 		Area:     *area,
 		Service:  *service,
 		Resource: *resource,
 	}
-	output := cli.Output{
+	output := core.Output{
 		Names:         *namesOutput,
 		Long:          *longOutput,
 		HumanReadable: *humanReadableVals,
@@ -131,19 +131,19 @@ func main() {
 
 	switch cmdString {
 	case clusterListCmd.FullCommand():
-		c := &cli.Cluster{
+		c := &core.Cluster{
 			Filter: filter,
 			Output: output,
 		}
-		cli.RunListTask(c, *outputFmt)
+		core.RunListTask(c, *outputFmt)
 
 	case clusterShowCmd.FullCommand():
-		c := &cli.Cluster{
+		c := &core.Cluster{
 			ID:     *clusterShowID,
 			Filter: filter,
 			Output: output,
 		}
-		cli.RunGetTask(c, *outputFmt)
+		core.RunGetTask(c, *outputFmt)
 
 	case clusterSetCmd.FullCommand():
 		// this manual check is required due to the order of the Args.
@@ -153,119 +153,119 @@ func main() {
 			errors.Handle(errors.New("required argument 'cluster-id' not provided, try --help"))
 		}
 
-		c := &cli.Cluster{ID: *clusterSetID}
-		q, err := cli.ParseRawQuotas(c, clusterSetCaps, false)
+		c := &core.Cluster{ID: *clusterSetID}
+		q, err := core.ParseRawQuotas(c, clusterSetCaps, false)
 		errors.Handle(err)
-		cli.RunSetTask(c, q)
+		core.RunSetTask(c, q)
 
 	case domainListCmd.FullCommand():
-		d := &cli.Domain{
+		d := &core.Domain{
 			Filter: filter,
 			Output: output,
 		}
 		d.Filter.Cluster = *domainCluster
-		cli.RunListTask(d, *outputFmt)
+		core.RunListTask(d, *outputFmt)
 
 	case domainShowCmd.FullCommand():
 		// since gophercloud does not allow domain listing across
 		// different clusters therefore we skip FindDomain(), if a cluster
 		// was provided at the command-line
-		var d *cli.Domain
+		var d *core.Domain
 		if *domainCluster == "" {
 			var err error
-			d, err = cli.FindDomain(*domainShowID)
+			d, err = core.FindDomain(*domainShowID)
 			errors.Handle(err)
 		} else {
-			d = &cli.Domain{ID: *domainShowID}
+			d = &core.Domain{ID: *domainShowID}
 		}
 
 		d.Filter = filter
 		d.Filter.Cluster = *domainCluster
 		d.Output = output
-		cli.RunGetTask(d, *outputFmt)
+		core.RunGetTask(d, *outputFmt)
 
 	case domainSetCmd.FullCommand():
 		if strings.Contains(*domainSetID, "=") {
 			errors.Handle(errors.New("required argument 'domain-id' not provided, try --help"))
 		}
-		var d *cli.Domain
+		var d *core.Domain
 		if *domainCluster == "" {
 			var err error
-			d, err = cli.FindDomain(*domainSetID)
+			d, err = core.FindDomain(*domainSetID)
 			errors.Handle(err)
 		} else {
-			d = &cli.Domain{ID: *domainSetID}
+			d = &core.Domain{ID: *domainSetID}
 		}
 
 		d.Filter.Cluster = *domainCluster
-		q, err := cli.ParseRawQuotas(d, domainSetQuotas, false)
+		q, err := core.ParseRawQuotas(d, domainSetQuotas, false)
 		errors.Handle(err)
-		cli.RunSetTask(d, q)
+		core.RunSetTask(d, q)
 
 	case projectListCmd.FullCommand():
-		var d *cli.Domain
+		var d *core.Domain
 		var err error
 		if *projectCluster == "" {
-			d, err = cli.FindDomain(*projectListDomain)
+			d, err = core.FindDomain(*projectListDomain)
 		} else {
-			d, err = cli.FindDomainInCluster(*projectListDomain, *projectCluster)
+			d, err = core.FindDomainInCluster(*projectListDomain, *projectCluster)
 		}
 		errors.Handle(err)
 
-		p := &cli.Project{
+		p := &core.Project{
 			DomainID:   d.ID,
 			DomainName: d.Name,
 			Filter:     filter,
 			Output:     output,
 		}
 		p.Filter.Cluster = *projectCluster
-		cli.RunListTask(p, *outputFmt)
+		core.RunListTask(p, *outputFmt)
 
 	case projectShowCmd.FullCommand():
-		var p *cli.Project
+		var p *core.Project
 		var err error
 		if *projectCluster == "" {
-			p, err = cli.FindProject(*projectShowID, *projectShowDomain)
+			p, err = core.FindProject(*projectShowID, *projectShowDomain)
 		} else {
-			p, err = cli.FindProjectInCluster(*projectShowID, *projectShowDomain, *projectCluster)
+			p, err = core.FindProjectInCluster(*projectShowID, *projectShowDomain, *projectCluster)
 		}
 		errors.Handle(err)
 
 		p.Filter = filter
 		p.Filter.Cluster = *projectCluster
 		p.Output = output
-		cli.RunGetTask(p, *outputFmt)
+		core.RunGetTask(p, *outputFmt)
 
 	case projectSetCmd.FullCommand():
 		if strings.Contains(*projectSetID, "=") {
 			errors.Handle(errors.New("required argument 'project-id' not provided, try --help"))
 		}
-		var p *cli.Project
+		var p *core.Project
 		var err error
 		if *projectCluster == "" {
-			p, err = cli.FindProject(*projectSetID, *projectSetDomain)
+			p, err = core.FindProject(*projectSetID, *projectSetDomain)
 		} else {
-			p, err = cli.FindProjectInCluster(*projectSetID, *projectSetDomain, *projectCluster)
+			p, err = core.FindProjectInCluster(*projectSetID, *projectSetDomain, *projectCluster)
 		}
 		errors.Handle(err)
 
 		p.Filter.Cluster = *projectCluster
-		q, err := cli.ParseRawQuotas(p, projectSetQuotas, false)
+		q, err := core.ParseRawQuotas(p, projectSetQuotas, false)
 		errors.Handle(err)
-		cli.RunSetTask(p, q)
+		core.RunSetTask(p, q)
 
 	case projectSyncCmd.FullCommand():
-		var p *cli.Project
+		var p *core.Project
 		var err error
 		if *projectCluster == "" {
-			p, err = cli.FindProject(*projectSyncID, *projectSyncDomain)
+			p, err = core.FindProject(*projectSyncID, *projectSyncDomain)
 		} else {
-			p, err = cli.FindProjectInCluster(*projectSyncID, *projectSyncDomain, *projectCluster)
+			p, err = core.FindProjectInCluster(*projectSyncID, *projectSyncDomain, *projectCluster)
 		}
 		errors.Handle(err)
 
 		p.Filter.Cluster = *projectCluster
-		cli.RunSyncTask(p)
+		core.RunSyncTask(p)
 	}
 }
 
@@ -277,7 +277,7 @@ func setEnvUnlessEmpty(env, val string) {
 	os.Setenv(env, val)
 }
 
-type rawQuotas cli.RawQuotas
+type rawQuotas core.RawQuotas
 
 // Set implements the kingpin.Value interface.
 func (rq *rawQuotas) Set(value string) error {
@@ -296,9 +296,9 @@ func (rq *rawQuotas) IsCumulative() bool {
 }
 
 // QuotaList appends the raw quota values given at the command line to the
-// aggregate cli.RawQuotas list.
-func QuotaList(s kingpin.Settings) (target *cli.RawQuotas) {
-	target = new(cli.RawQuotas)
+// aggregate core.RawQuotas list.
+func QuotaList(s kingpin.Settings) (target *core.RawQuotas) {
+	target = new(core.RawQuotas)
 	s.SetValue((*rawQuotas)(target))
 	return
 }

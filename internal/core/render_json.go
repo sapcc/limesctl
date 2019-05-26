@@ -17,12 +17,12 @@
 *
 *******************************************************************************/
 
-package cli
+package core
 
 import (
 	"encoding/json"
 
-	"github.com/sapcc/limesctl/pkg/errors"
+	"github.com/sapcc/limesctl/internal/errors"
 )
 
 type jsonData []byte

@@ -17,7 +17,7 @@
 *
 *******************************************************************************/
 
-package cli
+package core
 
 import (
 	"math"
@@ -26,7 +26,7 @@ import (
 	"time"
 
 	"github.com/sapcc/limes"
-	"github.com/sapcc/limesctl/pkg/errors"
+	"github.com/sapcc/limesctl/internal/errors"
 )
 
 type csvData [][]string

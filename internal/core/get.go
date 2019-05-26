@@ -17,53 +17,49 @@
 *
 *******************************************************************************/
 
-package cli
+package core
 
 import (
-	"fmt"
-
 	"github.com/sapcc/gophercloud-limes/resources/v1/clusters"
 	"github.com/sapcc/gophercloud-limes/resources/v1/domains"
 	"github.com/sapcc/gophercloud-limes/resources/v1/projects"
-	"github.com/sapcc/limesctl/pkg/errors"
+	"github.com/sapcc/limesctl/internal/errors"
 )
 
-// set updates the resource capacities for a cluster.
-func (c *Cluster) set(q *Quotas) {
+// get retrieves information about a single cluster.
+func (c *Cluster) get() {
 	_, limesV1 := getServiceClients()
 
-	sc := makeServiceCapacities(q)
-
-	err := clusters.Update(limesV1, c.ID, clusters.UpdateOpts{Services: sc})
-	errors.Handle(err, "could not set new capacities for cluster")
+	c.Result = clusters.Get(limesV1, c.ID, clusters.GetOpts{
+		Area:     c.Filter.Area,
+		Service:  c.Filter.Service,
+		Resource: c.Filter.Resource,
+	})
+	errors.Handle(c.Result.Err, "could not get cluster")
 }
 
-// set updates the resource quota(s) for a domain.
-func (d *Domain) set(q *Quotas) {
+// get retrieves information about a single domain.
+func (d *Domain) get() {
 	_, limesV1 := getServiceClients()
 
-	sq := makeServiceQuotas(q)
-
-	err := domains.Update(limesV1, d.ID, domains.UpdateOpts{
+	d.Result = domains.Get(limesV1, d.ID, domains.GetOpts{
 		Cluster:  d.Filter.Cluster,
-		Services: sq,
+		Area:     d.Filter.Area,
+		Service:  d.Filter.Service,
+		Resource: d.Filter.Resource,
 	})
-	errors.Handle(err, "could not set new quota(s) for domain")
+	errors.Handle(d.Result.Err, "could not get domain")
 }
 
-// set updates the resource quota(s) for a project within a specific domain.
-func (p *Project) set(q *Quotas) {
+// get retrieves information about a single project within a specific domain.
+func (p *Project) get() {
 	_, limesV1 := getServiceClients()
 
-	sq := makeServiceQuotas(q)
-
-	respBody, err := projects.Update(limesV1, p.DomainID, p.ID, projects.UpdateOpts{
+	p.Result = projects.Get(limesV1, p.DomainID, p.ID, projects.GetOpts{
 		Cluster:  p.Filter.Cluster,
-		Services: sq,
+		Area:     p.Filter.Area,
+		Service:  p.Filter.Service,
+		Resource: p.Filter.Resource,
 	})
-	errors.Handle(err, "could not set new quota(s) for project")
-
-	if respBody != nil {
-		fmt.Println(string(respBody))
-	}
+	errors.Handle(p.Result.Err, "could not get project")
 }

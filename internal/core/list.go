@@ -17,13 +17,13 @@
 *
 *******************************************************************************/
 
-package cli
+package core
 
 import (
 	"github.com/sapcc/gophercloud-limes/resources/v1/clusters"
 	"github.com/sapcc/gophercloud-limes/resources/v1/domains"
 	"github.com/sapcc/gophercloud-limes/resources/v1/projects"
-	"github.com/sapcc/limesctl/pkg/errors"
+	"github.com/sapcc/limesctl/internal/errors"
 )
 
 // list retrieves information about all the clusters within the token scope.

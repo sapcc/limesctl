@@ -17,14 +17,14 @@
 *
 *******************************************************************************/
 
-package cli
+package core
 
 import (
 	"github.com/gophercloud/gophercloud"
 	"github.com/gophercloud/gophercloud/openstack"
 	"github.com/gophercloud/utils/openstack/clientconfig"
 	"github.com/sapcc/gophercloud-limes/resources"
-	"github.com/sapcc/limesctl/pkg/errors"
+	"github.com/sapcc/limesctl/internal/errors"
 )
 
 // getServiceClients authenticates against OpenStack and returns respective ServiceClients

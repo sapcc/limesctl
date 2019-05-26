@@ -17,7 +17,7 @@
 *
 *******************************************************************************/
 
-package cli
+package core
 
 import (
 	"os"
@@ -25,7 +25,7 @@ import (
 	"github.com/sapcc/gophercloud-limes/resources/v1/clusters"
 	"github.com/sapcc/gophercloud-limes/resources/v1/domains"
 	"github.com/sapcc/gophercloud-limes/resources/v1/projects"
-	"github.com/sapcc/limesctl/pkg/errors"
+	"github.com/sapcc/limesctl/internal/errors"
 )
 
 // Cluster contains information regarding a cluster(s).

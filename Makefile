@@ -49,11 +49,11 @@ release/$(BINARY64): FORCE
 ################################################################################
 
 # which packages to test with static checkers?
-GO_ALLPKGS := $(PKG) $(shell go list $(PKG)/pkg/...)
+GO_ALLPKGS := $(PKG) $(shell go list $(PKG)/internal/...)
 # which packages to test with `go test`?
-GO_TESTPKGS := $(shell go list -f '{{if .TestGoFiles}}{{.ImportPath}}{{end}}' $(PKG)/pkg/...)
+GO_TESTPKGS := $(shell go list -f '{{if .TestGoFiles}}{{.ImportPath}}{{end}}' $(PKG)/internal/...)
 # which packages to measure coverage for?
-GO_COVERPKGS := $(shell go list $(PKG)/pkg/...)
+GO_COVERPKGS := $(shell go list $(PKG)/internal/...)
 # output files from `go test`
 GO_COVERFILES := $(patsubst %,build/%.cover.out,$(subst /,_,$(GO_TESTPKGS)))
 

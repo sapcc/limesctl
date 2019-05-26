@@ -17,7 +17,7 @@
 *
 *******************************************************************************/
 
-package cli
+package core
 
 import (
 	"fmt"
@@ -31,7 +31,7 @@ import (
 	"github.com/sapcc/gophercloud-limes/resources/v1/domains"
 	"github.com/sapcc/gophercloud-limes/resources/v1/projects"
 	"github.com/sapcc/limes"
-	"github.com/sapcc/limesctl/pkg/errors"
+	"github.com/sapcc/limesctl/internal/errors"
 )
 
 // quotaUnits is map of limes.Unit to x, such that base-2 exponential of x is
