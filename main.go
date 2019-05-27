@@ -201,13 +201,10 @@ func main() {
 		core.RunListTask(p, *outputFmt)
 
 	case projectShowCmd.FullCommand():
-		var p *core.Project
-		var err error
-		if *projectCluster == "" {
-			p, err = core.FindProject(*projectShowID, *projectShowDomain)
-		} else {
-			p, err = core.FindProjectInCluster(*projectShowID, *projectShowDomain, *projectCluster)
+		if *projectCluster != "" && *projectShowDomain == "" {
+			errors.Handle(errors.New("required argument 'domain-id' not provided, try --help"))
 		}
+		p, err := core.FindProject(*projectShowID, *projectShowDomain, *projectCluster)
 		errors.Handle(err)
 
 		p.Filter = filter
@@ -216,16 +213,13 @@ func main() {
 		core.RunGetTask(p, *outputFmt)
 
 	case projectSetCmd.FullCommand():
+		if *projectCluster != "" && *projectSetDomain == "" {
+			errors.Handle(errors.New("required argument 'domain-id' not provided, try --help"))
+		}
 		if strings.Contains(*projectSetID, "=") {
 			errors.Handle(errors.New("required argument 'project-id' not provided, try --help"))
 		}
-		var p *core.Project
-		var err error
-		if *projectCluster == "" {
-			p, err = core.FindProject(*projectSetID, *projectSetDomain)
-		} else {
-			p, err = core.FindProjectInCluster(*projectSetID, *projectSetDomain, *projectCluster)
-		}
+		p, err := core.FindProject(*projectSetID, *projectSetDomain, *projectCluster)
 		errors.Handle(err)
 
 		p.Filter.Cluster = *projectCluster
@@ -234,13 +228,7 @@ func main() {
 		core.RunSetTask(p, q)
 
 	case projectSyncCmd.FullCommand():
-		var p *core.Project
-		var err error
-		if *projectCluster == "" {
-			p, err = core.FindProject(*projectSyncID, *projectSyncDomain)
-		} else {
-			p, err = core.FindProjectInCluster(*projectSyncID, *projectSyncDomain, *projectCluster)
-		}
+		p, err := core.FindProject(*projectSyncID, *projectSyncDomain, *projectCluster)
 		errors.Handle(err)
 
 		p.Filter.Cluster = *projectCluster
