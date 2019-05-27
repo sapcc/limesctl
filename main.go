@@ -24,6 +24,7 @@ import (
 	"strings"
 
 	"github.com/alecthomas/kingpin"
+	"github.com/sapcc/limesctl/internal/auth"
 	"github.com/sapcc/limesctl/internal/core"
 	"github.com/sapcc/limesctl/internal/errors"
 )
@@ -131,19 +132,21 @@ func main() {
 
 	switch cmdString {
 	case clusterListCmd.FullCommand():
+		_, limesV1 := auth.ServiceClients()
 		c := &core.Cluster{
 			Filter: filter,
 			Output: output,
 		}
-		core.RunListTask(c, *outputFmt)
+		core.RunListTask(limesV1, c, *outputFmt)
 
 	case clusterShowCmd.FullCommand():
+		_, limesV1 := auth.ServiceClients()
 		c := &core.Cluster{
 			ID:     *clusterShowID,
 			Filter: filter,
 			Output: output,
 		}
-		core.RunGetTask(c, *outputFmt)
+		core.RunGetTask(limesV1, c, *outputFmt)
 
 	case clusterSetCmd.FullCommand():
 		// this manual check is required due to the order of the Args.
@@ -153,42 +156,47 @@ func main() {
 			errors.Handle(errors.New("required argument 'cluster-id' not provided, try --help"))
 		}
 
+		_, limesV1 := auth.ServiceClients()
 		c := &core.Cluster{ID: *clusterSetID}
 		q, err := core.ParseRawQuotas(c, clusterSetCaps, false)
 		errors.Handle(err)
-		core.RunSetTask(c, q)
+		core.RunSetTask(limesV1, c, q)
 
 	case domainListCmd.FullCommand():
+		_, limesV1 := auth.ServiceClients()
 		d := &core.Domain{
 			Filter: filter,
 			Output: output,
 		}
 		d.Filter.Cluster = *domainCluster
-		core.RunListTask(d, *outputFmt)
+		core.RunListTask(limesV1, d, *outputFmt)
 
 	case domainShowCmd.FullCommand():
-		d, err := core.FindDomain(*domainShowID, *domainCluster)
+		identityV3, limesV1 := auth.ServiceClients()
+		d, err := core.FindDomain(identityV3, limesV1, *domainShowID, *domainCluster)
 		errors.Handle(err)
 
 		d.Filter = filter
 		d.Filter.Cluster = *domainCluster
 		d.Output = output
-		core.RunGetTask(d, *outputFmt)
+		core.RunGetTask(limesV1, d, *outputFmt)
 
 	case domainSetCmd.FullCommand():
 		if strings.Contains(*domainSetID, "=") {
 			errors.Handle(errors.New("required argument 'domain-id' not provided, try --help"))
 		}
-		d, err := core.FindDomain(*domainSetID, *domainCluster)
+		identityV3, limesV1 := auth.ServiceClients()
+		d, err := core.FindDomain(identityV3, limesV1, *domainSetID, *domainCluster)
 		errors.Handle(err)
 
 		d.Filter.Cluster = *domainCluster
 		q, err := core.ParseRawQuotas(d, domainSetQuotas, false)
 		errors.Handle(err)
-		core.RunSetTask(d, q)
+		core.RunSetTask(limesV1, d, q)
 
 	case projectListCmd.FullCommand():
-		d, err := core.FindDomain(*projectListDomain, *projectCluster)
+		identityV3, limesV1 := auth.ServiceClients()
+		d, err := core.FindDomain(identityV3, limesV1, *projectListDomain, *projectCluster)
 		errors.Handle(err)
 
 		p := &core.Project{
@@ -198,19 +206,21 @@ func main() {
 			Output:     output,
 		}
 		p.Filter.Cluster = *projectCluster
-		core.RunListTask(p, *outputFmt)
+		core.RunListTask(limesV1, p, *outputFmt)
 
 	case projectShowCmd.FullCommand():
 		if *projectCluster != "" && *projectShowDomain == "" {
 			errors.Handle(errors.New("required argument 'domain-id' not provided, try --help"))
 		}
-		p, err := core.FindProject(*projectShowID, *projectShowDomain, *projectCluster)
+
+		identityV3, limesV1 := auth.ServiceClients()
+		p, err := core.FindProject(identityV3, limesV1, *projectShowID, *projectShowDomain, *projectCluster)
 		errors.Handle(err)
 
 		p.Filter = filter
 		p.Filter.Cluster = *projectCluster
 		p.Output = output
-		core.RunGetTask(p, *outputFmt)
+		core.RunGetTask(limesV1, p, *outputFmt)
 
 	case projectSetCmd.FullCommand():
 		if *projectCluster != "" && *projectSetDomain == "" {
@@ -219,20 +229,22 @@ func main() {
 		if strings.Contains(*projectSetID, "=") {
 			errors.Handle(errors.New("required argument 'project-id' not provided, try --help"))
 		}
-		p, err := core.FindProject(*projectSetID, *projectSetDomain, *projectCluster)
+		identityV3, limesV1 := auth.ServiceClients()
+		p, err := core.FindProject(identityV3, limesV1, *projectSetID, *projectSetDomain, *projectCluster)
 		errors.Handle(err)
 
 		p.Filter.Cluster = *projectCluster
 		q, err := core.ParseRawQuotas(p, projectSetQuotas, false)
 		errors.Handle(err)
-		core.RunSetTask(p, q)
+		core.RunSetTask(limesV1, p, q)
 
 	case projectSyncCmd.FullCommand():
-		p, err := core.FindProject(*projectSyncID, *projectSyncDomain, *projectCluster)
+		identityV3, limesV1 := auth.ServiceClients()
+		p, err := core.FindProject(identityV3, limesV1, *projectSyncID, *projectSyncDomain, *projectCluster)
 		errors.Handle(err)
 
 		p.Filter.Cluster = *projectCluster
-		core.RunSyncTask(p)
+		core.RunSyncTask(limesV1, p)
 	}
 }
 

@@ -22,10 +22,10 @@ package core
 import (
 	"os"
 
+	"github.com/gophercloud/gophercloud"
 	"github.com/sapcc/gophercloud-limes/resources/v1/clusters"
 	"github.com/sapcc/gophercloud-limes/resources/v1/domains"
 	"github.com/sapcc/gophercloud-limes/resources/v1/projects"
-	"github.com/sapcc/limesctl/internal/auth"
 	"github.com/sapcc/limesctl/internal/errors"
 )
 
@@ -90,14 +90,14 @@ type Renderer interface {
 
 // GetTask is the interface type that abstracts a get operation.
 type GetTask interface {
-	get()
+	get(*gophercloud.ServiceClient)
 	Renderer
 }
 
 // RunGetTask is the function that operates on a GetTask and shows the output in the respective
 // format that is specified at the command line.
-func RunGetTask(t GetTask, outputFmt string) {
-	t.get()
+func RunGetTask(limesV1 *gophercloud.ServiceClient, t GetTask, outputFmt string) {
+	t.get(limesV1)
 	switch outputFmt {
 	case "json":
 		t.renderJSON().write(os.Stdout)
@@ -110,14 +110,14 @@ func RunGetTask(t GetTask, outputFmt string) {
 
 // ListTask is the interface type that abstracts a list operation.
 type ListTask interface {
-	list()
+	list(*gophercloud.ServiceClient)
 	Renderer
 }
 
 // RunListTask is the function that operates on a ListTask and shows the output in the respective
 // format that is specified at the command line.
-func RunListTask(t ListTask, outputFmt string) {
-	t.list()
+func RunListTask(limesV1 *gophercloud.ServiceClient, t ListTask, outputFmt string) {
+	t.list(limesV1)
 	switch outputFmt {
 	case "json":
 		t.renderJSON().write(os.Stdout)
@@ -130,20 +130,18 @@ func RunListTask(t ListTask, outputFmt string) {
 
 // SetTask is the interface type that abstracts a put operation.
 type SetTask interface {
-	set(*Quotas)
+	set(*gophercloud.ServiceClient, *Quotas)
 }
 
 // RunSetTask is the function that operates on a SetTask and shows the output in the respective
 // format that is specified at the command line.
-func RunSetTask(t SetTask, q *Quotas) {
-	t.set(q)
+func RunSetTask(limesV1 *gophercloud.ServiceClient, t SetTask, q *Quotas) {
+	t.set(limesV1, q)
 }
 
 // RunSyncTask schedules a sync job that pulls quota and usage data for a project from
 // the backing services into Limes' local database.
-func RunSyncTask(p *Project) {
-	_, limesV1 := auth.ServiceClients()
-
+func RunSyncTask(limesV1 *gophercloud.ServiceClient, p *Project) {
 	err := projects.Sync(limesV1, p.DomainID, p.ID, projects.SyncOpts{
 		Cluster: p.Filter.Cluster,
 	})

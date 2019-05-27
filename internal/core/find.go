@@ -38,9 +38,7 @@ import (
 // within the token scope.
 // Different strategies are tried in a chronological order to find the relevant
 // domain in the most efficient way possible.
-func FindDomain(userInput, clusterID string) (*Domain, error) {
-	identityV3, limesV1 := auth.ServiceClients()
-
+func FindDomain(identityV3, limesV1 *gophercloud.ServiceClient, userInput, clusterID string) (*Domain, error) {
 	// Strategy 1: if clusterID is given then userInput is assumed to be an ID
 	if clusterID != "" {
 		return findDomainInCluster(limesV1, userInput, clusterID)
@@ -108,9 +106,7 @@ func findDomainInCluster(limesV1 *gophercloud.ServiceClient, domainID, clusterID
 // within the token scope.
 // Different strategies are tried in a chronological order to find the relevant
 // project in the most efficient way possible.
-func FindProject(userInputProject, userInputDomain, clusterID string) (*Project, error) {
-	identityV3, limesV1 := auth.ServiceClients()
-
+func FindProject(identityV3, limesV1 *gophercloud.ServiceClient, userInputProject, userInputDomain, clusterID string) (*Project, error) {
 	// Strategy 1: if clusterID is given then userInputs are assumed to be IDs
 	if clusterID != "" {
 		return findProjectInCluster(limesV1, userInputProject, userInputDomain, clusterID)
@@ -163,7 +159,7 @@ func FindProject(userInputProject, userInputDomain, clusterID string) (*Project,
 	// restricted to that specific name
 	var page pagination.Page
 	if userInputDomain != "" {
-		d, err := FindDomain(userInputDomain, clusterID)
+		d, err := FindDomain(identityV3, limesV1, userInputDomain, clusterID)
 		if err == nil {
 			page, err = gopherprojects.List(identityV3, gopherprojects.ListOpts{
 				Name:     userInputProject,

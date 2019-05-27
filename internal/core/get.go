@@ -20,17 +20,15 @@
 package core
 
 import (
+	"github.com/gophercloud/gophercloud"
 	"github.com/sapcc/gophercloud-limes/resources/v1/clusters"
 	"github.com/sapcc/gophercloud-limes/resources/v1/domains"
 	"github.com/sapcc/gophercloud-limes/resources/v1/projects"
-	"github.com/sapcc/limesctl/internal/auth"
 	"github.com/sapcc/limesctl/internal/errors"
 )
 
 // get retrieves information about a single cluster.
-func (c *Cluster) get() {
-	_, limesV1 := auth.ServiceClients()
-
+func (c *Cluster) get(limesV1 *gophercloud.ServiceClient) {
 	c.Result = clusters.Get(limesV1, c.ID, clusters.GetOpts{
 		Area:     c.Filter.Area,
 		Service:  c.Filter.Service,
@@ -40,9 +38,7 @@ func (c *Cluster) get() {
 }
 
 // get retrieves information about a single domain.
-func (d *Domain) get() {
-	_, limesV1 := auth.ServiceClients()
-
+func (d *Domain) get(limesV1 *gophercloud.ServiceClient) {
 	d.Result = domains.Get(limesV1, d.ID, domains.GetOpts{
 		Cluster:  d.Filter.Cluster,
 		Area:     d.Filter.Area,
@@ -53,9 +49,7 @@ func (d *Domain) get() {
 }
 
 // get retrieves information about a single project within a specific domain.
-func (p *Project) get() {
-	_, limesV1 := auth.ServiceClients()
-
+func (p *Project) get(limesV1 *gophercloud.ServiceClient) {
 	p.Result = projects.Get(limesV1, p.DomainID, p.ID, projects.GetOpts{
 		Cluster:  p.Filter.Cluster,
 		Area:     p.Filter.Area,

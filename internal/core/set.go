@@ -22,17 +22,15 @@ package core
 import (
 	"fmt"
 
+	"github.com/gophercloud/gophercloud"
 	"github.com/sapcc/gophercloud-limes/resources/v1/clusters"
 	"github.com/sapcc/gophercloud-limes/resources/v1/domains"
 	"github.com/sapcc/gophercloud-limes/resources/v1/projects"
-	"github.com/sapcc/limesctl/internal/auth"
 	"github.com/sapcc/limesctl/internal/errors"
 )
 
 // set updates the resource capacities for a cluster.
-func (c *Cluster) set(q *Quotas) {
-	_, limesV1 := auth.ServiceClients()
-
+func (c *Cluster) set(limesV1 *gophercloud.ServiceClient, q *Quotas) {
 	sc := makeServiceCapacities(q)
 
 	err := clusters.Update(limesV1, c.ID, clusters.UpdateOpts{Services: sc})
@@ -40,9 +38,7 @@ func (c *Cluster) set(q *Quotas) {
 }
 
 // set updates the resource quota(s) for a domain.
-func (d *Domain) set(q *Quotas) {
-	_, limesV1 := auth.ServiceClients()
-
+func (d *Domain) set(limesV1 *gophercloud.ServiceClient, q *Quotas) {
 	sq := makeServiceQuotas(q)
 
 	err := domains.Update(limesV1, d.ID, domains.UpdateOpts{
@@ -53,9 +49,7 @@ func (d *Domain) set(q *Quotas) {
 }
 
 // set updates the resource quota(s) for a project within a specific domain.
-func (p *Project) set(q *Quotas) {
-	_, limesV1 := auth.ServiceClients()
-
+func (p *Project) set(limesV1 *gophercloud.ServiceClient, q *Quotas) {
 	sq := makeServiceQuotas(q)
 
 	respBody, err := projects.Update(limesV1, p.DomainID, p.ID, projects.UpdateOpts{
