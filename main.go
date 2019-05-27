@@ -130,6 +130,10 @@ func main() {
 		HumanReadable: *humanReadableVals,
 	}
 
+	if output.Names && output.Long {
+		errors.Handle(errors.New("'--names' and '--long' can not be used together"))
+	}
+
 	switch cmdString {
 	case clusterListCmd.FullCommand():
 		_, limesV1 := auth.ServiceClients()

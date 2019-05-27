@@ -67,10 +67,6 @@ func (d *Domain) renderCSV() *csvData {
 	var data csvData
 	var labels []string
 
-	if d.Output.Names && d.Output.Long {
-		errors.Handle(errors.New("'--names' and '--long' can not be used together"))
-	}
-
 	switch {
 	case d.Output.Names:
 		labels = []string{"domain name", "service", "resource", "quota", "projects quota", "usage", "unit"}
@@ -103,10 +99,6 @@ func (d *Domain) renderCSV() *csvData {
 func (p *Project) renderCSV() *csvData {
 	var data csvData
 	var labels []string
-
-	if p.Output.Names && p.Output.Long {
-		errors.Handle(errors.New("'--names' and '--long' can not be used together"))
-	}
 
 	switch {
 	case p.Output.Names:
