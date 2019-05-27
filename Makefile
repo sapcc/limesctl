@@ -1,18 +1,12 @@
-ifeq ($(shell uname -s),Darwin)
-	PREFIX  := /usr/local
-else
-	PREFIX  := /usr
-endif
+PREFIX  := /usr/local
 PKG      = github.com/sapcc/limesctl
 VERSION := $(shell util/find_version.sh)
 
-GO          := GOPATH=$(CURDIR)/.gopath GOBIN=$(CURDIR)/build go
+GOOS        ?= $(word 1, $(subst /, " ", $(word 4, $(shell go version))))
+GO          := GOBIN=$(CURDIR)/build go
 BUILD_FLAGS :=
 LD_FLAGS    := -s -w -X main.version=$(VERSION)
 
-ifndef GOOS
-	GOOS := $(word 1, $(subst /, " ", $(word 4, $(shell go version))))
-endif
 BINARY64  := limesctl-$(GOOS)_amd64
 RELEASE64 := limesctl-$(VERSION)-$(GOOS)_amd64
 
@@ -35,7 +29,7 @@ release: FORCE release/$(BINARY64)
 	cd release && rm -f limesctl.exe
 else
 release: FORCE release/$(BINARY64)
-	cd release && cp -f $(BINARY64) limesctl && tar -czf $(RELEASE64).tgz limesctl
+	cd release && cp -f $(BINARY64) limesctl && tar -czf $(RELEASE64).tar.gz limesctl
 	cd release && rm -f limesctl
 endif
 
@@ -49,11 +43,11 @@ release/$(BINARY64): FORCE
 ################################################################################
 
 # which packages to test with static checkers?
-GO_ALLPKGS := $(PKG) $(shell go list $(PKG)/internal/...)
+GO_ALLPKGS := $(PKG) $(shell $(GO) list $(GO_BUILDFLAGS) $(PKG)/internal/...)
 # which packages to test with `go test`?
-GO_TESTPKGS := $(shell go list -f '{{if .TestGoFiles}}{{.ImportPath}}{{end}}' $(PKG)/internal/...)
+GO_TESTPKGS := $(shell $(GO) list $(GO_BUILDFLAGS) -f '{{if .TestGoFiles}}{{.ImportPath}}{{end}}' $(PKG)/internal/...)
 # which packages to measure coverage for?
-GO_COVERPKGS := $(shell go list $(PKG)/internal/...)
+GO_COVERPKGS := $(shell $(GO) list $(GO_BUILDFLAGS) $(PKG)/internal/...)
 # output files from `go test`
 GO_COVERFILES := $(patsubst %,build/%.cover.out,$(subst /,_,$(GO_TESTPKGS)))
 
@@ -63,24 +57,25 @@ space := $(null) $(null)
 comma := ,
 
 check: all static-check build/cover.html FORCE
-	@echo -e "\e[1;32m>> All tests successful.\e[0m"
+	@printf "\e[1;32m>> All tests successful.\e[0m\n"
 static-check: FORCE
-	@if ! hash golint 2>/dev/null; then echo ">> Installing golint..."; go get -u golang.org/x/lint/golint; fi
-	@echo '>> gofmt'
-	@if s="$$(gofmt -s -l *.go pkg 2>/dev/null)" && test -n "$$s"; then printf ' => %s\n%s\n' gofmt  "$$s"; false; fi
-	@echo '>> golint'
-	@if s="$$(golint . && find pkg -type d ! -name dbdata -exec golint {} \; 2>/dev/null)" && test -n "$$s"; then printf ' => %s\n%s\n' golint "$$s"; false; fi
-	@echo '>> go vet'
-	@$(GO) vet -composites=false $(GO_ALLPKGS)
+	@if ! hash golint 2>/dev/null; then printf "\e[1;36m>> Installing golint...\e[0m\n"; go get -u golang.org/x/lint/golint; fi
+	@printf "\e[1;36m>> gofmt\e[0m\n"
+	@if s="$$(gofmt -s -l *.go cmd pkg 2>/dev/null)" && test -n "$$s"; then printf ' => %s\n%s\n' gofmt  "$$s"; false; fi
+	@printf "\e[1;36m>> golint\e[0m\n"
+	@if s="$$(golint . && find pkg -type d -exec golint {} \; 2>/dev/null)" && test -n "$$s"; then printf ' => %s\n%s\n' golint "$$s"; false; fi
+	@printf "\e[1;36m>> go vet\e[0m\n"
+	@$(GO) vet -composites=false $(GO_BUILDFLAGS) $(GO_ALLPKGS)
+
 build/%.cover.out: FORCE
-	@echo '>> go test $*'
+	@printf "\e[1;36m>> go test $(subst _,/,$*)\e[0m\n"
 	$(GO) test $(GO_BUILDFLAGS) -ldflags '$(GO_LDFLAGS)' -coverprofile=$@ -covermode=count -coverpkg=$(subst $(space),$(comma),$(GO_COVERPKGS)) $(subst _,/,$*)
 build/cover.out: $(GO_COVERFILES)
-	util/gocovcat/main.go $(GO_COVERFILES) > $@
+	$(GO) run $(GO_BUILDFLAGS) util/gocovcat/main.go $(GO_COVERFILES) > $@
 build/cover.html: build/cover.out
 	$(GO) tool cover -html $< -o $@
 
 clean: FORCE
-	rm -rf build release
+	rm -rf -- build release
 
 .PHONY: FORCE
