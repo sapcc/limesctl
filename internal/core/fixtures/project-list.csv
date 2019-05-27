@@ -1,11 +1,11 @@
-"domain id";"project id";"service";"resource";"quota";"usage";"unit"
-"uuid-for-germany";"uuid-for-berlin";"shared";"capacity";10;2;"B"
-"uuid-for-germany";"uuid-for-berlin";"shared";"external_things";1;0;""
-"uuid-for-germany";"uuid-for-berlin";"shared";"things";10;2;""
-"uuid-for-germany";"uuid-for-berlin";"unshared";"capacity";10;2;"B"
-"uuid-for-germany";"uuid-for-berlin";"unshared";"things";10;2;""
-"uuid-for-germany";"uuid-for-dresden";"shared";"capacity";10;2;"B"
-"uuid-for-germany";"uuid-for-dresden";"shared";"external_things";1;0;""
-"uuid-for-germany";"uuid-for-dresden";"shared";"things";10;2;""
-"uuid-for-germany";"uuid-for-dresden";"unshared";"capacity";10;2;"B"
-"uuid-for-germany";"uuid-for-dresden";"unshared";"things";10;2;""
+domain id;project id;service;resource;quota;usage;unit
+uuid-for-germany;uuid-for-berlin;shared;capacity;10;2;B
+uuid-for-germany;uuid-for-berlin;shared;external_things;1;0;
+uuid-for-germany;uuid-for-berlin;shared;things;10;2;
+uuid-for-germany;uuid-for-berlin;unshared;capacity;10;2;B
+uuid-for-germany;uuid-for-berlin;unshared;things;10;2;
+uuid-for-germany;uuid-for-dresden;shared;capacity;10;2;B
+uuid-for-germany;uuid-for-dresden;shared;external_things;1;0;
+uuid-for-germany;uuid-for-dresden;shared;things;10;2;
+uuid-for-germany;uuid-for-dresden;unshared;capacity;10;2;B
+uuid-for-germany;uuid-for-dresden;unshared;things;10;2;

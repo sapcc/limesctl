@@ -1,2 +1,2 @@
-"cluster id";"area";"service";"category";"resource";"capacity";"domains quota";"usage";"burst usage";"unit";"comment";"scraped at (UTC)"
-"west";"shared";"shared";"";"capacity";10240;3072;1536;2;"TiB";"hand-counted";"1970-01-01T00:00:22Z"
+cluster id;area;service;category;resource;capacity;domains quota;usage;burst usage;unit;comment;scraped at (UTC)
+west;shared;shared;;capacity;10240;3072;1536;2;TiB;hand-counted;1970-01-01T00:00:22Z

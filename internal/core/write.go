@@ -20,12 +20,12 @@
 package core
 
 import (
+	"encoding/csv"
 	"fmt"
 	"io"
-	"regexp"
-	"strings"
 
 	"github.com/olekukonko/tablewriter"
+	"github.com/sapcc/limesctl/internal/errors"
 )
 
 // writeJSON is a helper function that writes the JSON data to os.Stdout.
@@ -33,29 +33,13 @@ func (data *jsonData) write(writer io.Writer) {
 	fmt.Fprintln(writer, string(*data))
 }
 
-// writeCSV is a helper function that writes the CSV data to os.Stdout.
-func (data *csvData) write(writer io.Writer) {
-	for _, record := range *data {
-		var str string
-		for i, v := range record {
-			// precede double-quotes with a double-quote
-			v = strings.Replace(v, "\"", "\"\"", -1)
+// Write writes the CSV data to w.
+func (data *csvData) write(w io.Writer) {
+	csvW := csv.NewWriter(w)
+	csvW.Comma = rune(';') // use semicolon as delimiter
 
-			// double-quote non-number values
-			rx := regexp.MustCompile(`^([0-9]+)$`)
-			match := rx.MatchString(v)
-			if !match {
-				v = fmt.Sprintf("\"%v\"", v)
-			}
-
-			// delimit values
-			if i != (len(record) - 1) {
-				v = fmt.Sprintf("%v;", v)
-			}
-			str += v
-		}
-		fmt.Fprintln(writer, str)
-	}
+	err := csvW.WriteAll(*data)
+	errors.Handle(err, "could not write CSV data")
 }
 
 // writeTable is a helper function that writes the CSV data to os.Stdout in an ASCII table format.
