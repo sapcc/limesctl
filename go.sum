@@ -18,8 +18,8 @@ github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZb
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/sapcc/gophercloud-limes v0.0.0-20181214134236-10c7457ba500 h1:mdDUYJAbmWLyDr4YCeXIBgD1WvcSSKGFdaf59onT7oE=
 github.com/sapcc/gophercloud-limes v0.0.0-20181214134236-10c7457ba500/go.mod h1:JPGfht1BLaayK4fxs8GSkiL2mGQYDZeMG3m6dPkMPJQ=
-github.com/sapcc/limes v0.0.0-20181214131110-ef5da93b7831 h1:GN8inLgy/wg8jgrFohatUp+/CSbGhy21YUsvbHwEAag=
-github.com/sapcc/limes v0.0.0-20181214131110-ef5da93b7831/go.mod h1:Fq0sDroTbraRqiS+OWjf8GFMREFVgrF8nhvJ76SgAk4=
+github.com/sapcc/limes v0.0.0-20190524085111-8e11b9dd01db h1:jWIc+Wc8W4bYLPv0YDlEIw9GnO5/bl2sYdEDCWajIxU=
+github.com/sapcc/limes v0.0.0-20190524085111-8e11b9dd01db/go.mod h1:Fq0sDroTbraRqiS+OWjf8GFMREFVgrF8nhvJ76SgAk4=
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
 github.com/stretchr/testify v1.3.0 h1:TivCn/peBQ7UY8ooIcPgZFpTNSz0Q2U6UrFlUfqbe0Q=
 github.com/stretchr/testify v1.3.0/go.mod h1:M5WIy9Dh21IEIfnGCwXGc5bZfKNJtfHm1UVUgZn+9EI=

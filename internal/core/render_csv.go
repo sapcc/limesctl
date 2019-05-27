@@ -39,7 +39,7 @@ func (c *Cluster) renderCSV() *csvData {
 	switch {
 	case c.Output.Long:
 		labels = []string{"cluster id", "area", "service", "category", "resource", "capacity",
-			"domains quota", "usage", "burst usage", "unit", "comment", "scraped at (UTC)"}
+			"domains quota", "usage", "physical usage", "burst usage", "unit", "comment", "scraped at (UTC)"}
 	default:
 		labels = []string{"cluster id", "service", "resource", "capacity", "domains quota", "usage", "unit"}
 	}
@@ -72,7 +72,7 @@ func (d *Domain) renderCSV() *csvData {
 		labels = []string{"domain name", "service", "resource", "quota", "projects quota", "usage", "unit"}
 	case d.Output.Long:
 		labels = []string{"domain id", "domain name", "area", "service", "category", "resource",
-			"quota", "projects quota", "usage", "burst usage", "unit", "scraped at (UTC)"}
+			"quota", "projects quota", "usage", "physical usage", "burst usage", "unit", "scraped at (UTC)"}
 	default:
 		labels = []string{"domain id", "service", "resource", "quota", "projects quota", "usage", "unit"}
 	}
@@ -106,7 +106,7 @@ func (p *Project) renderCSV() *csvData {
 	case p.Output.Long:
 		labels = []string{"domain id", "domain name", "project id", "project name",
 			"area", "service", "category", "resource", "quota", "burst quota", "usage",
-			"burst usage", "unit", "scraped at (UTC)"}
+			"physical usage", "burst usage", "unit", "scraped at (UTC)"}
 	default:
 		labels = []string{"domain id", "project id", "service", "resource", "quota", "usage", "unit"}
 	}
@@ -158,19 +158,24 @@ func (c *Cluster) parseToCSV(cluster *limes.ClusterReport, data *csvData) {
 			if cSrvRes.Capacity != nil {
 				cap = *cSrvRes.Capacity
 			}
+			physicalUsage := cSrvRes.Usage
+			if cSrvRes.PhysicalUsage != nil {
+				physicalUsage = *cSrvRes.PhysicalUsage
+			}
 
 			unit, val := humanReadable(c.Output.HumanReadable, cSrvRes.ResourceInfo.Unit, rawValues{
-				"capacity":     cap,
-				"domainsQuota": cSrvRes.DomainsQuota,
-				"usage":        cSrvRes.Usage,
-				"burstUsage":   cSrvRes.BurstUsage,
+				"capacity":      cap,
+				"domainsQuota":  cSrvRes.DomainsQuota,
+				"usage":         cSrvRes.Usage,
+				"burstUsage":    cSrvRes.BurstUsage,
+				"physicalUsage": physicalUsage,
 			})
 
 			switch {
 			case c.Output.Long:
 				csvRecord = append(csvRecord, cluster.ID, cSrv.ServiceInfo.Area, cSrv.ServiceInfo.Type,
 					cSrvRes.ResourceInfo.Category, cSrvRes.ResourceInfo.Name, val["capacity"], val["domainsQuota"],
-					val["usage"], val["burstUsage"], unit, cSrvRes.Comment, timestampToString(cSrv.MinScrapedAt),
+					val["usage"], val["physicalUsage"], val["burstUsage"], unit, cSrvRes.Comment, timestampToString(cSrv.MinScrapedAt),
 				)
 			default:
 				csvRecord = append(csvRecord, cluster.ID, cSrv.ServiceInfo.Type, cSrvRes.ResourceInfo.Name,
@@ -207,11 +212,17 @@ func (d *Domain) parseToCSV(domain *limes.DomainReport, data *csvData) {
 			dSrv := domain.Services[srv]
 			dSrvRes := domain.Services[srv].Resources[res]
 
+			physicalUsage := dSrvRes.Usage
+			if dSrvRes.PhysicalUsage != nil {
+				physicalUsage = *dSrvRes.PhysicalUsage
+			}
+
 			unit, val := humanReadable(d.Output.HumanReadable, dSrvRes.ResourceInfo.Unit, rawValues{
 				"domainQuota":   dSrvRes.DomainQuota,
 				"projectsQuota": dSrvRes.ProjectsQuota,
 				"usage":         dSrvRes.Usage,
 				"burstUsage":    dSrvRes.BurstUsage,
+				"physicalUsage": physicalUsage,
 			})
 
 			switch {
@@ -222,7 +233,7 @@ func (d *Domain) parseToCSV(domain *limes.DomainReport, data *csvData) {
 			case d.Output.Long:
 				csvRecord = append(csvRecord, domain.UUID, domain.Name, dSrv.ServiceInfo.Area, dSrv.ServiceInfo.Type,
 					dSrvRes.ResourceInfo.Category, dSrvRes.ResourceInfo.Name, val["domainQuota"], val["projectsQuota"],
-					val["usage"], val["burstUsage"], unit, timestampToString(dSrv.MinScrapedAt),
+					val["usage"], val["physicalUsage"], val["burstUsage"], unit, timestampToString(dSrv.MinScrapedAt),
 				)
 			default:
 				csvRecord = append(csvRecord, domain.UUID, dSrv.ServiceInfo.Type, dSrvRes.ResourceInfo.Name,
@@ -270,11 +281,17 @@ func (p *Project) parseToCSV(project *limes.ProjectReport, data *csvData) {
 				}
 			}
 
+			physicalUsage := pSrvRes.Usage
+			if pSrvRes.PhysicalUsage != nil {
+				physicalUsage = *pSrvRes.PhysicalUsage
+			}
+
 			unit, val := humanReadable(p.Output.HumanReadable, pSrvRes.ResourceInfo.Unit, rawValues{
-				"quota":      pSrvRes.Quota,
-				"burstQuota": burstQuota,
-				"usage":      pSrvRes.Usage,
-				"burstUsage": burstUsage,
+				"quota":         pSrvRes.Quota,
+				"burstQuota":    burstQuota,
+				"usage":         pSrvRes.Usage,
+				"burstUsage":    burstUsage,
+				"physicalUsage": physicalUsage,
 			})
 
 			switch {
@@ -285,7 +302,7 @@ func (p *Project) parseToCSV(project *limes.ProjectReport, data *csvData) {
 			case p.Output.Long:
 				csvRecord = append(csvRecord, p.DomainID, p.DomainName, project.UUID, project.Name, pSrv.ServiceInfo.Area,
 					pSrv.ServiceInfo.Type, pSrvRes.ResourceInfo.Category, pSrvRes.ResourceInfo.Name, val["quota"],
-					val["burstQuota"], val["usage"], val["burstUsage"], unit, timestampToString(pSrv.ScrapedAt),
+					val["burstQuota"], val["usage"], val["physicalUsage"], val["burstUsage"], unit, timestampToString(pSrv.ScrapedAt),
 				)
 			default:
 				csvRecord = append(csvRecord, p.DomainID, project.UUID, pSrv.ServiceInfo.Type,
@@ -311,13 +328,7 @@ type convertedValues map[string]string
 func humanReadable(convert bool, unit limes.Unit, rv rawValues) (string, convertedValues) {
 	cv := make(convertedValues, len(rv))
 
-	// 'usage' is used to determine conversion suitability because it is common
-	// in all three hierarchies and is the lowest value amongst its counterparts,
-	// unless 'burstUsage > 0' then that is used instead.
-	computeAgainst := rv["usage"]
-	if rv["burstUsage"] > 0 {
-		computeAgainst = rv["burstUsage"]
-	}
+	computeAgainst := smallestValue(rv)
 
 	if unit == limes.UnitNone || computeAgainst < 1024 {
 		convert = false
@@ -360,4 +371,24 @@ func humanReadable(convert bool, unit limes.Unit, rv rawValues) (string, convert
 	}
 
 	return string(newUnit), cv
+}
+
+func smallestValue(rv rawValues) uint64 {
+	var vals []uint64
+	for _, v := range rv {
+		vals = append(vals, v)
+	}
+	sort.Slice(vals, func(i, j int) bool { return vals[i] < vals[j] })
+
+	small := vals[0]
+	if small == 0 {
+		for _, v := range vals {
+			if v != 0 && v > small {
+				small = v
+				break
+			}
+		}
+	}
+
+	return small
 }

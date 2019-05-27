@@ -11,6 +11,6 @@ require (
 	github.com/mattn/go-runewidth v0.0.3 // indirect
 	github.com/olekukonko/tablewriter v0.0.0-20180912035003-be2c049b30cc
 	github.com/sapcc/gophercloud-limes v0.0.0-20181214134236-10c7457ba500
-	github.com/sapcc/limes v0.0.0-20181214131110-ef5da93b7831
+	github.com/sapcc/limes v0.0.0-20190524085111-8e11b9dd01db
 	github.com/stretchr/testify v1.3.0 // indirect
 )
