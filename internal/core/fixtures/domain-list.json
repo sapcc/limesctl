@@ -49,7 +49,12 @@
               "projects_quota": 10,
               "usage": 2,
               "backend_quota": 0,
-              "infinite_backend_quota": true
+              "infinite_backend_quota": true,
+              "scales_with": {
+                "resource_name": "things",
+                "service_type": "shared",
+                "factor": 2
+              }
             }
           ],
           "max_scraped_at": 55,
@@ -78,13 +83,21 @@
               "externally_managed": true,
               "quota": 2,
               "projects_quota": 2,
-              "usage": 0
+              "usage": 0,
+              "annotations": {
+                "annotated": true,
+                "text": "this annotation appears on shared things of domain germany and project dresden"
+              }
             },
             {
               "name": "things",
               "quota": 30,
               "projects_quota": 20,
-              "usage": 4
+              "usage": 4,
+              "annotations": {
+                "annotated": true,
+                "text": "this annotation appears on shared things of domain germany and project dresden"
+              }
             }
           ],
           "max_scraped_at": 44,
@@ -105,7 +118,12 @@
               "name": "things",
               "quota": 50,
               "projects_quota": 20,
-              "usage": 4
+              "usage": 4,
+              "scales_with": {
+                "resource_name": "things",
+                "service_type": "shared",
+                "factor": 2
+              }
             }
           ],
           "max_scraped_at": 33,

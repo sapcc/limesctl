@@ -32,32 +32,12 @@ func TestRenderClusterCSV(t *testing.T) {
 	var actual bytes.Buffer
 
 	// get
-	c, err := makeMockCluster("./fixtures/cluster-get.json")
+	c, err := makeMockCluster("./fixtures/cluster-get-west.json")
 	th.AssertNoErr(t, err)
 
-	expected, err := ioutil.ReadFile("./fixtures/cluster-get.csv")
+	expected, err := ioutil.ReadFile("./fixtures/cluster-get-west.csv")
 	th.AssertNoErr(t, err)
 
-	c.renderCSV().write(&actual)
-	th.AssertEquals(t, string(expected), actual.String())
-
-	// filtered get with quota bursting
-	c, err = makeMockCluster("./fixtures/cluster-get-filtered.json")
-	th.AssertNoErr(t, err)
-	c.Output = Output{
-		HumanReadable: true,
-		Long:          true,
-	}
-	c.Filter = Filter{
-		Area:     "shared",
-		Service:  "shared",
-		Resource: "capacity",
-	}
-
-	expected, err = ioutil.ReadFile("./fixtures/cluster-get-filtered.csv")
-	th.AssertNoErr(t, err)
-
-	actual.Reset()
 	c.renderCSV().write(&actual)
 	th.AssertEquals(t, string(expected), actual.String())
 
@@ -78,7 +58,8 @@ func TestRenderClusterCSV(t *testing.T) {
 	th.AssertNoErr(t, err)
 	c.IsList = true
 	c.Output = Output{
-		Long: true,
+		HumanReadable: true,
+		Long:          true,
 	}
 	c.Filter = Filter{
 		Area:     "shared",
@@ -98,32 +79,12 @@ func TestRenderDomainCSV(t *testing.T) {
 	var actual bytes.Buffer
 
 	// get
-	d, err := makeMockDomain("./fixtures/domain-get.json")
+	d, err := makeMockDomain("./fixtures/domain-get-germany.json")
 	th.AssertNoErr(t, err)
 
-	expected, err := ioutil.ReadFile("./fixtures/domain-get.csv")
+	expected, err := ioutil.ReadFile("./fixtures/domain-get-germany.csv")
 	th.AssertNoErr(t, err)
 
-	d.renderCSV().write(&actual)
-	th.AssertEquals(t, string(expected), actual.String())
-
-	// filtered get with quota bursting
-	d, err = makeMockDomain("./fixtures/domain-get-filtered.json")
-	th.AssertNoErr(t, err)
-	d.Output = Output{
-		HumanReadable: true,
-		Names:         true,
-	}
-	d.Filter = Filter{
-		Area:     "shared",
-		Service:  "shared",
-		Resource: "capacity",
-	}
-
-	expected, err = ioutil.ReadFile("./fixtures/domain-get-filtered.csv")
-	th.AssertNoErr(t, err)
-
-	actual.Reset()
 	d.renderCSV().write(&actual)
 	th.AssertEquals(t, string(expected), actual.String())
 
@@ -144,7 +105,8 @@ func TestRenderDomainCSV(t *testing.T) {
 	th.AssertNoErr(t, err)
 	d.IsList = true
 	d.Output = Output{
-		Long: true,
+		HumanReadable: true,
+		Long:          true,
 	}
 	d.Filter = Filter{
 		Area:     "shared",
@@ -164,32 +126,12 @@ func TestRenderProjectCSV(t *testing.T) {
 	var actual bytes.Buffer
 
 	// get
-	p, err := makeMockProject("./fixtures/project-get.json")
+	p, err := makeMockProject("./fixtures/project-get-dresden.json")
 	th.AssertNoErr(t, err)
 
-	expected, err := ioutil.ReadFile("./fixtures/project-get.csv")
+	expected, err := ioutil.ReadFile("./fixtures/project-get-dresden.csv")
 	th.AssertNoErr(t, err)
 
-	p.renderCSV().write(&actual)
-	th.AssertEquals(t, string(expected), actual.String())
-
-	// filtered get with quota bursting
-	p, err = makeMockProject("./fixtures/project-get-filtered.json")
-	th.AssertNoErr(t, err)
-	p.Output = Output{
-		HumanReadable: true,
-		Names:         true,
-	}
-	p.Filter = Filter{
-		Area:     "shared",
-		Service:  "shared",
-		Resource: "capacity",
-	}
-
-	expected, err = ioutil.ReadFile("./fixtures/project-get-filtered.csv")
-	th.AssertNoErr(t, err)
-
-	actual.Reset()
 	p.renderCSV().write(&actual)
 	th.AssertEquals(t, string(expected), actual.String())
 

@@ -10,11 +10,9 @@
           "shared": true,
           "resources": [
             {
-              "name": "capacity",
-              "unit": "B",
-              "capacity": 185,
-              "comment": "hand-counted",
-              "domains_quota": 50,
+              "name": "things",
+              "capacity": 246,
+              "domains_quota": 90,
               "usage": 8
             }
           ],
@@ -22,7 +20,7 @@
           "min_scraped_at": 88
         }
       ],
-      "max_scraped_at": 1200,
+      "max_scraped_at": 1100,
       "min_scraped_at": 1100
     },
     {
@@ -34,11 +32,9 @@
           "shared": true,
           "resources": [
             {
-              "name": "capacity",
-              "unit": "B",
-              "capacity": 185,
-              "comment": "hand-counted",
-              "domains_quota": 50,
+              "name": "things",
+              "capacity": 246,
+              "domains_quota": 90,
               "usage": 8
             }
           ],
@@ -47,7 +43,7 @@
         }
       ],
       "max_scraped_at": 1100,
-      "min_scraped_at": 1000
+      "min_scraped_at": 1100
     }
   ]
 }

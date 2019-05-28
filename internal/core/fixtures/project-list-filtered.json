@@ -12,6 +12,7 @@
             {
               "name": "things",
               "quota": 10,
+              "usable_quota": 10,
               "usage": 2
             }
           ],
@@ -31,7 +32,12 @@
             {
               "name": "things",
               "quota": 10,
-              "usage": 2
+              "usable_quota": 10,
+              "usage": 2,
+              "annotations": {
+                "annotated": true,
+                "text": "this annotation appears on shared things of domain germany and project dresden"
+              }
             }
           ],
           "scraped_at": 44

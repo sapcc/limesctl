@@ -1,3 +1,3 @@
-domain id;domain name;project id;project name;area;service;category;resource;quota;burst quota;usage;burst usage;unit;scraped at (UTC)
-uuid-for-germany;germany;uuid-for-berlin;berlin;shared;shared;;things;10;0;2;0;;1970-01-01T00:00:22Z
-uuid-for-germany;germany;uuid-for-dresden;dresden;shared;shared;;things;10;0;2;0;;1970-01-01T00:00:44Z
+domain id;domain name;project id;project name;area;service;category;resource;quota;burst quota;usage;physical usage;burst usage;unit;scraped at (UTC)
+uuid-for-germany;germany;uuid-for-berlin;berlin;shared;shared;;things;10;0;2;2;0;;1970-01-01T00:00:22Z
+uuid-for-germany;germany;uuid-for-dresden;dresden;shared;shared;;things;10;0;2;2;0;;1970-01-01T00:00:44Z
