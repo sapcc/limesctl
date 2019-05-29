@@ -22,31 +22,18 @@ package errors
 import (
 	"errors"
 	"fmt"
-
-	"github.com/alecthomas/kingpin"
+	"os"
 )
 
-// Handle is a convenient wrapper around kingpin.Fatalf.
-// It takes an error and an arbitrary number of arguments and displays an error
-// in the format:
-//	limesctl: error: args[0]: args[1]: ... : args[n]: err
-func Handle(err error, args ...interface{}) {
-	if err == nil {
-		return
-	}
-
-	if len(args) == 0 {
-		kingpin.Fatalf(err.Error())
-	} else {
-		var format string
-		for i := 0; i < len(args); i++ {
-			if i == 0 {
-				format += "%v"
-			} else {
-				format += ": %v"
-			}
+// Handle takes an error and a string writes an error message to os.Stderr.
+func Handle(err error, str string) {
+	if err != nil {
+		msg := "limesctl: error"
+		if str != "" {
+			msg += ": " + str
 		}
-		kingpin.Fatalf("%s: %v", fmt.Sprintf(format, args...), err)
+		fmt.Fprintf(os.Stderr, "%s: %v\n", msg, err)
+		os.Exit(1)
 	}
 }
 

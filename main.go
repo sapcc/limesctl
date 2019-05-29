@@ -106,16 +106,15 @@ func main() {
 	cmdString := kingpin.MustParse(app.Parse(os.Args[1:]))
 
 	// overwrite OpenStack variables
-	err := setEnvUnlessEmpty("OS_AUTH_URL", *osAuthURL)
-	err = setEnvUnlessEmpty("OS_USERNAME", *osUsername)
-	err = setEnvUnlessEmpty("OS_PASSWORD", *osPassword)
-	err = setEnvUnlessEmpty("OS_USER_DOMAIN_ID", *osUserDomainID)
-	err = setEnvUnlessEmpty("OS_USER_DOMAIN_NAME", *osUserDomainName)
-	err = setEnvUnlessEmpty("OS_PROJECT_ID", *osProjectID)
-	err = setEnvUnlessEmpty("OS_PROJECT_NAME", *osProjectName)
-	err = setEnvUnlessEmpty("OS_PROJECT_DOMAIN_ID", *osProjectDomainID)
-	err = setEnvUnlessEmpty("OS_PROJECT_DOMAIN_NAME", *osProjectDomainName)
-	errors.Handle(err, "could not set custom value for OpenStack environment variable")
+	setEnvUnlessEmpty("OS_AUTH_URL", *osAuthURL)
+	setEnvUnlessEmpty("OS_USERNAME", *osUsername)
+	setEnvUnlessEmpty("OS_PASSWORD", *osPassword)
+	setEnvUnlessEmpty("OS_USER_DOMAIN_ID", *osUserDomainID)
+	setEnvUnlessEmpty("OS_USER_DOMAIN_NAME", *osUserDomainName)
+	setEnvUnlessEmpty("OS_PROJECT_ID", *osProjectID)
+	setEnvUnlessEmpty("OS_PROJECT_NAME", *osProjectName)
+	setEnvUnlessEmpty("OS_PROJECT_DOMAIN_ID", *osProjectDomainID)
+	setEnvUnlessEmpty("OS_PROJECT_DOMAIN_NAME", *osProjectDomainName)
 
 	// output and filter are initialized in advance with values that were provided
 	// at the command-line. Later, we pass only the specific information that
@@ -132,7 +131,7 @@ func main() {
 	}
 
 	if output.Names && output.Long {
-		errors.Handle(errors.New("'--names' and '--long' can not be used together"))
+		errors.Handle(errors.New("'--names' and '--long' can not be used together"), "")
 	}
 
 	switch cmdString {
@@ -158,13 +157,13 @@ func main() {
 		// If the ID is not provided then the capacities get interpreted
 		// as the ID and the error shown is not relevant to the context
 		if strings.Contains(*clusterSetID, "=") {
-			errors.Handle(errors.New("required argument 'cluster-id' not provided, try --help"))
+			errors.Handle(errors.New("required argument 'cluster-id' not provided, try --help"), "")
 		}
 
 		_, limesV1 := auth.ServiceClients()
 		c := &core.Cluster{ID: *clusterSetID}
 		q, err := core.ParseRawQuotas(limesV1, c, *clusterSetCaps, false)
-		errors.Handle(err)
+		errors.Handle(err, "")
 		core.RunSetTask(limesV1, c, q)
 
 	case domainListCmd.FullCommand():
@@ -179,7 +178,7 @@ func main() {
 	case domainShowCmd.FullCommand():
 		identityV3, limesV1 := auth.ServiceClients()
 		d, err := core.FindDomain(identityV3, limesV1, *domainShowID, *domainCluster)
-		errors.Handle(err)
+		errors.Handle(err, "")
 
 		d.Filter = filter
 		d.Filter.Cluster = *domainCluster
@@ -188,21 +187,21 @@ func main() {
 
 	case domainSetCmd.FullCommand():
 		if strings.Contains(*domainSetID, "=") {
-			errors.Handle(errors.New("required argument 'domain-id' not provided, try --help"))
+			errors.Handle(errors.New("required argument 'domain-id' not provided, try --help"), "")
 		}
 		identityV3, limesV1 := auth.ServiceClients()
 		d, err := core.FindDomain(identityV3, limesV1, *domainSetID, *domainCluster)
-		errors.Handle(err)
+		errors.Handle(err, "")
 
 		d.Filter.Cluster = *domainCluster
 		q, err := core.ParseRawQuotas(limesV1, d, *domainSetQuotas, false)
-		errors.Handle(err)
+		errors.Handle(err, "")
 		core.RunSetTask(limesV1, d, q)
 
 	case projectListCmd.FullCommand():
 		identityV3, limesV1 := auth.ServiceClients()
 		d, err := core.FindDomain(identityV3, limesV1, *projectListDomain, *projectCluster)
-		errors.Handle(err)
+		errors.Handle(err, "")
 
 		p := &core.Project{
 			DomainID:   d.ID,
@@ -215,12 +214,12 @@ func main() {
 
 	case projectShowCmd.FullCommand():
 		if *projectCluster != "" && *projectShowDomain == "" {
-			errors.Handle(errors.New("required argument 'domain-id' not provided, try --help"))
+			errors.Handle(errors.New("required argument 'domain-id' not provided, try --help"), "")
 		}
 
 		identityV3, limesV1 := auth.ServiceClients()
 		p, err := core.FindProject(identityV3, limesV1, *projectShowID, *projectShowDomain, *projectCluster)
-		errors.Handle(err)
+		errors.Handle(err, "")
 
 		p.Filter = filter
 		p.Filter.Cluster = *projectCluster
@@ -229,35 +228,35 @@ func main() {
 
 	case projectSetCmd.FullCommand():
 		if *projectCluster != "" && *projectSetDomain == "" {
-			errors.Handle(errors.New("required argument 'domain-id' not provided, try --help"))
+			errors.Handle(errors.New("required argument 'domain-id' not provided, try --help"), "")
 		}
 		if strings.Contains(*projectSetID, "=") {
-			errors.Handle(errors.New("required argument 'project-id' not provided, try --help"))
+			errors.Handle(errors.New("required argument 'project-id' not provided, try --help"), "")
 		}
 		identityV3, limesV1 := auth.ServiceClients()
 		p, err := core.FindProject(identityV3, limesV1, *projectSetID, *projectSetDomain, *projectCluster)
-		errors.Handle(err)
+		errors.Handle(err, "")
 
 		p.Filter.Cluster = *projectCluster
 		q, err := core.ParseRawQuotas(limesV1, p, *projectSetQuotas, false)
-		errors.Handle(err)
+		errors.Handle(err, "")
 		core.RunSetTask(limesV1, p, q)
 
 	case projectSyncCmd.FullCommand():
 		identityV3, limesV1 := auth.ServiceClients()
 		p, err := core.FindProject(identityV3, limesV1, *projectSyncID, *projectSyncDomain, *projectCluster)
-		errors.Handle(err)
+		errors.Handle(err, "")
 
 		p.Filter.Cluster = *projectCluster
 		core.RunSyncTask(limesV1, p)
 	}
 }
 
-func setEnvUnlessEmpty(key, value string) error {
-	if value == "" {
-		return nil
+func setEnvUnlessEmpty(key, value string) {
+	if value != "" {
+		err := os.Setenv(key, value)
+		errors.Handle(err, "could not set custom value for OpenStack environment variable")
 	}
-	return os.Setenv(key, value)
 }
 
 type rawQuotas core.RawQuotas
