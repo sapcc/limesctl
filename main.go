@@ -162,7 +162,7 @@ func main() {
 
 		_, limesV1 := auth.ServiceClients()
 		c := &core.Cluster{ID: *clusterSetID}
-		q, err := core.ParseRawQuotas(c, clusterSetCaps, false)
+		q, err := core.ParseRawQuotas(limesV1, c, clusterSetCaps, false)
 		errors.Handle(err)
 		core.RunSetTask(limesV1, c, q)
 
@@ -194,7 +194,7 @@ func main() {
 		errors.Handle(err)
 
 		d.Filter.Cluster = *domainCluster
-		q, err := core.ParseRawQuotas(d, domainSetQuotas, false)
+		q, err := core.ParseRawQuotas(limesV1, d, domainSetQuotas, false)
 		errors.Handle(err)
 		core.RunSetTask(limesV1, d, q)
 
@@ -238,7 +238,7 @@ func main() {
 		errors.Handle(err)
 
 		p.Filter.Cluster = *projectCluster
-		q, err := core.ParseRawQuotas(p, projectSetQuotas, false)
+		q, err := core.ParseRawQuotas(limesV1, p, projectSetQuotas, false)
 		errors.Handle(err)
 		core.RunSetTask(limesV1, p, q)
 

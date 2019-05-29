@@ -24,38 +24,37 @@ import (
 
 	th "github.com/gophercloud/gophercloud/testhelper"
 	"github.com/sapcc/limes"
+	"github.com/sapcc/limesctl/internal/auth"
 )
 
 // TestQuotaValueRx tests if the regular expression used to parse the quota
 // values given at the command line is correct.
 func TestQuotaValueRx(t *testing.T) {
-	acceptableMockQuotaValues := []string{
-		"123456",
-		"123456unit",
-		"123.456",
-		"123.456unit",
-		".456",
-		".456unit",
+	tt := []struct {
+		in    string
+		match bool
+	}{
+		{"service/resource=123456", true},
+		{"service/resource=123456:comment", true},
+		{"service/resource=123.456Unit", true},
+		{"service/resource=.456Unit:comment", true},
+
+		{"serv1ce/resource=123", false},
+		{"service/re3ource=123", false},
+		{"service?resource=123", false},
+		{"service/resource?123", false},
+		{"service/resource=g123", false},
+		{"service/resource=123g456", false},
+		{"service/resource=123,456Unit", false},
 	}
 
-	for _, v := range acceptableMockQuotaValues {
-		match := quotaValueRx.MatchString(v)
-		if !match {
-			t.Errorf("regular expression did not match the quota value: %s", v)
-		}
-	}
-
-	unacceptableMockQuotaValues := []string{
-		"g123",
-		"g123unit",
-		"123g456",
-		"123g456unit",
-	}
-
-	for _, v := range unacceptableMockQuotaValues {
-		match := quotaValueRx.MatchString(v)
-		if match {
-			t.Errorf("regular expression should not match the quota value: %s", v)
+	for _, tc := range tt {
+		if match := quotaValueRx.MatchString(tc.in); match != tc.match {
+			if tc.match {
+				t.Errorf("%q did not match the regular expression. Was expected to match.\n", tc.in)
+			} else {
+				t.Errorf("%q matched the regular expression. Was expected not to match.\n", tc.in)
+			}
 		}
 	}
 }
@@ -68,10 +67,11 @@ func TestParseCapacities(t *testing.T) {
 		"unshared/things=120:test comment.",
 	}
 
-	c, err := makeMockCluster("./fixtures/cluster-get.json")
+	c, err := makeMockCluster("./fixtures/cluster-get-west.json")
 	th.AssertNoErr(t, err)
 
-	q, err := ParseRawQuotas(c, &mockRawCapacities, true)
+	_, limesV1 := auth.ServiceClients()
+	q, err := ParseRawQuotas(limesV1, c, &mockRawCapacities, true)
 	th.AssertNoErr(t, err)
 
 	actual := makeServiceCapacities(q)
@@ -107,7 +107,8 @@ func TestParseQuotas(t *testing.T) {
 	}
 
 	assertParseQuotas := func(s baseUnitsSetter, rq *RawQuotas) {
-		q, err := ParseRawQuotas(s, rq, true)
+		_, limesV1 := auth.ServiceClients()
+		q, err := ParseRawQuotas(limesV1, s, rq, true)
 		th.AssertNoErr(t, err)
 
 		actual := makeServiceQuotas(q)
@@ -123,11 +124,11 @@ func TestParseQuotas(t *testing.T) {
 		th.AssertDeepEquals(t, expected, actual)
 	}
 
-	d, err := makeMockDomain("./fixtures/domain-get.json")
+	d, err := makeMockDomain("./fixtures/domain-get-germany.json")
 	th.AssertNoErr(t, err)
 	assertParseQuotas(d, &mockRawQuotas)
 
-	p, err := makeMockProject("./fixtures/project-get.json")
+	p, err := makeMockProject("./fixtures/project-get-dresden.json")
 	th.AssertNoErr(t, err)
 	assertParseQuotas(p, &mockRawQuotas)
 }

@@ -27,11 +27,11 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/gophercloud/gophercloud"
 	"github.com/sapcc/gophercloud-limes/resources/v1/clusters"
 	"github.com/sapcc/gophercloud-limes/resources/v1/domains"
 	"github.com/sapcc/gophercloud-limes/resources/v1/projects"
 	"github.com/sapcc/limes"
-	"github.com/sapcc/limesctl/internal/auth"
 	"github.com/sapcc/limesctl/internal/errors"
 )
 
@@ -69,14 +69,16 @@ type resourceUnits map[string]map[string]limes.Unit
 // baseUnitsSetter is the interface type that is implemented by different
 // hierarchies.
 type baseUnitsSetter interface {
-	setBaseUnits(*resourceUnits, bool)
+	setBaseUnits(*gophercloud.ServiceClient, *resourceUnits, bool)
 }
 
-var quotaValueRx = regexp.MustCompile(`^([0-9]*\.?[0-9]+)([A-Za-z]+)?$`)
+// Reference:
+//   matchList == [<full-match>, <service>, <resource>, <value>, <unit>?, (:<comment>)?, <comment>?]
+var quotaValueRx = regexp.MustCompile(`^([a-zA-Z]+)/([a-zA-Z]+)=(\d*\.?\d+)([a-zA-Z]+)?(:(.*))?$`)
 
 // ParseRawQuotas parses the raw quota values given at the command line to a
 // Quotas map.
-func ParseRawQuotas(s baseUnitsSetter, rq *RawQuotas, isTest bool) (*Quotas, error) {
+func ParseRawQuotas(limesV1 *gophercloud.ServiceClient, s baseUnitsSetter, rq *RawQuotas, isTest bool) (*Quotas, error) {
 	q := &Quotas{}
 
 	type userInput struct {
@@ -92,69 +94,51 @@ func ParseRawQuotas(s baseUnitsSetter, rq *RawQuotas, isTest bool) (*Quotas, err
 
 	// validate raw quota values
 	for _, rqInList := range *rq {
-		var input userInput
+		rqInList := strings.TrimSpace(rqInList)
 
-		// separate the quota value from its identifier
-		idfVal := strings.SplitN(rqInList, "=", 2)
-		if len(idfVal) != 2 {
-			return nil, fmt.Errorf("expected a quota in the format: service/resource=value(unit), got '%s'", rqInList)
+		matchList := quotaValueRx.FindStringSubmatch(rqInList)
+		if matchList == nil {
+			return nil, fmt.Errorf("expected a quota with optional unit and comment in the format: service/resource=value(unit):comment, got %q", rqInList)
 		}
 
-		// separate service and resource
-		srvRes := strings.SplitN(idfVal[0], "/", 2)
-		if len(srvRes) != 2 {
-			return nil, fmt.Errorf("expected service/resource, got '%s'", idfVal[0])
-		}
-		input.service = srvRes[0]
-		input.resource = srvRes[1]
-
-		// separate quota value and comment (if one was given)
-		valCom := strings.SplitN(idfVal[1], ":", 2)
-		if len(valCom) > 1 {
-			if valCom[1] != "" {
-				input.comment = strings.TrimSpace(valCom[1])
-			}
+		input := userInput{
+			service:  matchList[1],
+			resource: matchList[2],
+			value:    matchList[3],
+			comment:  matchList[6],
 		}
 
-		// separate quota's value from its unit (if one was given)
-		match := quotaValueRx.MatchString(valCom[0])
-		if !match {
-			return nil, fmt.Errorf("expected a quota value with optional unit in the format: 12.3Unit, got '%s'", valCom[0])
-		}
-
-		// rxMatchedList contains ["entire regex matched string", "quota value", "unit (empty, if no unit given)"]
-		rxMatchedList := quotaValueRx.FindStringSubmatch(valCom[0])
-		input.value = rxMatchedList[1]
-
-		if rxMatchedList[2] == "" {
+		givenUnit := matchList[4]
+		if givenUnit == "" {
 			input.unit = limes.UnitNone
-
 			if strings.Contains(input.value, ".") {
 				return nil, fmt.Errorf("counted values must be an integer, got '%s'", input.value)
 			}
 		} else {
-			input.unit = limes.Unit(rxMatchedList[2])
-
+			input.unit = limes.Unit(givenUnit)
 			_, unitIsValid := quotaUnits[input.unit]
 			if !unitIsValid {
-				return nil, fmt.Errorf("acceptable units: ['B', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB'], got '%s'", rxMatchedList[2])
+				acceptableUnits := make([]limes.Unit, 0, len(quotaUnits))
+				for k := range quotaUnits {
+					acceptableUnits = append(acceptableUnits, k)
+				}
+				sort.Slice(acceptableUnits, func(i, j int) bool {
+					return quotaUnits[acceptableUnits[i]] < quotaUnits[acceptableUnits[j]]
+				})
+				return nil, fmt.Errorf("expected a unit from: %v, got %q", acceptableUnits, givenUnit)
 			}
-		}
-
-		if input.unit == limes.UnitNone {
 		}
 
 		_, exists := resUnits[input.service]
 		if !exists {
 			resUnits[input.service] = make(map[string]limes.Unit)
 		}
-
 		resUnits[input.service][input.resource] = input.unit
 
 		userInputs = append(userInputs, input)
 	}
 
-	s.setBaseUnits(&resUnits, isTest)
+	s.setBaseUnits(limesV1, &resUnits, isTest)
 
 	for _, input := range userInputs {
 		var intQuotaVal int64
@@ -199,12 +183,11 @@ func ParseRawQuotas(s baseUnitsSetter, rq *RawQuotas, isTest bool) (*Quotas, err
 
 // setBaseUnits (re)sets the resourceUnits map to the respective base units for
 // resources.
-func (c *Cluster) setBaseUnits(ru *resourceUnits, isTest bool) {
+func (c *Cluster) setBaseUnits(limesV1 *gophercloud.ServiceClient, ru *resourceUnits, isTest bool) {
 	// no need to make a GET request if `isTest = true` because in that case
 	// the c.Result would already be populated with the necessary mock test
 	// data
 	if !isTest {
-		_, limesV1 := auth.ServiceClients()
 		c.Result = clusters.Get(limesV1, c.ID, clusters.GetOpts{})
 	}
 
@@ -223,12 +206,11 @@ func (c *Cluster) setBaseUnits(ru *resourceUnits, isTest bool) {
 
 // setBaseUnits (re)sets the resourceUnits map to the respective base units for
 // resources.
-func (d *Domain) setBaseUnits(ru *resourceUnits, isTest bool) {
+func (d *Domain) setBaseUnits(limesV1 *gophercloud.ServiceClient, ru *resourceUnits, isTest bool) {
 	// no need to make a GET request if `isTest = true` because in that case
 	// the d.Result would already be populated with the necessary mock test
 	// data
 	if !isTest {
-		_, limesV1 := auth.ServiceClients()
 		d.Result = domains.Get(limesV1, d.ID, domains.GetOpts{
 			Cluster: d.Filter.Cluster})
 	}
@@ -248,12 +230,11 @@ func (d *Domain) setBaseUnits(ru *resourceUnits, isTest bool) {
 
 // setBaseUnits (re)sets the resourceUnits map to the respective base units for
 // resources.
-func (p *Project) setBaseUnits(ru *resourceUnits, isTest bool) {
+func (p *Project) setBaseUnits(limesV1 *gophercloud.ServiceClient, ru *resourceUnits, isTest bool) {
 	// no need to make a GET request if `isTest = true` because in that case
 	// the p.Result would already be populated with the necessary mock test
 	// data
 	if !isTest {
-		_, limesV1 := auth.ServiceClients()
 		p.Result = projects.Get(limesV1, p.DomainID, p.ID, projects.GetOpts{
 			Cluster: p.Filter.Cluster})
 	}
