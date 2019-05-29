@@ -29,26 +29,23 @@ import (
 )
 
 // writeJSON is a helper function that writes the JSON data to os.Stdout.
-func (data *jsonData) write(writer io.Writer) {
-	fmt.Fprintln(writer, string(*data))
+func (d jsonData) write(w io.Writer) {
+	fmt.Fprintln(w, string(d))
 }
 
 // Write writes the CSV data to w.
-func (data *csvData) write(w io.Writer) {
+func (d csvData) write(w io.Writer) {
 	csvW := csv.NewWriter(w)
 	csvW.Comma = rune(';') // use semicolon as delimiter
 
-	err := csvW.WriteAll(*data)
+	err := csvW.WriteAll(d)
 	errors.Handle(err, "could not write CSV data")
 }
 
 // writeTable is a helper function that writes the CSV data to os.Stdout in an ASCII table format.
-func (data *csvData) writeTable(writer io.Writer) {
-	table := tablewriter.NewWriter(writer)
-	table.SetHeader((*data)[0])
-
-	for _, v := range (*data)[1:] {
-		table.Append(v)
-	}
-	table.Render()
+func (d csvData) writeTable(w io.Writer) {
+	t := tablewriter.NewWriter(w)
+	t.SetHeader(d[0])
+	t.AppendBulk(d[1:])
+	t.Render()
 }

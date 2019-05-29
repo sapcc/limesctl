@@ -30,7 +30,7 @@ import (
 )
 
 // set updates the resource capacities for a cluster.
-func (c *Cluster) set(limesV1 *gophercloud.ServiceClient, q *Quotas) {
+func (c *Cluster) set(limesV1 *gophercloud.ServiceClient, q Quotas) {
 	sc := makeServiceCapacities(q)
 
 	err := clusters.Update(limesV1, c.ID, clusters.UpdateOpts{Services: sc})
@@ -38,7 +38,7 @@ func (c *Cluster) set(limesV1 *gophercloud.ServiceClient, q *Quotas) {
 }
 
 // set updates the resource quota(s) for a domain.
-func (d *Domain) set(limesV1 *gophercloud.ServiceClient, q *Quotas) {
+func (d *Domain) set(limesV1 *gophercloud.ServiceClient, q Quotas) {
 	sq := makeServiceQuotas(q)
 
 	err := domains.Update(limesV1, d.ID, domains.UpdateOpts{
@@ -49,7 +49,7 @@ func (d *Domain) set(limesV1 *gophercloud.ServiceClient, q *Quotas) {
 }
 
 // set updates the resource quota(s) for a project within a specific domain.
-func (p *Project) set(limesV1 *gophercloud.ServiceClient, q *Quotas) {
+func (p *Project) set(limesV1 *gophercloud.ServiceClient, q Quotas) {
 	sq := makeServiceQuotas(q)
 
 	respBody, err := projects.Update(limesV1, p.DomainID, p.ID, projects.UpdateOpts{

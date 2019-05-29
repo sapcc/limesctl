@@ -28,23 +28,22 @@ import (
 type jsonData []byte
 
 // getJSON returns the result body of a get/list/update operation.
-func (c *Cluster) renderJSON() *jsonData {
+func (c *Cluster) renderJSON() jsonData {
 	return parseToJSON(c.Result.Body)
 }
 
 // getJSON returns the result body of a get/list/update operation.
-func (d *Domain) renderJSON() *jsonData {
+func (d *Domain) renderJSON() jsonData {
 	return parseToJSON(d.Result.Body)
 }
 
 // getJSON returns the result body of a get/list/update operation.
-func (p *Project) renderJSON() *jsonData {
+func (p *Project) renderJSON() jsonData {
 	return parseToJSON(p.Result.Body)
 }
 
-func parseToJSON(data interface{}) *jsonData {
-	var jd jsonData
-	jd, err := json.Marshal(data)
+func parseToJSON(data interface{}) jsonData {
+	b, err := json.Marshal(data)
 	errors.Handle(err, "could not marshal JSON")
-	return &jd
+	return jsonData(b)
 }

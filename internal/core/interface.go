@@ -84,8 +84,8 @@ type Output struct {
 // Renderer interface type contains different methods for rendering data in
 // different formats.
 type Renderer interface {
-	renderJSON() *jsonData
-	renderCSV() *csvData
+	renderJSON() jsonData
+	renderCSV() csvData
 }
 
 // GetTask is the interface type that abstracts a get operation.
@@ -130,12 +130,12 @@ func RunListTask(limesV1 *gophercloud.ServiceClient, t ListTask, outputFmt strin
 
 // SetTask is the interface type that abstracts a put operation.
 type SetTask interface {
-	set(*gophercloud.ServiceClient, *Quotas)
+	set(*gophercloud.ServiceClient, Quotas)
 }
 
 // RunSetTask is the function that operates on a SetTask and shows the output in the respective
 // format that is specified at the command line.
-func RunSetTask(limesV1 *gophercloud.ServiceClient, t SetTask, q *Quotas) {
+func RunSetTask(limesV1 *gophercloud.ServiceClient, t SetTask, q Quotas) {
 	t.set(limesV1, q)
 }
 

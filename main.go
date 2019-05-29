@@ -44,7 +44,7 @@ var (
 	projectCluster = projectCmd.Flag("cluster", "Cluster ID. When this option is given, the domain/project must be identified by ID. Specifiying a domain/project name will not work.").Short('c').String()
 
 	osAuthURL           = app.Flag("os-auth-url", "Authentication URL.").PlaceHolder("OS_AUTH_URL").String()
-	osUsername          = app.Flag("os-username", "Username").PlaceHolder("OS_USERNAME").String()
+	osUsername          = app.Flag("os-username", "Username.").PlaceHolder("OS_USERNAME").String()
 	osPassword          = app.Flag("os-password", "User's Password").PlaceHolder("OS_PASSWORD").String()
 	osUserDomainID      = app.Flag("os-user-domain-id", "User's domain ID.").PlaceHolder("OS_USER_DOMAIN_ID").String()
 	osUserDomainName    = app.Flag("os-user-domain-name", "User's domain name.").PlaceHolder("OS_USER_DOMAIN_NAME").String()
@@ -58,7 +58,7 @@ var (
 	resource          = app.Flag("resource", "Resource name.").String()
 	namesOutput       = app.Flag("names", "Show output with names instead of UUIDs.").Bool()
 	longOutput        = app.Flag("long", "Show detailed output.").Bool()
-	humanReadableVals = app.Flag("human-readable", "Show detailed output.").Bool()
+	humanReadableVals = app.Flag("human-readable", "Show quota and usage values in a more user friendly unit.").Bool()
 	outputFmt         = app.Flag("format", "Output format (table, json, csv).").PlaceHolder("table").Short('f').Enum("table", "json", "csv")
 
 	// second-level subcommands and their flags/args
@@ -106,15 +106,16 @@ func main() {
 	cmdString := kingpin.MustParse(app.Parse(os.Args[1:]))
 
 	// overwrite OpenStack variables
-	setEnvUnlessEmpty("OS_AUTH_URL", *osAuthURL)
-	setEnvUnlessEmpty("OS_USERNAME", *osUsername)
-	setEnvUnlessEmpty("OS_PASSWORD", *osPassword)
-	setEnvUnlessEmpty("OS_USER_DOMAIN_ID", *osUserDomainID)
-	setEnvUnlessEmpty("OS_USER_DOMAIN_NAME", *osUserDomainName)
-	setEnvUnlessEmpty("OS_PROJECT_ID", *osProjectID)
-	setEnvUnlessEmpty("OS_PROJECT_NAME", *osProjectName)
-	setEnvUnlessEmpty("OS_PROJECT_DOMAIN_ID", *osProjectDomainID)
-	setEnvUnlessEmpty("OS_PROJECT_DOMAIN_NAME", *osProjectDomainName)
+	err := setEnvUnlessEmpty("OS_AUTH_URL", *osAuthURL)
+	err = setEnvUnlessEmpty("OS_USERNAME", *osUsername)
+	err = setEnvUnlessEmpty("OS_PASSWORD", *osPassword)
+	err = setEnvUnlessEmpty("OS_USER_DOMAIN_ID", *osUserDomainID)
+	err = setEnvUnlessEmpty("OS_USER_DOMAIN_NAME", *osUserDomainName)
+	err = setEnvUnlessEmpty("OS_PROJECT_ID", *osProjectID)
+	err = setEnvUnlessEmpty("OS_PROJECT_NAME", *osProjectName)
+	err = setEnvUnlessEmpty("OS_PROJECT_DOMAIN_ID", *osProjectDomainID)
+	err = setEnvUnlessEmpty("OS_PROJECT_DOMAIN_NAME", *osProjectDomainName)
+	errors.Handle(err, "could not set custom value for OpenStack environment variable")
 
 	// output and filter are initialized in advance with values that were provided
 	// at the command-line. Later, we pass only the specific information that
@@ -162,7 +163,7 @@ func main() {
 
 		_, limesV1 := auth.ServiceClients()
 		c := &core.Cluster{ID: *clusterSetID}
-		q, err := core.ParseRawQuotas(limesV1, c, clusterSetCaps, false)
+		q, err := core.ParseRawQuotas(limesV1, c, *clusterSetCaps, false)
 		errors.Handle(err)
 		core.RunSetTask(limesV1, c, q)
 
@@ -194,7 +195,7 @@ func main() {
 		errors.Handle(err)
 
 		d.Filter.Cluster = *domainCluster
-		q, err := core.ParseRawQuotas(limesV1, d, domainSetQuotas, false)
+		q, err := core.ParseRawQuotas(limesV1, d, *domainSetQuotas, false)
 		errors.Handle(err)
 		core.RunSetTask(limesV1, d, q)
 
@@ -238,7 +239,7 @@ func main() {
 		errors.Handle(err)
 
 		p.Filter.Cluster = *projectCluster
-		q, err := core.ParseRawQuotas(limesV1, p, projectSetQuotas, false)
+		q, err := core.ParseRawQuotas(limesV1, p, *projectSetQuotas, false)
 		errors.Handle(err)
 		core.RunSetTask(limesV1, p, q)
 
@@ -252,12 +253,11 @@ func main() {
 	}
 }
 
-func setEnvUnlessEmpty(env, val string) {
-	if val == "" {
-		return
+func setEnvUnlessEmpty(key, value string) error {
+	if value == "" {
+		return nil
 	}
-
-	os.Setenv(env, val)
+	return os.Setenv(key, value)
 }
 
 type rawQuotas core.RawQuotas

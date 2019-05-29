@@ -32,7 +32,7 @@ import (
 type csvData [][]string
 
 // renderCSV renders the result of a get/list/set operation in the CSV format.
-func (c *Cluster) renderCSV() *csvData {
+func (c *Cluster) renderCSV() csvData {
 	var data csvData
 	var labels []string
 
@@ -59,11 +59,11 @@ func (c *Cluster) renderCSV() *csvData {
 		c.parseToCSV(cluster, &data)
 	}
 
-	return &data
+	return data
 }
 
 // renderCSV renders the result of a get/list/set operation in the CSV format.
-func (d *Domain) renderCSV() *csvData {
+func (d *Domain) renderCSV() csvData {
 	var data csvData
 	var labels []string
 
@@ -92,11 +92,11 @@ func (d *Domain) renderCSV() *csvData {
 		d.parseToCSV(domain, &data)
 	}
 
-	return &data
+	return data
 }
 
 // renderCSV renders the result of a get/list/set operation in the CSV format.
-func (p *Project) renderCSV() *csvData {
+func (p *Project) renderCSV() csvData {
 	var data csvData
 	var labels []string
 
@@ -126,7 +126,7 @@ func (p *Project) renderCSV() *csvData {
 		p.parseToCSV(project, &data)
 	}
 
-	return &data
+	return data
 }
 
 // parseToCSV parses a limes.ClusterReport to CSV depending on the output format and assigns it
@@ -383,7 +383,7 @@ func smallestValue(rv rawValues) uint64 {
 	small := vals[0]
 	if small == 0 {
 		for _, v := range vals {
-			if v != 0 && v > small {
+			if v != 0 {
 				small = v
 				break
 			}

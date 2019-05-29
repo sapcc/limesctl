@@ -78,8 +78,8 @@ var quotaValueRx = regexp.MustCompile(`^([a-zA-Z]+)/([a-zA-Z]+)=(\d*\.?\d+)([a-z
 
 // ParseRawQuotas parses the raw quota values given at the command line to a
 // Quotas map.
-func ParseRawQuotas(limesV1 *gophercloud.ServiceClient, s baseUnitsSetter, rq *RawQuotas, isTest bool) (*Quotas, error) {
-	q := &Quotas{}
+func ParseRawQuotas(limesV1 *gophercloud.ServiceClient, s baseUnitsSetter, rq RawQuotas, isTest bool) (Quotas, error) {
+	q := make(Quotas)
 
 	type userInput struct {
 		service  string
@@ -89,13 +89,11 @@ func ParseRawQuotas(limesV1 *gophercloud.ServiceClient, s baseUnitsSetter, rq *R
 		comment  string
 	}
 
-	userInputs := make([]userInput, 0, len(*rq))
+	userInputs := make([]userInput, 0, len(rq))
 	resUnits := make(resourceUnits)
 
 	// validate raw quota values
-	for _, rqInList := range *rq {
-		rqInList := strings.TrimSpace(rqInList)
-
+	for _, rqInList := range rq {
 		matchList := quotaValueRx.FindStringSubmatch(rqInList)
 		if matchList == nil {
 			return nil, fmt.Errorf("expected a quota with optional unit and comment in the format: service/resource=value(unit):comment, got %q", rqInList)
@@ -170,7 +168,7 @@ func ParseRawQuotas(limesV1 *gophercloud.ServiceClient, s baseUnitsSetter, rq *R
 			intQuotaVal = tmp
 		}
 
-		(*q)[input.service] = append((*q)[input.service], Resource{
+		q[input.service] = append(q[input.service], Resource{
 			Name:    input.resource,
 			Value:   intQuotaVal,
 			Unit:    input.unit,
@@ -254,17 +252,17 @@ func (p *Project) setBaseUnits(limesV1 *gophercloud.ServiceClient, ru *resourceU
 
 // makeServiceCapacities is a helper function that converts a Quotas type to
 // a slice of limes.ServiceCapacityRequest for use with cluster set operations.
-func makeServiceCapacities(q *Quotas) []limes.ServiceCapacityRequest {
+func makeServiceCapacities(q Quotas) []limes.ServiceCapacityRequest {
 	//serialize service types with ordered keys for consistent test results
-	types := make([]string, 0, len(*q))
-	for typeStr := range *q {
+	types := make([]string, 0, len(q))
+	for typeStr := range q {
 		types = append(types, typeStr)
 	}
 	sort.Strings(types)
 
 	sc := make([]limes.ServiceCapacityRequest, 0, len(types))
 	for _, srv := range types {
-		resList := (*q)[srv]
+		resList := q[srv]
 		rc := make([]limes.ResourceCapacityRequest, 0, len(resList))
 		for _, r := range resList {
 			// take a copy of the loop variable (it will be updated by the loop, so if
@@ -290,10 +288,10 @@ func makeServiceCapacities(q *Quotas) []limes.ServiceCapacityRequest {
 
 // makeServiceQuotas is a helper function that converts a Quotas type to
 // limes.QuotaRequest for use with domain/project set operations.
-func makeServiceQuotas(q *Quotas) limes.QuotaRequest {
+func makeServiceQuotas(q Quotas) limes.QuotaRequest {
 	sq := make(limes.QuotaRequest)
 
-	for srv, resList := range *q {
+	for srv, resList := range q {
 		sq[srv] = make(limes.ServiceQuotaRequest)
 
 		for _, r := range resList {

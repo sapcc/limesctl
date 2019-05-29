@@ -69,7 +69,7 @@ func TestParseCapacities(t *testing.T) {
 	c, err := makeMockCluster("./fixtures/cluster-get-west.json")
 	th.AssertNoErr(t, err)
 
-	q, err := ParseRawQuotas(nil, c, &mockRawCapacities, true)
+	q, err := ParseRawQuotas(nil, c, mockRawCapacities, true)
 	th.AssertNoErr(t, err)
 
 	actual := makeServiceCapacities(q)
@@ -104,7 +104,7 @@ func TestParseQuotas(t *testing.T) {
 		"unshared/things=12",
 	}
 
-	assertParseQuotas := func(s baseUnitsSetter, rq *RawQuotas) {
+	assertParseQuotas := func(s baseUnitsSetter, rq RawQuotas) {
 		q, err := ParseRawQuotas(nil, s, rq, true)
 		th.AssertNoErr(t, err)
 
@@ -123,9 +123,9 @@ func TestParseQuotas(t *testing.T) {
 
 	d, err := makeMockDomain("./fixtures/domain-get-germany.json")
 	th.AssertNoErr(t, err)
-	assertParseQuotas(d, &mockRawQuotas)
+	assertParseQuotas(d, mockRawQuotas)
 
 	p, err := makeMockProject("./fixtures/project-get-dresden.json")
 	th.AssertNoErr(t, err)
-	assertParseQuotas(p, &mockRawQuotas)
+	assertParseQuotas(p, mockRawQuotas)
 }
