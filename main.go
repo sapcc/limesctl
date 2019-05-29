@@ -65,32 +65,32 @@ var (
 	clusterListCmd = clusterCmd.Command("list", "Query data for all the clusters. Requires a cloud-admin token.")
 
 	clusterShowCmd = clusterCmd.Command("show", "Query data for a specific cluster. Use 'current' to show information regarding the current cluster. Requires a cloud-admin token.")
-	clusterShowID  = clusterShowCmd.Arg("cluster-id", "Cluster ID.").Required().String()
+	clusterShowID  = clusterShowCmd.Arg("cluster-id", "Cluster ID.").Default("current").String()
 
 	clusterSetCmd  = clusterCmd.Command("set", "Change resource(s) quota for a cluster. Use 'current' to show information regarding the current cluster. Requires a cloud-admin token.")
-	clusterSetID   = clusterSetCmd.Arg("cluster-id", "Cluster ID.").Required().String()
-	clusterSetCaps = QuotaList(clusterSetCmd.Arg("capacities", "Capacities to change. Format: service/resource=value(unit):\"comment\"").Required())
+	clusterSetID   = clusterSetCmd.Arg("cluster-id", "Cluster ID.").Default("current").String()
+	clusterSetCaps = QuotaList(clusterSetCmd.Arg("capacities", "Capacities to change. Format: service/resource=value(unit):\"comment\""))
 
 	domainListCmd = domainCmd.Command("list", "Query data for all the domains. Requires a cloud-admin token.")
 
 	domainShowCmd = domainCmd.Command("show", "Query data for a specific domain. Requires a domain-admin token.")
-	domainShowID  = domainShowCmd.Arg("domain-id", "Domain ID (name/UUID).").Required().String()
+	domainShowID  = domainShowCmd.Arg("domain-id", "Domain ID (name/UUID).").Default("current").String()
 
 	domainSetCmd    = domainCmd.Command("set", "Change resource(s) quota for a domain. Requires a cloud-admin token.")
-	domainSetID     = domainSetCmd.Arg("domain-id", "Domain ID (name/UUID).").Required().String()
-	domainSetQuotas = QuotaList(domainSetCmd.Arg("quotas", "Quotas to change. Format: service/resource=value(unit)").Required())
+	domainSetID     = domainSetCmd.Arg("domain-id", "Domain ID (name/UUID).").Default("current").String()
+	domainSetQuotas = QuotaList(domainSetCmd.Arg("quotas", "Quotas to change. Format: service/resource=value(unit)"))
 
 	projectListCmd    = projectCmd.Command("list", "Query data for all the projects in a domain. Requires a domain-admin token.")
 	projectListDomain = projectListCmd.Flag("domain", "Domain ID.").Short('d').Required().String()
 
 	projectShowCmd    = projectCmd.Command("show", "Query data for a specific project in a domain. Requires project member permissions.")
 	projectShowDomain = projectShowCmd.Flag("domain", "Domain ID.").Short('d').String()
-	projectShowID     = projectShowCmd.Arg("project-id", "Project ID (name/UUID).").Required().String()
+	projectShowID     = projectShowCmd.Arg("project-id", "Project ID (name/UUID).").Default("current").String()
 
 	projectSetCmd    = projectCmd.Command("set", "Change resource(s) quota for a project. Requires a domain-admin token.")
 	projectSetDomain = projectSetCmd.Flag("domain", "Domain ID.").Short('d').String()
-	projectSetID     = projectSetCmd.Arg("project-id", "Project ID (name/UUID).").Required().String()
-	projectSetQuotas = QuotaList(projectSetCmd.Arg("quotas", "Quotas to change. Format: service/resource=value(unit)").Required())
+	projectSetID     = projectSetCmd.Arg("project-id", "Project ID (name/UUID).").Default("current").String()
+	projectSetQuotas = QuotaList(projectSetCmd.Arg("quotas", "Quotas to change. Format: service/resource=value(unit)"))
 
 	projectSyncCmd    = projectCmd.Command("sync", "Sync a project's quota and usage data from the backing services into Limes' local database. Requires a project-admin token.")
 	projectSyncDomain = projectSyncCmd.Flag("domain", "Domain ID.").Short('d').String()
@@ -153,11 +153,16 @@ func main() {
 		core.RunGetTask(limesV1, c, *outputFmt)
 
 	case clusterSetCmd.FullCommand():
-		// this manual check is required due to the order of the Args.
-		// If the ID is not provided then the capacities get interpreted
-		// as the ID and the error shown is not relevant to the context
-		if strings.Contains(*clusterSetID, "=") {
-			errors.Handle(errors.New("required argument 'cluster-id' not provided, try --help"), "")
+		// these manual check are required due to the order of the Args.
+		// If the ID is not provided then the first resource capacity gets
+		// interpreted as the ID
+		idIsCapacity := strings.Contains(*clusterSetID, "=")
+		if len(*clusterSetCaps) == 0 && !idIsCapacity {
+			errors.Handle(errors.New("required argument 'capacities' not provided, try --help"), "")
+		}
+		if idIsCapacity {
+			*clusterSetCaps = append(*clusterSetCaps, *clusterSetID)
+			*clusterSetID = "current"
 		}
 
 		_, limesV1 := auth.ServiceClients()
@@ -186,8 +191,13 @@ func main() {
 		core.RunGetTask(limesV1, d, *outputFmt)
 
 	case domainSetCmd.FullCommand():
-		if strings.Contains(*domainSetID, "=") {
-			errors.Handle(errors.New("required argument 'domain-id' not provided, try --help"), "")
+		idIsQuota := strings.Contains(*domainSetID, "=")
+		if len(*domainSetQuotas) == 0 && !idIsQuota {
+			errors.Handle(errors.New("required argument 'quotas' not provided, try --help"), "")
+		}
+		if idIsQuota {
+			*domainSetQuotas = append(*domainSetQuotas, *domainSetID)
+			*domainSetID = "current"
 		}
 		identityV3, limesV1 := auth.ServiceClients()
 		d, err := core.FindDomain(identityV3, limesV1, *domainSetID, *domainCluster)
@@ -216,7 +226,9 @@ func main() {
 		if *projectCluster != "" && *projectShowDomain == "" {
 			errors.Handle(errors.New("required argument 'domain-id' not provided, try --help"), "")
 		}
-
+		if *projectShowID == "current" && *projectShowDomain != "" {
+			errors.Handle(errors.New("required argument 'project-id' not provided, try --help"), "")
+		}
 		identityV3, limesV1 := auth.ServiceClients()
 		p, err := core.FindProject(identityV3, limesV1, *projectShowID, *projectShowDomain, *projectCluster)
 		errors.Handle(err, "")
@@ -230,9 +242,18 @@ func main() {
 		if *projectCluster != "" && *projectSetDomain == "" {
 			errors.Handle(errors.New("required argument 'domain-id' not provided, try --help"), "")
 		}
-		if strings.Contains(*projectSetID, "=") {
+		if *projectSetID == "current" && *projectSetDomain != "" {
 			errors.Handle(errors.New("required argument 'project-id' not provided, try --help"), "")
 		}
+		idIsQuota := strings.Contains(*projectSetID, "=")
+		if len(*projectSetQuotas) == 0 && !idIsQuota {
+			errors.Handle(errors.New("required argument 'quotas' not provided, try --help"), "")
+		}
+		if idIsQuota {
+			*projectSetQuotas = append(*projectSetQuotas, *projectSetID)
+			*projectSetID = "current"
+		}
+
 		identityV3, limesV1 := auth.ServiceClients()
 		p, err := core.FindProject(identityV3, limesV1, *projectSetID, *projectSetDomain, *projectCluster)
 		errors.Handle(err, "")
@@ -243,6 +264,12 @@ func main() {
 		core.RunSetTask(limesV1, p, q)
 
 	case projectSyncCmd.FullCommand():
+		if *projectCluster != "" && *projectSyncDomain == "" {
+			errors.Handle(errors.New("required argument 'domain-id' not provided, try --help"), "")
+		}
+		if *projectSyncID == "current" && *projectSyncDomain != "" {
+			errors.Handle(errors.New("required argument 'project-id' not provided, try --help"), "")
+		}
 		identityV3, limesV1 := auth.ServiceClients()
 		p, err := core.FindProject(identityV3, limesV1, *projectSyncID, *projectSyncDomain, *projectCluster)
 		errors.Handle(err, "")

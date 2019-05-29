@@ -34,7 +34,7 @@ import (
 	"github.com/sapcc/limesctl/internal/errors"
 )
 
-// FindDomain uses the user's input (name/UUID) to find a specific domain
+// FindDomain uses the user's input (name/UUID/"current") to find a specific domain
 // within the token scope.
 // Different strategies are tried in a chronological order to find the relevant
 // domain in the most efficient way possible.
@@ -44,26 +44,36 @@ func FindDomain(identityV3, limesV1 *gophercloud.ServiceClient, userInput, clust
 		return findDomainInCluster(limesV1, userInput, clusterID)
 	}
 
-	// Strategy 2: check if the domain is mentioned in the current token scope
 	token, err := auth.CurrentToken(identityV3)
 	if err == nil {
 		d1 := token.Domain
-		if d1.ID != "" && (d1.Name == userInput || d1.ID == userInput) {
+		d2 := token.Project.Domain
+		// Strategy 2: get domain id from current token scope
+		if userInput == "current" {
+			if d1.ID != "" {
+				return &Domain{Name: d1.Name, ID: d1.ID}, nil
+			}
+			if d2.ID != "" {
+				return &Domain{Name: d2.Name, ID: d2.ID}, nil
+			}
+			return nil, errors.New("domain not found") // further strategies are not needed
+		}
+		// Strategy 3: check if userInput matches the domain(s) mentioned in the current token scope
+		if d1.ID != "" && (userInput == d1.ID || userInput == d1.Name) {
 			return &Domain{Name: d1.Name, ID: d1.ID}, nil
 		}
-		d2 := token.Project.Domain
-		if d2.ID != "" && (d2.Name == userInput || d2.ID == userInput) {
+		if d2.ID != "" && (userInput == d2.ID || userInput == d2.Name) {
 			return &Domain{Name: d2.Name, ID: d2.ID}, nil
 		}
 	}
 
-	// Strategy 3: assume that userInput is an ID
+	// Strategy 4: assume that userInput is an ID
 	d, err := gopherdomains.Get(identityV3, userInput).Extract()
 	if err == nil {
 		return &Domain{Name: d.Name, ID: d.ID}, nil
 	}
 
-	// Strategy 4: assume userInput is a name and do a domain listing
+	// Strategy 5: assume userInput is a name and do a domain listing
 	// restricted to that specific name
 	page, err := gopherdomains.List(identityV3, gopherdomains.ListOpts{Name: userInput}).AllPages()
 	if err != nil {
@@ -102,7 +112,7 @@ func findDomainInCluster(limesV1 *gophercloud.ServiceClient, domainID, clusterID
 	return &Domain{ID: s.Domain.UUID, Name: s.Domain.Name}, nil
 }
 
-// FindProject uses the user's input (name/UUID) to find a specific project
+// FindProject uses the user's input (name/UUID/"current") to find a specific project
 // within the token scope.
 // Different strategies are tried in a chronological order to find the relevant
 // project in the most efficient way possible.
@@ -112,13 +122,36 @@ func FindProject(identityV3, limesV1 *gophercloud.ServiceClient, userInputProjec
 		return findProjectInCluster(limesV1, userInputProject, userInputDomain, clusterID)
 	}
 
-	// Strategy 2: check if the project is mentioned in the current token scope
 	token, err := auth.CurrentToken(identityV3)
 	if err == nil {
 		p := token.Project
-		if p.ID != "" && (p.ID == userInputProject || p.Name == userInputProject) {
-			d1 := token.Domain
-			if d1.ID != "" && (d1.Name == userInputDomain || d1.ID == userInputDomain) {
+		d1 := token.Project.Domain
+		d2 := token.Domain
+		// Strategy 2: get project id from current token scope
+		if userInputProject == "current" {
+			if p.ID != "" {
+				if d1.ID != "" {
+					return &Project{
+						ID:         p.ID,
+						Name:       p.Name,
+						DomainID:   d1.ID,
+						DomainName: d1.Name,
+					}, nil
+				}
+				if d2.ID != "" {
+					return &Project{
+						ID:         p.ID,
+						Name:       p.Name,
+						DomainID:   d2.ID,
+						DomainName: d2.Name,
+					}, nil
+				}
+			}
+			return nil, errors.New("project not found") // further strategies are not needed
+		}
+		// Strategy 3: check if userInputProject matches the project mentioned in the current token scope
+		if p.ID != "" && (userInputProject == p.ID || userInputProject == p.Name) {
+			if d1.ID != "" && (userInputDomain == d1.ID || userInputDomain == d1.Name) {
 				return &Project{
 					ID:         p.ID,
 					Name:       p.Name,
@@ -126,8 +159,7 @@ func FindProject(identityV3, limesV1 *gophercloud.ServiceClient, userInputProjec
 					DomainName: d1.Name,
 				}, nil
 			}
-			d2 := token.Project.Domain
-			if d2.ID != "" && (d2.Name == userInputDomain || d2.ID == userInputDomain) {
+			if d2.ID != "" && (userInputDomain == d2.ID || userInputDomain == d2.Name) {
 				return &Project{
 					ID:         p.ID,
 					Name:       p.Name,
@@ -138,7 +170,7 @@ func FindProject(identityV3, limesV1 *gophercloud.ServiceClient, userInputProjec
 		}
 	}
 
-	// Strategy 3: assume that userInputProject is an ID
+	// Strategy 4: assume that userInputProject is an ID
 	p, err := gopherprojects.Get(identityV3, userInputProject).Extract()
 	if err == nil {
 		// get domain name
@@ -155,7 +187,7 @@ func FindProject(identityV3, limesV1 *gophercloud.ServiceClient, userInputProjec
 		}, nil
 	}
 
-	// Strategy 4: assume userInputProject is a name and do a project listing
+	// Strategy 5: assume userInputProject is a name and do a project listing
 	// restricted to that specific name
 	var page pagination.Page
 	if userInputDomain != "" {
