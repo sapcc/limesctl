@@ -24,7 +24,6 @@ import (
 
 	th "github.com/gophercloud/gophercloud/testhelper"
 	"github.com/sapcc/limes"
-	"github.com/sapcc/limesctl/internal/auth"
 )
 
 // TestQuotaValueRx tests if the regular expression used to parse the quota
@@ -70,8 +69,7 @@ func TestParseCapacities(t *testing.T) {
 	c, err := makeMockCluster("./fixtures/cluster-get-west.json")
 	th.AssertNoErr(t, err)
 
-	_, limesV1 := auth.ServiceClients()
-	q, err := ParseRawQuotas(limesV1, c, &mockRawCapacities, true)
+	q, err := ParseRawQuotas(nil, c, &mockRawCapacities, true)
 	th.AssertNoErr(t, err)
 
 	actual := makeServiceCapacities(q)
@@ -107,8 +105,7 @@ func TestParseQuotas(t *testing.T) {
 	}
 
 	assertParseQuotas := func(s baseUnitsSetter, rq *RawQuotas) {
-		_, limesV1 := auth.ServiceClients()
-		q, err := ParseRawQuotas(limesV1, s, rq, true)
+		q, err := ParseRawQuotas(nil, s, rq, true)
 		th.AssertNoErr(t, err)
 
 		actual := makeServiceQuotas(q)
