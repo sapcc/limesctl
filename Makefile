@@ -1,6 +1,6 @@
 PREFIX  := /usr/local
 PKG      = github.com/sapcc/limesctl
-VERSION := $(shell util/find_version.sh)
+VERSION := $(shell scripts/find_version.sh)
 
 GOOS        ?= $(word 1, $(subst /, " ", $(word 4, $(shell go version))))
 GO          := GOBIN=$(CURDIR)/build go
@@ -71,7 +71,7 @@ build/%.cover.out: FORCE
 	@printf "\e[1;36m>> go test $(subst _,/,$*)\e[0m\n"
 	$(GO) test $(GO_BUILDFLAGS) -ldflags '$(GO_LDFLAGS)' -coverprofile=$@ -covermode=count -coverpkg=$(subst $(space),$(comma),$(GO_COVERPKGS)) $(subst _,/,$*)
 build/cover.out: $(GO_COVERFILES)
-	$(GO) run $(GO_BUILDFLAGS) util/gocovcat/main.go $(GO_COVERFILES) > $@
+	$(GO) run $(GO_BUILDFLAGS) tools/gocovcat.go $(GO_COVERFILES) > $@
 build/cover.html: build/cover.out
 	$(GO) tool cover -html $< -o $@
 
