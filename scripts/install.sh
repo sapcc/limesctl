@@ -33,7 +33,6 @@ cleanup() {
 
 main() {
 	printf "\e[1;34m==> Downloading limesctl for $(uname -s)\e[0m\n"
-	echo ${TEMP_DIR}
 	download
 	printf "\e[1;34m==> Installing limesctl\e[0m\n"
 	install
