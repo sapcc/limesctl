@@ -175,15 +175,24 @@ func FindProject(identityV3, limesV1 *gophercloud.ServiceClient, userInputProjec
 	if err == nil {
 		// get domain name
 		d, err := gopherdomains.Get(identityV3, p.DomainID).Extract()
-		if err != nil {
+		var domainName string
+		if err == nil {
+			domainName = d.Name
+		} else if strings.Contains(err.Error(), "Forbidden") {
+			// if the user can access the project, but does not have permissions for
+			// `openstack domain show`, continue with a bogus domain name (this issue
+			// would otherwise completely break limesctl for that user even though
+			// they have permissions for the Limes API)
+			domainName = "domain-" + p.DomainID
+		} else {
+			// unexpected error
 			return nil, fmt.Errorf("could not find project: %v", err)
 		}
-
 		return &Project{
 			ID:         p.ID,
 			Name:       p.Name,
-			DomainID:   d.ID,
-			DomainName: d.Name,
+			DomainID:   p.DomainID,
+			DomainName: domainName,
 		}, nil
 	}
 
