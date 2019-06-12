@@ -21,6 +21,7 @@ package cli
 
 import (
 	"errors"
+	"strings"
 
 	"github.com/gophercloud/gophercloud/openstack/identity/v3/domains"
 	"github.com/gophercloud/gophercloud/openstack/identity/v3/projects"
@@ -151,10 +152,18 @@ func FindProject(userInputProject, userInputDomain string) (*Project, error) {
 	// which means we still don't have the domain name
 	if p.DomainName == "" {
 		d, err := domains.Get(identityV3, p.DomainID).Extract()
-		if err != nil {
+		if err == nil {
+			p.DomainName = d.Name
+		} else if strings.Contains(err.Error(), "Forbidden") {
+			//if the user can access the project, but does not have permissions for
+			//`openstack domain show`, continue with a bogus domain name (this issue
+			//would otherwise completely break limesctl for that user even though
+			//they have permissions for the Limes API)
+			p.DomainName = "domain-" + p.DomainID
+		} else {
+			//unexpected error
 			return nil, err
 		}
-		p.DomainName = d.Name
 	}
 
 	return p, nil
