@@ -20,7 +20,6 @@
 package core
 
 import (
-	"errors"
 	"fmt"
 	"strings"
 
@@ -213,23 +212,30 @@ func FindProject(identityV3, limesV1 *gophercloud.ServiceClient, userInputProjec
 	if err != nil {
 		return nil, err
 	}
-
-	// this is needed in case the user did not gave a domain ID at input
-	// which means we still don't have the domain name
-	if p.DomainName == "" {
-		d, err := domains.Get(identityV3, p.DomainID).Extract()
+	pList, err := gopherprojects.ExtractProjects(page)
+	if err != nil {
+		return nil, err
+	}
+	if len(pList) > 1 {
+		return nil, fmt.Errorf("more than one project exists with the name %q", userInputProject)
+	}
+	if len(pList) != 0 && pList[0].ID != "" {
+		// get domain name
+		d, err := gopherdomains.Get(identityV3, pList[0].DomainID).Extract()
+		var domainName string
 		if err == nil {
-			p.DomainName = d.Name
+			domainName = d.Name
 		} else if strings.Contains(err.Error(), "Forbidden") {
-			//if the user can access the project, but does not have permissions for
-			//`openstack domain show`, continue with a bogus domain name (this issue
-			//would otherwise completely break limesctl for that user even though
-			//they have permissions for the Limes API)
-			p.DomainName = "domain-" + p.DomainID
+			domainName = "domain-" + p.DomainID
 		} else {
-			//unexpected error
-			return nil, err
+			return nil, fmt.Errorf("could not find project: %v", err)
 		}
+		return &Project{
+			ID:         pList[0].ID,
+			Name:       pList[0].Name,
+			DomainID:   pList[0].DomainID,
+			DomainName: domainName,
+		}, nil
 	}
 
 	// at this point all strategies have failed
