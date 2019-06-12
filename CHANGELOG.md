@@ -1,3 +1,8 @@
+# v1.4.1 (2019-06-12)
+
+Bugfixes:
+- Do not fail project operations when Keystone permissions for domain listing are missing
+
 # v1.4.0 (2019-03-28)
 
 New features:
