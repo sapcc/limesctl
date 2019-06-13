@@ -36,7 +36,7 @@ main() {
 	download
 	printf "\e[1;34m==> Installing limesctl\e[0m\n"
 	install
-	printf "\e[1;32m==> limesctl v${VERSION} successfully installed as $(which limesctl)\e[0m\n"
+	printf "\e[1;32m==> limesctl v${VERSION} successfully installed as /usr/local/bin/limesctl\e[0m\n"
 	cleanup
 }
 
