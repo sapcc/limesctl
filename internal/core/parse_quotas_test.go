@@ -33,13 +33,14 @@ func TestQuotaValueRx(t *testing.T) {
 		in    string
 		match bool
 	}{
-		{"service/resource=123456", true},
-		{"service/resource=123456:comment", true},
+		{"ser1vice/reso-urce=123456", true},
+		{"serv.ice/reso\\urce=123456:comment", true},
 		{"service/resource=123.456Unit", true},
 		{"service/resource=.456Unit:comment", true},
 
-		{"serv1ce/resource=123", false},
-		{"service/re3ource=123", false},
+		{"serv/ice/resource=123", false},
+		{"service/resou=rce=123", false},
+		{"service/reso:urce=123", false},
 		{"service?resource=123", false},
 		{"service/resource?123", false},
 		{"service/resource=g123", false},

@@ -73,8 +73,8 @@ type baseUnitsSetter interface {
 }
 
 // Reference:
-//   matchList == [<full-match>, <service>, <resource>, <value>, <unit>?, (:<comment>)?, <comment>?]
-var quotaValueRx = regexp.MustCompile(`^([a-zA-Z]+)/([a-zA-Z]+)=(\d*\.?\d+)([a-zA-Z]+)?(:(.*))?$`)
+//   matchList == [<full-match>, <service>, <resource>, <value>, <unit>?, <comment>?]
+var quotaValueRx = regexp.MustCompile(`^([^:/=]+)/([^:/=]+)=(\d*\.?\d+)([a-zA-Z]+)?(?::(.*))?$`)
 
 // ParseRawQuotas parses the raw quota values given at the command line to a
 // Quotas map.
@@ -103,7 +103,7 @@ func ParseRawQuotas(limesV1 *gophercloud.ServiceClient, s baseUnitsSetter, rq Ra
 			service:  matchList[1],
 			resource: matchList[2],
 			value:    matchList[3],
-			comment:  matchList[6],
+			comment:  matchList[5],
 		}
 
 		givenUnit := matchList[4]
