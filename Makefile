@@ -1,4 +1,8 @@
-PREFIX  := /usr/local
+ifeq ($(shell uname -s),Darwin)
+	PREFIX := /usr/local
+else
+	PREFIX := /usr
+endif
 PKG      = github.com/sapcc/limesctl
 VERSION := $(shell scripts/find_version.sh)
 
