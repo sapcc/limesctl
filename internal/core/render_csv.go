@@ -328,7 +328,7 @@ type convertedValues map[string]string
 func humanReadable(convert bool, unit limes.Unit, rv rawValues) (string, convertedValues) {
 	cv := make(convertedValues, len(rv))
 
-	computeAgainst := smallestValue(rv)
+	computeAgainst := smallestNonzeroValue(rv)
 
 	if unit == limes.UnitNone || computeAgainst < 1024 {
 		convert = false
@@ -373,22 +373,16 @@ func humanReadable(convert bool, unit limes.Unit, rv rawValues) (string, convert
 	return string(newUnit), cv
 }
 
-func smallestValue(rv rawValues) uint64 {
+func smallestNonzeroValue(rv rawValues) uint64 {
 	var vals []uint64
 	for _, v := range rv {
-		vals = append(vals, v)
-	}
-	sort.Slice(vals, func(i, j int) bool { return vals[i] < vals[j] })
-
-	small := vals[0]
-	if small == 0 {
-		for _, v := range vals {
-			if v != 0 {
-				small = v
-				break
-			}
+		if v != 0 {
+			vals = append(vals, v)
 		}
 	}
-
-	return small
+	if len(vals) == 0 {
+		return 0
+	}
+	sort.Slice(vals, func(i, j int) bool { return vals[i] < vals[j] })
+	return vals[0]
 }
