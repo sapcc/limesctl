@@ -105,7 +105,7 @@ func findDomainInCluster(limesV1 *gophercloud.ServiceClient, domainID, clusterID
 	// gophercloud-limes is used here
 	err := domains.Get(limesV1, domainID, domains.GetOpts{Cluster: clusterID}).ExtractInto(&s)
 	if err != nil {
-		return nil, fmt.Errorf("could not find domain: %v", err)
+		return nil, fmt.Errorf("could not find domain with domain_id = %q: %v", domainID, err)
 	}
 
 	return &Domain{ID: s.Domain.UUID, Name: s.Domain.Name}, nil
@@ -255,7 +255,7 @@ func findProjectInCluster(limesV1 *gophercloud.ServiceClient, projectID, domainI
 	err := projects.Get(limesV1, domainID, projectID, projects.GetOpts{
 		Cluster: clusterID}).ExtractInto(&s)
 	if err != nil {
-		return nil, fmt.Errorf("could not find project: %v", err)
+		return nil, fmt.Errorf("could not find project with project_id = %q, project_domain_id = %q: %v", projectID, domainID, err)
 	}
 
 	// get domain name
