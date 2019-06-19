@@ -33,7 +33,7 @@ release: FORCE release/$(BINARY64)
 	cd release && rm -f limesctl.exe
 else
 release: FORCE release/$(BINARY64)
-	cd release && cp -f $(BINARY64) limesctl && tar -czf $(RELEASE64).tar.gz limesctl
+	cd release && cp -f $(BINARY64) limesctl && tar -czf $(RELEASE64).tgz limesctl
 	cd release && rm -f limesctl
 endif
 
