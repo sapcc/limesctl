@@ -1,0 +1,48 @@
+{
+  "projects": [
+    {
+      "id": "uuid-for-berlin",
+      "name": "berlin",
+      "parent_id": "uuid-for-germany",
+      "services": [
+        {
+          "type": "shared",
+          "area": "shared",
+          "resources": [
+            {
+              "name": "things",
+              "quota": 10,
+              "usable_quota": 10,
+              "usage": 2
+            }
+          ],
+          "scraped_at": 22
+        }
+      ]
+    },
+    {
+      "id": "uuid-for-dresden",
+      "name": "dresden",
+      "parent_id": "uuid-for-berlin",
+      "services": [
+        {
+          "type": "shared",
+          "area": "shared",
+          "resources": [
+            {
+              "name": "things",
+              "quota": 10,
+              "usable_quota": 10,
+              "usage": 2,
+              "annotations": {
+                "annotated": true,
+                "text": "this annotation appears on shared things of domain germany and project dresden"
+              }
+            }
+          ],
+          "scraped_at": 44
+        }
+      ]
+    }
+  ]
+}

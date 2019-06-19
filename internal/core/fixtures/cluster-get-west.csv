@@ -1,0 +1,6 @@
+cluster id;service;resource;capacity;domains quota;usage;unit
+west;shared;capacity;185;50;8;B
+west;shared;external_things;0;3;0;
+west;shared;things;246;90;8;
+west;unshared;capacity;0;100;6;B
+west;unshared;things;139;70;6;

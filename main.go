@@ -24,8 +24,9 @@ import (
 	"strings"
 
 	"github.com/alecthomas/kingpin"
-	"github.com/sapcc/limesctl/pkg/cli"
-	"github.com/sapcc/limesctl/pkg/errors"
+	"github.com/sapcc/limesctl/internal/auth"
+	"github.com/sapcc/limesctl/internal/core"
+	"github.com/sapcc/limesctl/internal/errors"
 )
 
 var (
@@ -43,7 +44,7 @@ var (
 	projectCluster = projectCmd.Flag("cluster", "Cluster ID. When this option is given, the domain/project must be identified by ID. Specifiying a domain/project name will not work.").Short('c').String()
 
 	osAuthURL           = app.Flag("os-auth-url", "Authentication URL.").PlaceHolder("OS_AUTH_URL").String()
-	osUsername          = app.Flag("os-username", "Username").PlaceHolder("OS_USERNAME").String()
+	osUsername          = app.Flag("os-username", "Username.").PlaceHolder("OS_USERNAME").String()
 	osPassword          = app.Flag("os-password", "User's Password").PlaceHolder("OS_PASSWORD").String()
 	osUserDomainID      = app.Flag("os-user-domain-id", "User's domain ID.").PlaceHolder("OS_USER_DOMAIN_ID").String()
 	osUserDomainName    = app.Flag("os-user-domain-name", "User's domain name.").PlaceHolder("OS_USER_DOMAIN_NAME").String()
@@ -57,39 +58,39 @@ var (
 	resource          = app.Flag("resource", "Resource name.").String()
 	namesOutput       = app.Flag("names", "Show output with names instead of UUIDs.").Bool()
 	longOutput        = app.Flag("long", "Show detailed output.").Bool()
-	humanReadableVals = app.Flag("human-readable", "Show detailed output.").Bool()
+	humanReadableVals = app.Flag("human-readable", "Show quota and usage values in a more user friendly unit.").Bool()
 	outputFmt         = app.Flag("format", "Output format (table, json, csv).").PlaceHolder("table").Short('f').Enum("table", "json", "csv")
 
 	// second-level subcommands and their flags/args
 	clusterListCmd = clusterCmd.Command("list", "Query data for all the clusters. Requires a cloud-admin token.")
 
 	clusterShowCmd = clusterCmd.Command("show", "Query data for a specific cluster. Use 'current' to show information regarding the current cluster. Requires a cloud-admin token.")
-	clusterShowID  = clusterShowCmd.Arg("cluster-id", "Cluster ID.").Required().String()
+	clusterShowID  = clusterShowCmd.Arg("cluster-id", "Cluster ID.").Default("current").String()
 
 	clusterSetCmd  = clusterCmd.Command("set", "Change resource(s) quota for a cluster. Use 'current' to show information regarding the current cluster. Requires a cloud-admin token.")
-	clusterSetID   = clusterSetCmd.Arg("cluster-id", "Cluster ID.").Required().String()
-	clusterSetCaps = QuotaList(clusterSetCmd.Arg("capacities", "Capacities to change. Format: service/resource=value(unit):\"comment\"").Required())
+	clusterSetID   = clusterSetCmd.Arg("cluster-id", "Cluster ID.").Default("current").String()
+	clusterSetCaps = QuotaList(clusterSetCmd.Arg("capacities", "Capacities to change. Format: service/resource=value(unit):\"comment\""))
 
 	domainListCmd = domainCmd.Command("list", "Query data for all the domains. Requires a cloud-admin token.")
 
 	domainShowCmd = domainCmd.Command("show", "Query data for a specific domain. Requires a domain-admin token.")
-	domainShowID  = domainShowCmd.Arg("domain-id", "Domain ID (name/UUID).").Required().String()
+	domainShowID  = domainShowCmd.Arg("domain-id", "Domain ID (name/UUID).").Default("current").String()
 
 	domainSetCmd    = domainCmd.Command("set", "Change resource(s) quota for a domain. Requires a cloud-admin token.")
-	domainSetID     = domainSetCmd.Arg("domain-id", "Domain ID (name/UUID).").Required().String()
-	domainSetQuotas = QuotaList(domainSetCmd.Arg("quotas", "Quotas to change. Format: service/resource=value(unit)").Required())
+	domainSetID     = domainSetCmd.Arg("domain-id", "Domain ID (name/UUID).").Default("current").String()
+	domainSetQuotas = QuotaList(domainSetCmd.Arg("quotas", "Quotas to change. Format: service/resource=value(unit)"))
 
 	projectListCmd    = projectCmd.Command("list", "Query data for all the projects in a domain. Requires a domain-admin token.")
 	projectListDomain = projectListCmd.Flag("domain", "Domain ID.").Short('d').Required().String()
 
 	projectShowCmd    = projectCmd.Command("show", "Query data for a specific project in a domain. Requires project member permissions.")
 	projectShowDomain = projectShowCmd.Flag("domain", "Domain ID.").Short('d').String()
-	projectShowID     = projectShowCmd.Arg("project-id", "Project ID (name/UUID).").Required().String()
+	projectShowID     = projectShowCmd.Arg("project-id", "Project ID (name/UUID).").Default("current").String()
 
 	projectSetCmd    = projectCmd.Command("set", "Change resource(s) quota for a project. Requires a domain-admin token.")
 	projectSetDomain = projectSetCmd.Flag("domain", "Domain ID.").Short('d').String()
-	projectSetID     = projectSetCmd.Arg("project-id", "Project ID (name/UUID).").Required().String()
-	projectSetQuotas = QuotaList(projectSetCmd.Arg("quotas", "Quotas to change. Format: service/resource=value(unit)").Required())
+	projectSetID     = projectSetCmd.Arg("project-id", "Project ID (name/UUID).").Default("current").String()
+	projectSetQuotas = QuotaList(projectSetCmd.Arg("quotas", "Quotas to change. Format: service/resource=value(unit)"))
 
 	projectSyncCmd    = projectCmd.Command("sync", "Sync a project's quota and usage data from the backing services into Limes' local database. Requires a project-admin token.")
 	projectSyncDomain = projectSyncCmd.Flag("domain", "Domain ID.").Short('d').String()
@@ -118,166 +119,174 @@ func main() {
 	// output and filter are initialized in advance with values that were provided
 	// at the command-line. Later, we pass only the specific information that
 	// is required by the operation
-	filter := cli.Filter{
+	filter := core.Filter{
 		Area:     *area,
 		Service:  *service,
 		Resource: *resource,
 	}
-	output := cli.Output{
+	output := core.Output{
 		Names:         *namesOutput,
 		Long:          *longOutput,
 		HumanReadable: *humanReadableVals,
 	}
 
+	if output.Names && output.Long {
+		errors.Handle(errors.New("'--names' and '--long' can not be used together"), "")
+	}
+
 	switch cmdString {
 	case clusterListCmd.FullCommand():
-		c := &cli.Cluster{
+		_, limesV1 := auth.ServiceClients()
+		c := &core.Cluster{
 			Filter: filter,
 			Output: output,
 		}
-		cli.RunListTask(c, *outputFmt)
+		core.RunListTask(limesV1, c, *outputFmt)
 
 	case clusterShowCmd.FullCommand():
-		c := &cli.Cluster{
+		_, limesV1 := auth.ServiceClients()
+		c := &core.Cluster{
 			ID:     *clusterShowID,
 			Filter: filter,
 			Output: output,
 		}
-		cli.RunGetTask(c, *outputFmt)
+		core.RunGetTask(limesV1, c, *outputFmt)
 
 	case clusterSetCmd.FullCommand():
-		// this manual check is required due to the order of the Args.
-		// If the ID is not provided then the capacities get interpreted
-		// as the ID and the error shown is not relevant to the context
-		if strings.Contains(*clusterSetID, "=") {
-			errors.Handle(errors.New("required argument 'cluster-id' not provided, try --help"))
+		// these manual check are required due to the order of the Args.
+		// If the ID is not provided then the first resource capacity gets
+		// interpreted as the ID
+		idIsCapacity := strings.Contains(*clusterSetID, "=")
+		if len(*clusterSetCaps) == 0 && !idIsCapacity {
+			errors.Handle(errors.New("required argument 'capacities' not provided, try --help"), "")
+		}
+		if idIsCapacity {
+			*clusterSetCaps = append(*clusterSetCaps, *clusterSetID)
+			*clusterSetID = "current"
 		}
 
-		c := &cli.Cluster{ID: *clusterSetID}
-		q, err := cli.ParseRawQuotas(c, clusterSetCaps, false)
-		errors.Handle(err)
-		cli.RunSetTask(c, q)
+		_, limesV1 := auth.ServiceClients()
+		c := &core.Cluster{ID: *clusterSetID}
+		q, err := core.ParseRawQuotas(limesV1, c, *clusterSetCaps, false)
+		errors.Handle(err, "")
+		core.RunSetTask(limesV1, c, q)
 
 	case domainListCmd.FullCommand():
-		d := &cli.Domain{
+		_, limesV1 := auth.ServiceClients()
+		d := &core.Domain{
 			Filter: filter,
 			Output: output,
 		}
 		d.Filter.Cluster = *domainCluster
-		cli.RunListTask(d, *outputFmt)
+		core.RunListTask(limesV1, d, *outputFmt)
 
 	case domainShowCmd.FullCommand():
-		// since gophercloud does not allow domain listing across
-		// different clusters therefore we skip FindDomain(), if a cluster
-		// was provided at the command-line
-		var d *cli.Domain
-		if *domainCluster == "" {
-			var err error
-			d, err = cli.FindDomain(*domainShowID)
-			errors.Handle(err)
-		} else {
-			d = &cli.Domain{ID: *domainShowID}
-		}
+		identityV3, limesV1 := auth.ServiceClients()
+		d, err := core.FindDomain(identityV3, limesV1, *domainShowID, *domainCluster)
+		errors.Handle(err, "")
 
 		d.Filter = filter
 		d.Filter.Cluster = *domainCluster
 		d.Output = output
-		cli.RunGetTask(d, *outputFmt)
+		core.RunGetTask(limesV1, d, *outputFmt)
 
 	case domainSetCmd.FullCommand():
-		if strings.Contains(*domainSetID, "=") {
-			errors.Handle(errors.New("required argument 'domain-id' not provided, try --help"))
+		idIsQuota := strings.Contains(*domainSetID, "=")
+		if len(*domainSetQuotas) == 0 && !idIsQuota {
+			errors.Handle(errors.New("required argument 'quotas' not provided, try --help"), "")
 		}
-		var d *cli.Domain
-		if *domainCluster == "" {
-			var err error
-			d, err = cli.FindDomain(*domainSetID)
-			errors.Handle(err)
-		} else {
-			d = &cli.Domain{ID: *domainSetID}
+		if idIsQuota {
+			*domainSetQuotas = append(*domainSetQuotas, *domainSetID)
+			*domainSetID = "current"
 		}
+		identityV3, limesV1 := auth.ServiceClients()
+		d, err := core.FindDomain(identityV3, limesV1, *domainSetID, *domainCluster)
+		errors.Handle(err, "")
 
 		d.Filter.Cluster = *domainCluster
-		q, err := cli.ParseRawQuotas(d, domainSetQuotas, false)
-		errors.Handle(err)
-		cli.RunSetTask(d, q)
+		q, err := core.ParseRawQuotas(limesV1, d, *domainSetQuotas, false)
+		errors.Handle(err, "")
+		core.RunSetTask(limesV1, d, q)
 
 	case projectListCmd.FullCommand():
-		var d *cli.Domain
-		var err error
-		if *projectCluster == "" {
-			d, err = cli.FindDomain(*projectListDomain)
-		} else {
-			d, err = cli.FindDomainInCluster(*projectListDomain, *projectCluster)
-		}
-		errors.Handle(err)
+		identityV3, limesV1 := auth.ServiceClients()
+		d, err := core.FindDomain(identityV3, limesV1, *projectListDomain, *projectCluster)
+		errors.Handle(err, "")
 
-		p := &cli.Project{
+		p := &core.Project{
 			DomainID:   d.ID,
 			DomainName: d.Name,
 			Filter:     filter,
 			Output:     output,
 		}
 		p.Filter.Cluster = *projectCluster
-		cli.RunListTask(p, *outputFmt)
+		core.RunListTask(limesV1, p, *outputFmt)
 
 	case projectShowCmd.FullCommand():
-		var p *cli.Project
-		var err error
-		if *projectCluster == "" {
-			p, err = cli.FindProject(*projectShowID, *projectShowDomain)
-		} else {
-			p, err = cli.FindProjectInCluster(*projectShowID, *projectShowDomain, *projectCluster)
+		if *projectCluster != "" && *projectShowDomain == "" {
+			errors.Handle(errors.New("required argument 'domain-id' not provided, try --help"), "")
 		}
-		errors.Handle(err)
+		if *projectShowID == "current" && *projectShowDomain != "" {
+			errors.Handle(errors.New("required argument 'project-id' not provided, try --help"), "")
+		}
+		identityV3, limesV1 := auth.ServiceClients()
+		p, err := core.FindProject(identityV3, limesV1, *projectShowID, *projectShowDomain, *projectCluster)
+		errors.Handle(err, "")
 
 		p.Filter = filter
 		p.Filter.Cluster = *projectCluster
 		p.Output = output
-		cli.RunGetTask(p, *outputFmt)
+		core.RunGetTask(limesV1, p, *outputFmt)
 
 	case projectSetCmd.FullCommand():
-		if strings.Contains(*projectSetID, "=") {
-			errors.Handle(errors.New("required argument 'project-id' not provided, try --help"))
+		if *projectCluster != "" && *projectSetDomain == "" {
+			errors.Handle(errors.New("required argument 'domain-id' not provided, try --help"), "")
 		}
-		var p *cli.Project
-		var err error
-		if *projectCluster == "" {
-			p, err = cli.FindProject(*projectSetID, *projectSetDomain)
-		} else {
-			p, err = cli.FindProjectInCluster(*projectSetID, *projectSetDomain, *projectCluster)
+		if *projectSetID == "current" && *projectSetDomain != "" {
+			errors.Handle(errors.New("required argument 'project-id' not provided, try --help"), "")
 		}
-		errors.Handle(err)
+		idIsQuota := strings.Contains(*projectSetID, "=")
+		if len(*projectSetQuotas) == 0 && !idIsQuota {
+			errors.Handle(errors.New("required argument 'quotas' not provided, try --help"), "")
+		}
+		if idIsQuota {
+			*projectSetQuotas = append(*projectSetQuotas, *projectSetID)
+			*projectSetID = "current"
+		}
+
+		identityV3, limesV1 := auth.ServiceClients()
+		p, err := core.FindProject(identityV3, limesV1, *projectSetID, *projectSetDomain, *projectCluster)
+		errors.Handle(err, "")
 
 		p.Filter.Cluster = *projectCluster
-		q, err := cli.ParseRawQuotas(p, projectSetQuotas, false)
-		errors.Handle(err)
-		cli.RunSetTask(p, q)
+		q, err := core.ParseRawQuotas(limesV1, p, *projectSetQuotas, false)
+		errors.Handle(err, "")
+		core.RunSetTask(limesV1, p, q)
 
 	case projectSyncCmd.FullCommand():
-		var p *cli.Project
-		var err error
-		if *projectCluster == "" {
-			p, err = cli.FindProject(*projectSyncID, *projectSyncDomain)
-		} else {
-			p, err = cli.FindProjectInCluster(*projectSyncID, *projectSyncDomain, *projectCluster)
+		if *projectCluster != "" && *projectSyncDomain == "" {
+			errors.Handle(errors.New("required argument 'domain-id' not provided, try --help"), "")
 		}
-		errors.Handle(err)
+		if *projectSyncID == "current" && *projectSyncDomain != "" {
+			errors.Handle(errors.New("required argument 'project-id' not provided, try --help"), "")
+		}
+		identityV3, limesV1 := auth.ServiceClients()
+		p, err := core.FindProject(identityV3, limesV1, *projectSyncID, *projectSyncDomain, *projectCluster)
+		errors.Handle(err, "")
 
 		p.Filter.Cluster = *projectCluster
-		cli.RunSyncTask(p)
+		core.RunSyncTask(limesV1, p)
 	}
 }
 
-func setEnvUnlessEmpty(env, val string) {
-	if val == "" {
-		return
+func setEnvUnlessEmpty(key, value string) {
+	if value != "" {
+		err := os.Setenv(key, value)
+		errors.Handle(err, "could not set custom value for OpenStack environment variable")
 	}
-
-	os.Setenv(env, val)
 }
 
-type rawQuotas cli.RawQuotas
+type rawQuotas core.RawQuotas
 
 // Set implements the kingpin.Value interface.
 func (rq *rawQuotas) Set(value string) error {
@@ -296,9 +305,9 @@ func (rq *rawQuotas) IsCumulative() bool {
 }
 
 // QuotaList appends the raw quota values given at the command line to the
-// aggregate cli.RawQuotas list.
-func QuotaList(s kingpin.Settings) (target *cli.RawQuotas) {
-	target = new(cli.RawQuotas)
+// aggregate core.RawQuotas list.
+func QuotaList(s kingpin.Settings) (target *core.RawQuotas) {
+	target = new(core.RawQuotas)
 	s.SetValue((*rawQuotas)(target))
 	return
 }
