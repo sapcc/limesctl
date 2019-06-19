@@ -1,3 +1,14 @@
+# v1.5.0 (2019-06-19)
+
+New features:
+- Display physical usage information when `--long` output flag is given.
+- ID(s) are now optional for `show` and `set` operations. If ID(s) are not
+  explicitly given then they are extracted from the current authorization
+  token.
+
+Changes:
+- Code clean-up.
+
 # v1.4.1 (2019-06-12)
 
 Bugfixes:
