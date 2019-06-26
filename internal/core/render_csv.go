@@ -154,11 +154,10 @@ func (c *Cluster) parseToCSV(cluster *limes.ClusterReport, data *csvData) {
 			cSrvRes := cluster.Services[srv].Resources[res]
 
 			// need to do this check to avoid nil pointers
-			var cap uint64
+			var cap, physicalUsage uint64
 			if cSrvRes.Capacity != nil {
 				cap = *cSrvRes.Capacity
 			}
-			physicalUsage := cSrvRes.Usage
 			if cSrvRes.PhysicalUsage != nil {
 				physicalUsage = *cSrvRes.PhysicalUsage
 			}
@@ -170,6 +169,9 @@ func (c *Cluster) parseToCSV(cluster *limes.ClusterReport, data *csvData) {
 				"burstUsage":    cSrvRes.BurstUsage,
 				"physicalUsage": physicalUsage,
 			})
+			if val["physicalUsage"] == "0" {
+				val["physicalUsage"] = ""
+			}
 
 			switch {
 			case c.Output.Long:
@@ -212,7 +214,7 @@ func (d *Domain) parseToCSV(domain *limes.DomainReport, data *csvData) {
 			dSrv := domain.Services[srv]
 			dSrvRes := domain.Services[srv].Resources[res]
 
-			physicalUsage := dSrvRes.Usage
+			var physicalUsage uint64
 			if dSrvRes.PhysicalUsage != nil {
 				physicalUsage = *dSrvRes.PhysicalUsage
 			}
@@ -224,6 +226,9 @@ func (d *Domain) parseToCSV(domain *limes.DomainReport, data *csvData) {
 				"burstUsage":    dSrvRes.BurstUsage,
 				"physicalUsage": physicalUsage,
 			})
+			if val["physicalUsage"] == "0" {
+				val["physicalUsage"] = ""
+			}
 
 			switch {
 			case d.Output.Names:
@@ -270,7 +275,7 @@ func (p *Project) parseToCSV(project *limes.ProjectReport, data *csvData) {
 			pSrv := project.Services[srv]
 			pSrvRes := project.Services[srv].Resources[res]
 
-			var burstQuota, burstUsage uint64
+			var burstQuota, burstUsage, physicalUsage uint64
 			if project.Bursting != nil {
 				if project.Bursting.Enabled {
 					burstQuota = project.Bursting.Multiplier.ApplyTo(pSrvRes.Quota)
@@ -280,8 +285,6 @@ func (p *Project) parseToCSV(project *limes.ProjectReport, data *csvData) {
 					}
 				}
 			}
-
-			physicalUsage := pSrvRes.Usage
 			if pSrvRes.PhysicalUsage != nil {
 				physicalUsage = *pSrvRes.PhysicalUsage
 			}
@@ -293,6 +296,9 @@ func (p *Project) parseToCSV(project *limes.ProjectReport, data *csvData) {
 				"burstUsage":    burstUsage,
 				"physicalUsage": physicalUsage,
 			})
+			if val["physicalUsage"] == "0" {
+				val["physicalUsage"] = ""
+			}
 
 			switch {
 			case p.Output.Names:
