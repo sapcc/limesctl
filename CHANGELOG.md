@@ -1,3 +1,9 @@
+# v1.5.1 (2019-06-26)
+
+Changes:
+- Report non-existent `physical_usage` data as an empty string in the table and
+  csv format.
+
 # v1.5.0 (2019-06-19)
 
 New features:
