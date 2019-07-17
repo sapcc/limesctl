@@ -199,7 +199,8 @@ func FindProject(identityV3, limesV1 *gophercloud.ServiceClient, userInputProjec
 	// restricted to that specific name
 	var page pagination.Page
 	if userInputDomain != "" {
-		d, err := FindDomain(identityV3, limesV1, userInputDomain, clusterID)
+		var d *Domain
+		d, err = FindDomain(identityV3, limesV1, userInputDomain, clusterID)
 		if err == nil {
 			page, err = gopherprojects.List(identityV3, gopherprojects.ListOpts{
 				Name:     userInputProject,

@@ -1,3 +1,8 @@
+# v1.5.2 (2019-07-17)
+
+Bugfixes:
+- A typo that resulted in a previous instance of error not being properly recycled.
+
 # v1.5.1 (2019-06-26)
 
 Changes:
