@@ -1,3 +1,9 @@
+# v1.5.3 (2019-08-20)
+
+Bugfixes:
+- Do not throw segmentation fault error for invalid service names while setting
+  quota(s).
+
 # v1.5.2 (2019-07-17)
 
 Bugfixes:
