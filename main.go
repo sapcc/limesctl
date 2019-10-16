@@ -57,6 +57,7 @@ var (
 	service           = app.Flag("service", "Service type.").String()
 	resource          = app.Flag("resource", "Resource name.").String()
 	namesOutput       = app.Flag("names", "Show output with names instead of UUIDs.").Bool()
+	debugOutput       = app.Flag("debug", "Show debug output with JSON requests and responses.").Bool()
 	longOutput        = app.Flag("long", "Show detailed output.").Bool()
 	humanReadableVals = app.Flag("human-readable", "Show quota and usage values in a more user friendly unit.").Bool()
 	outputFmt         = app.Flag("format", "Output format (table, json, csv).").PlaceHolder("table").Short('f').Enum("table", "json", "csv")
@@ -136,7 +137,7 @@ func main() {
 
 	switch cmdString {
 	case clusterListCmd.FullCommand():
-		_, limesV1 := auth.ServiceClients()
+		_, limesV1 := auth.ServiceClients(*debugOutput)
 		c := &core.Cluster{
 			Filter: filter,
 			Output: output,
@@ -144,7 +145,7 @@ func main() {
 		core.RunListTask(limesV1, c, *outputFmt)
 
 	case clusterShowCmd.FullCommand():
-		_, limesV1 := auth.ServiceClients()
+		_, limesV1 := auth.ServiceClients(*debugOutput)
 		c := &core.Cluster{
 			ID:     *clusterShowID,
 			Filter: filter,
@@ -165,14 +166,14 @@ func main() {
 			*clusterSetID = "current"
 		}
 
-		_, limesV1 := auth.ServiceClients()
+		_, limesV1 := auth.ServiceClients(*debugOutput)
 		c := &core.Cluster{ID: *clusterSetID}
 		q, err := core.ParseRawQuotas(limesV1, c, *clusterSetCaps, false)
 		errors.Handle(err, "")
 		core.RunSetTask(limesV1, c, q)
 
 	case domainListCmd.FullCommand():
-		_, limesV1 := auth.ServiceClients()
+		_, limesV1 := auth.ServiceClients(*debugOutput)
 		d := &core.Domain{
 			Filter: filter,
 			Output: output,
@@ -181,7 +182,7 @@ func main() {
 		core.RunListTask(limesV1, d, *outputFmt)
 
 	case domainShowCmd.FullCommand():
-		identityV3, limesV1 := auth.ServiceClients()
+		identityV3, limesV1 := auth.ServiceClients(*debugOutput)
 		d, err := core.FindDomain(identityV3, limesV1, *domainShowID, *domainCluster)
 		errors.Handle(err, "")
 
@@ -199,7 +200,7 @@ func main() {
 			*domainSetQuotas = append(*domainSetQuotas, *domainSetID)
 			*domainSetID = "current"
 		}
-		identityV3, limesV1 := auth.ServiceClients()
+		identityV3, limesV1 := auth.ServiceClients(*debugOutput)
 		d, err := core.FindDomain(identityV3, limesV1, *domainSetID, *domainCluster)
 		errors.Handle(err, "")
 
@@ -209,7 +210,7 @@ func main() {
 		core.RunSetTask(limesV1, d, q)
 
 	case projectListCmd.FullCommand():
-		identityV3, limesV1 := auth.ServiceClients()
+		identityV3, limesV1 := auth.ServiceClients(*debugOutput)
 		d, err := core.FindDomain(identityV3, limesV1, *projectListDomain, *projectCluster)
 		errors.Handle(err, "")
 
@@ -229,7 +230,7 @@ func main() {
 		if *projectShowID == "current" && *projectShowDomain != "" {
 			errors.Handle(errors.New("required argument 'project-id' not provided, try --help"), "")
 		}
-		identityV3, limesV1 := auth.ServiceClients()
+		identityV3, limesV1 := auth.ServiceClients(*debugOutput)
 		p, err := core.FindProject(identityV3, limesV1, *projectShowID, *projectShowDomain, *projectCluster)
 		errors.Handle(err, "")
 
@@ -254,7 +255,7 @@ func main() {
 			*projectSetID = "current"
 		}
 
-		identityV3, limesV1 := auth.ServiceClients()
+		identityV3, limesV1 := auth.ServiceClients(*debugOutput)
 		p, err := core.FindProject(identityV3, limesV1, *projectSetID, *projectSetDomain, *projectCluster)
 		errors.Handle(err, "")
 
@@ -270,7 +271,7 @@ func main() {
 		if *projectSyncID == "current" && *projectSyncDomain != "" {
 			errors.Handle(errors.New("required argument 'project-id' not provided, try --help"), "")
 		}
-		identityV3, limesV1 := auth.ServiceClients()
+		identityV3, limesV1 := auth.ServiceClients(*debugOutput)
 		p, err := core.FindProject(identityV3, limesV1, *projectSyncID, *projectSyncDomain, *projectCluster)
 		errors.Handle(err, "")
 
