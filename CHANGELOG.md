@@ -1,3 +1,15 @@
+# v1.6.0 (TBD)
+
+New features:
+- The new `--debug` flag logs all HTTP requests and responses, for
+  troubleshooting in deployments where mitmproxy is not available for some
+  reason.
+
+Bugfixes:
+- On Windows, handle UTF-8-encoded environment variables in the same way as
+  python-openstackclient. See
+  <https://github.com/gophercloud/gophercloud/issues/1572> for details.
+
 # v1.5.3 (2019-08-20)
 
 Bugfixes:
