@@ -9,6 +9,7 @@ Bugfixes:
 - On Windows, handle UTF-8-encoded environment variables in the same way as
   python-openstackclient. See
   <https://github.com/gophercloud/gophercloud/issues/1572> for details.
+- Do not crash when unknown service/resource are used with `set` subcommand.
 
 # v1.5.3 (2019-08-20)
 

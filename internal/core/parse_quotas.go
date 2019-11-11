@@ -192,16 +192,18 @@ func (c *Cluster) setBaseUnits(limesV1 *gophercloud.ServiceClient, ru *resourceU
 	cluster, err := c.Result.Extract()
 	errors.Handle(err, "cluster does not exist")
 
-	for srv, resMap := range *ru {
-		for res := range resMap {
-			if cluster.Services[srv] != nil {
-				srvRes, exists := cluster.Services[srv].Resources[res]
-				if exists {
-					(*ru)[srv][res] = srvRes.ResourceInfo.Unit
-				}
-			} else {
-				errors.Handle(fmt.Errorf("service %s for cluster %s could not be found", srv, cluster.ID), "")
+	for srvName, resMap := range *ru {
+		for resName := range resMap {
+			srvReport, exists := cluster.Services[srvName]
+			if !exists {
+				errors.Handle(fmt.Errorf("service %q for cluster %q could not be found", srvName, cluster.ID), "")
 			}
+			resReport, exists := srvReport.Resources[resName]
+			if !exists {
+				errors.Handle(fmt.Errorf("resource %q for service %q for cluster %q could not be found", resName, srvName, cluster.ID), "")
+			}
+
+			(*ru)[srvName][resName] = resReport.ResourceInfo.Unit
 		}
 	}
 }
@@ -220,16 +222,18 @@ func (d *Domain) setBaseUnits(limesV1 *gophercloud.ServiceClient, ru *resourceUn
 	domain, err := d.Result.Extract()
 	errors.Handle(err, "domain does not exist")
 
-	for srv, resMap := range *ru {
-		for res := range resMap {
-			if domain.Services[srv] != nil {
-				srvRes, exists := domain.Services[srv].Resources[res]
-				if exists {
-					(*ru)[srv][res] = srvRes.ResourceInfo.Unit
-				}
-			} else {
-				errors.Handle(fmt.Errorf("service %s for domain %s could not be found", srv, domain.Name), "")
+	for srvName, resMap := range *ru {
+		for resName := range resMap {
+			srvReport, exists := domain.Services[srvName]
+			if !exists {
+				errors.Handle(fmt.Errorf("service %q for domain %q could not be found", srvName, domain.Name), "")
 			}
+			resReport, exists := srvReport.Resources[resName]
+			if !exists {
+				errors.Handle(fmt.Errorf("resource %q for service %q for domain %q could not be found", resName, srvName, domain.Name), "")
+			}
+
+			(*ru)[srvName][resName] = resReport.ResourceInfo.Unit
 		}
 	}
 }
@@ -248,16 +252,18 @@ func (p *Project) setBaseUnits(limesV1 *gophercloud.ServiceClient, ru *resourceU
 	project, err := p.Result.Extract()
 	errors.Handle(err, "project does not exist")
 
-	for srv, resMap := range *ru {
-		for res := range resMap {
-			if project.Services[srv] != nil {
-				srvRes, exists := project.Services[srv].Resources[res]
-				if exists {
-					(*ru)[srv][res] = srvRes.ResourceInfo.Unit
-				}
-			} else {
-				errors.Handle(fmt.Errorf("service %s for project %s could not be found", srv, project.Name), "")
+	for srvName, resMap := range *ru {
+		for resName := range resMap {
+			srvReport, exists := project.Services[srvName]
+			if !exists {
+				errors.Handle(fmt.Errorf("service %q for project %q could not be found", srvName, project.Name), "")
 			}
+			resReport, exists := srvReport.Resources[resName]
+			if !exists {
+				errors.Handle(fmt.Errorf("resource %q for service %q for project %q could not be found", resName, srvName, project.Name), "")
+			}
+
+			(*ru)[srvName][resName] = resReport.ResourceInfo.Unit
 		}
 	}
 }
