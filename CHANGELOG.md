@@ -1,4 +1,4 @@
-# v1.6.0 (TBD)
+# v1.6.0 (2019-11-18)
 
 New features:
 - The new `--debug` flag logs all HTTP requests and responses, for
