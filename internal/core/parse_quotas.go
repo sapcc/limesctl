@@ -310,10 +310,12 @@ func makeServiceQuotas(q Quotas) limes.QuotaRequest {
 	sq := make(limes.QuotaRequest)
 
 	for srv, resList := range q {
-		sq[srv] = make(limes.ServiceQuotaRequest)
+		sq[srv] = limes.ServiceQuotaRequest{
+			Resources: make(limes.ResourceQuotaRequest),
+		}
 
 		for _, r := range resList {
-			sq[srv][r.Name] = limes.ValueWithUnit{
+			sq[srv].Resources[r.Name] = limes.ValueWithUnit{
 				Value: uint64(r.Value),
 				Unit:  r.Unit,
 			}
