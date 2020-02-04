@@ -113,10 +113,14 @@ func TestParseQuotas(t *testing.T) {
 
 		expected := limes.QuotaRequest{
 			"shared": limes.ServiceQuotaRequest{
-				"capacity": limes.ValueWithUnit{1843, limes.UnitBytes},
+				Resources: limes.ResourceQuotaRequest{
+					"capacity": limes.ValueWithUnit{Value: 1843, Unit: limes.UnitBytes},
+				},
 			},
 			"unshared": limes.ServiceQuotaRequest{
-				"things": limes.ValueWithUnit{12, limes.UnitNone},
+				Resources: limes.ResourceQuotaRequest{
+					"things": limes.ValueWithUnit{Value: 12, Unit: limes.UnitNone},
+				},
 			},
 		}
 		th.AssertDeepEquals(t, expected, actual)
