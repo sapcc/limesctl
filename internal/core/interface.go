@@ -23,9 +23,9 @@ import (
 	"os"
 
 	"github.com/gophercloud/gophercloud"
-	"github.com/sapcc/gophercloud-limes/resources/v1/clusters"
-	"github.com/sapcc/gophercloud-limes/resources/v1/domains"
-	"github.com/sapcc/gophercloud-limes/resources/v1/projects"
+	"github.com/sapcc/gophercloud-sapcc/resources/v1/clusters"
+	"github.com/sapcc/gophercloud-sapcc/resources/v1/domains"
+	"github.com/sapcc/gophercloud-sapcc/resources/v1/projects"
 	"github.com/sapcc/limesctl/internal/errors"
 )
 
@@ -144,6 +144,6 @@ func RunSetTask(limesV1 *gophercloud.ServiceClient, t SetTask, q Quotas) {
 func RunSyncTask(limesV1 *gophercloud.ServiceClient, p *Project) {
 	err := projects.Sync(limesV1, p.DomainID, p.ID, projects.SyncOpts{
 		Cluster: p.Filter.Cluster,
-	})
+	}).ExtractErr()
 	errors.Handle(err, "could not sync project")
 }
