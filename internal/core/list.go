@@ -21,9 +21,9 @@ package core
 
 import (
 	"github.com/gophercloud/gophercloud"
-	"github.com/sapcc/gophercloud-limes/resources/v1/clusters"
-	"github.com/sapcc/gophercloud-limes/resources/v1/domains"
-	"github.com/sapcc/gophercloud-limes/resources/v1/projects"
+	"github.com/sapcc/gophercloud-sapcc/resources/v1/clusters"
+	"github.com/sapcc/gophercloud-sapcc/resources/v1/domains"
+	"github.com/sapcc/gophercloud-sapcc/resources/v1/projects"
 	"github.com/sapcc/limesctl/internal/errors"
 )
 

@@ -23,9 +23,9 @@ import (
 	"fmt"
 
 	"github.com/gophercloud/gophercloud"
-	"github.com/sapcc/gophercloud-limes/resources/v1/clusters"
-	"github.com/sapcc/gophercloud-limes/resources/v1/domains"
-	"github.com/sapcc/gophercloud-limes/resources/v1/projects"
+	"github.com/sapcc/gophercloud-sapcc/resources/v1/clusters"
+	"github.com/sapcc/gophercloud-sapcc/resources/v1/domains"
+	"github.com/sapcc/gophercloud-sapcc/resources/v1/projects"
 	"github.com/sapcc/limesctl/internal/errors"
 )
 
@@ -33,7 +33,7 @@ import (
 func (c *Cluster) set(limesV1 *gophercloud.ServiceClient, q Quotas) {
 	sc := makeServiceCapacities(q)
 
-	err := clusters.Update(limesV1, c.ID, clusters.UpdateOpts{Services: sc})
+	err := clusters.Update(limesV1, c.ID, clusters.UpdateOpts{Services: sc}).ExtractErr()
 	errors.Handle(err, "could not set new capacities for cluster")
 }
 
@@ -44,7 +44,7 @@ func (d *Domain) set(limesV1 *gophercloud.ServiceClient, q Quotas) {
 	err := domains.Update(limesV1, d.ID, domains.UpdateOpts{
 		Cluster:  d.Filter.Cluster,
 		Services: sq,
-	})
+	}).ExtractErr()
 	errors.Handle(err, "could not set new quota(s) for domain")
 }
 
@@ -52,13 +52,13 @@ func (d *Domain) set(limesV1 *gophercloud.ServiceClient, q Quotas) {
 func (p *Project) set(limesV1 *gophercloud.ServiceClient, q Quotas) {
 	sq := makeServiceQuotas(q)
 
-	respBody, err := projects.Update(limesV1, p.DomainID, p.ID, projects.UpdateOpts{
+	warn, err := projects.Update(limesV1, p.DomainID, p.ID, projects.UpdateOpts{
 		Cluster:  p.Filter.Cluster,
 		Services: sq,
-	})
+	}).Extract()
 	errors.Handle(err, "could not set new quota(s) for project")
 
-	if respBody != nil {
-		fmt.Println(string(respBody))
+	if warn != nil {
+		fmt.Println(string(warn))
 	}
 }

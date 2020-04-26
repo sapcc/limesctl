@@ -27,8 +27,8 @@ import (
 	gopherdomains "github.com/gophercloud/gophercloud/openstack/identity/v3/domains"
 	gopherprojects "github.com/gophercloud/gophercloud/openstack/identity/v3/projects"
 	"github.com/gophercloud/gophercloud/pagination"
-	"github.com/sapcc/gophercloud-limes/resources/v1/domains"
-	"github.com/sapcc/gophercloud-limes/resources/v1/projects"
+	"github.com/sapcc/gophercloud-sapcc/resources/v1/domains"
+	"github.com/sapcc/gophercloud-sapcc/resources/v1/projects"
 	"github.com/sapcc/limesctl/internal/auth"
 	"github.com/sapcc/limesctl/internal/errors"
 )
@@ -102,7 +102,7 @@ func findDomainInCluster(limesV1 *gophercloud.ServiceClient, domainID, clusterID
 	}
 
 	// gophercloud doesn't support projects across different clusters therefore
-	// gophercloud-limes is used here
+	// gophercloud-sapcc is used here
 	err := domains.Get(limesV1, domainID, domains.GetOpts{Cluster: clusterID}).ExtractInto(&s)
 	if err != nil {
 		return nil, fmt.Errorf("could not find domain with domain_id = %q: %v", domainID, err)
@@ -252,7 +252,7 @@ func findProjectInCluster(limesV1 *gophercloud.ServiceClient, projectID, domainI
 	}
 
 	// gophercloud doesn't support projects across different clusters therefore
-	// gophercloud-limes is used here
+	// gophercloud-sapcc is used here
 	err := projects.Get(limesV1, domainID, projectID, projects.GetOpts{
 		Cluster: clusterID}).ExtractInto(&s)
 	if err != nil {
