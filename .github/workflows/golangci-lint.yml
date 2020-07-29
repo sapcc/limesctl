@@ -18,8 +18,10 @@ jobs:
     runs-on: ubuntu-latest
     if: "!contains(github.event.head_commit.message, '[ci skip]')"
     steps:
-      - uses: actions/checkout@v2
-      - name: golangci-lint
+      - name: Check out code
+        uses: actions/checkout@v2
+
+      - name: Run golangci-lint
         uses: golangci/golangci-lint-action@v1
         with:
           # Required: the version of golangci-lint is required and must be
