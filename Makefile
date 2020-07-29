@@ -25,7 +25,7 @@ comma := ,
 all: build/limesctl
 
 build/limesctl: FORCE
-	$(GO) install -v $(GO_BUILDFLAGS) -ldflags '$(GO_LDFLAGS)' '$(PKG)'
+	$(GO) install $(GO_BUILDFLAGS) -ldflags '$(GO_LDFLAGS)' '$(PKG)'
 
 install: FORCE build/limesctl
 	install -D -m 0755 build/limesctl "$(DESTDIR)$(PREFIX)/bin/limesctl"
