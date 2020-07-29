@@ -6,9 +6,15 @@ updates:
     directory: "/"
     schedule:
       interval: "monthly"
-      
+    reviewers:
+      - "majewsky"
+      - "talal"
+
   # Maintain dependencies for Go
   - package-ecosystem: "gomod"
     directory: "/"
     schedule:
       interval: "monthly"
+    reviewers:
+      - "majewsky"
+      - "talal"
