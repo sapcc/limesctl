@@ -1,6 +1,7 @@
 # limesctl
 
 [![GitHub release](https://img.shields.io/github/release/sapcc/limesctl.svg)](https://github.com/sapcc/limesctl/releases/latest)
+![Build and Test](https://github.com/sapcc/limesctl/workflows/Build%20and%20Test/badge.svg)
 [![Go Report Card](https://goreportcard.com/badge/github.com/sapcc/limesctl)](https://goreportcard.com/report/github.com/sapcc/limesctl)
 
 `limesctl` is the command-line client for [Limes](https://github.com/sapcc/limes).

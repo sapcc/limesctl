@@ -20,8 +20,10 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/alecthomas/kingpin"
 	"github.com/sapcc/limesctl/internal/auth"
@@ -30,8 +32,11 @@ import (
 )
 
 var (
-	// defined by the Makefile at compile time
-	version string
+	// This info identifies a specific build of the app.
+	// Version and GitCommitHash are set at compile time.
+	version       = "unknown"
+	gitCommitHash = "unknown"
+	buildDate     = time.Now().UTC().Format(time.RFC3339)
 
 	app = kingpin.New("limesctl", "CLI client for Limes.")
 	// first-level commands and flags
@@ -99,7 +104,8 @@ var (
 )
 
 func main() {
-	app.Version("limesctl version " + version)
+	app.Version(fmt.Sprintf("limesctl has version %s built from Git commit %s on %s",
+		version, gitCommitHash, buildDate))
 	app.VersionFlag.Short('v')
 	app.HelpFlag.Short('h')
 

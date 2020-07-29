@@ -17,6 +17,9 @@
 
 // Command gocovcat combines multiple go cover runs, and prints the
 // result on stdout.
+
+// +build ignore
+
 package main
 
 import (
