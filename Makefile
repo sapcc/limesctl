@@ -45,6 +45,7 @@ check: FORCE build/limesctl lint build/cover.html
 	@printf "\e[1;32m>> All checks successful\e[0m\n"
 
 # Test with coverage
+test-coverage: build/cover.out
 build/%.cover.out: FORCE
 	@printf "\e[1;34m>> go test $(subst _,/,$*)\e[0m\n"
 	$(GO) test $(GO_BUILDFLAGS) -ldflags '$(GO_LDFLAGS)' -coverprofile=$@ -covermode=count -coverpkg=$(subst $(space),$(comma),$(GO_COVERPKGS)) $(subst _,/,$*)

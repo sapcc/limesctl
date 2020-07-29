@@ -28,5 +28,10 @@ jobs:
       - name: Basic build
         run: make
 
-      - name: Run tests
-        run: make test
+      - name: Run tests with coverage
+        run: make test-coverage
+
+      - name: Upload coverage report to Coveralls
+        run: go run github.com/mattn/goveralls -coverprofile=build/cover.out -service=github
+        env:
+          COVERALLS_TOKEN: ${{ github.token }}
