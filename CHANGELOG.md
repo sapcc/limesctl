@@ -6,11 +6,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [1.6.1] - 2020-07-29
 ### Added
 - Migrate from gophercloud-limes to gophercloud-sapcc.
 - Version flag now prints the Git commit hash and build date.
 
-## [1.6.0] - 2017-06-20
+## [1.6.0] - 2019-11-18
 ### Added
 - The new `--debug` flag logs all HTTP requests and responses, for
   troubleshooting in deployments where mitmproxy is not available for some
@@ -87,7 +89,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Initial release.
 
-[Unreleased]: https://github.com/sapcc/limesctl/compare/v1.6.0...HEAD
+[Unreleased]: https://github.com/sapcc/limesctl/compare/v1.6.1...HEAD
+[1.6.1]: https://github.com/sapcc/limesctl/compare/v1.6.0...v1.6.1
 [1.6.0]: https://github.com/sapcc/limesctl/compare/v1.5.3...v1.6.0
 [1.5.3]: https://github.com/sapcc/limesctl/compare/v1.5.2...v1.5.3
 [1.5.2]: https://github.com/sapcc/limesctl/compare/v1.5.1...v1.5.2
