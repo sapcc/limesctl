@@ -11,6 +11,4 @@ updates:
   - package-ecosystem: "gomod"
     directory: "/"
     schedule:
-      interval: "daily"
-      time: "08:00"
-      timezone: "Europe/Berlin"
+      interval: "monthly"
