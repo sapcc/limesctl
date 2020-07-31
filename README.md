@@ -10,8 +10,8 @@
 
 ### Pre-compiled binaries
 
-Pre-compiled binaries for Linux and macOS are avaiable on the
-[releases page](https://github.com/sapcc/limesctl/releases/latest).
+Pre-compiled binaries are avaiable on the [releases
+page](https://github.com/sapcc/limesctl/releases/latest).
 
 ### Building from source
 
