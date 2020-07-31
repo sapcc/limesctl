@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ## [1.6.1] - 2020-07-29
-### Added
+### Changed
 - Migrate from gophercloud-limes to gophercloud-sapcc.
 - Version flag now prints the Git commit hash and build date.
 
@@ -23,15 +23,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   python-openstackclient. See
   [gophercloud/gophercloud#1572](https://github.com/gophercloud/gophercloud/issues/1572)
   for details.
+
+### Fixed
 - Do not crash when unknown service/resource are used with `set` subcommand.
 
 ## [1.5.3] - 2019-08-20
-### Changed
+### Fixed
 - Do not throw segmentation fault error for invalid service names while setting
   quota(s).
 
 ## [1.5.2] - 2019-07-17
-### Changed
+### Fixed
 - A typo that resulted in a previous instance of error not being properly
   recycled.
 
@@ -43,12 +45,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.5.0] - 2019-06-19
 ### Added
 - Display physical usage information when `--long` output flag is given.
+
+### Changed
 - ID(s) are now optional for `show` and `set` operations. If ID(s) are not
   explicitly given then they are extracted from the current authorization
   token.
-
-### Changed
-- Code clean-up.
 
 ## [1.4.1] - 2019-06-12
 ### Changed
@@ -56,16 +57,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   are missing.
 
 ## [1.4.0] - 2019-03-28
-### Added
+### Changed
 - Avoid extra requests to Keystone to resolve a domain name into an ID, when
   the token scope already contains the correct domain ID.
 
 ## [1.3.0] - 2019-01-07
-### Added
+### Changed
 - Display quota bursting information when `--long` output flag is given.
 - Allow fractional quota values for the `set` subcommand.
-
-### Changed
 - Optimize library dependencies. Binary size has been reduced by over 20%.
 
 ## [1.2.0] - 2018-11-05
@@ -76,6 +75,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - For the `--cluster` flag, the domain/project must be identified by ID.
   Specifiying a domain/project name will not work.
+
+### Fixed
 - `--cluster` flag now works as expected.
 
 ## [1.1.0] - 2018-10-29
