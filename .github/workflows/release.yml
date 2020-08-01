@@ -31,10 +31,13 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-go-
 
+      - name: Generate release info
+        run: make build/release-info
+
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v2
         with:
           version: latest
-          args: release --rm-dist
+          args: release --rm-dist --release-notes=./build/releaseinfo
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

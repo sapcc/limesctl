@@ -51,9 +51,12 @@ build/%.cover.out: FORCE
 	@printf "\e[1;34m>> go test $(subst _,/,$*)\e[0m\n"
 	$(GO) test $(GO_BUILDFLAGS) -ldflags '$(GO_LDFLAGS)' -failfast -race -coverprofile=$@ -covermode=atomic -coverpkg=$(subst $(space),$(comma),$(GO_COVERPKGS)) $(subst _,/,$*)
 build/cover.out: $(GO_COVERFILES)
-	$(GO) run $(GO_BUILDFLAGS) tools/gocovcat.go $(GO_COVERFILES) > $@
+	$(GO) run $(GO_BUILDFLAGS) tools/gocovcat/main.go $(GO_COVERFILES) > $@
 build/cover.html: build/cover.out
 	$(GO) tool cover -html $< -o $@
+
+build/release-info: CHANGELOG.md
+	$(GO) run $(GO_BUILDFLAGS) tools/releaseinfo/main.go $< $(shell git describe --tags --abbrev=0) > $@
 
 clean: FORCE
 	rm -rf -- build/*
