@@ -23,9 +23,9 @@ GO_COVERFILES := $(patsubst %,build/%.cover.out,$(subst /,_,$(GO_TESTPKGS)))
 space := $(null) $(null)
 comma := ,
 
-all: build/limesctl
+all: FORCE build/limesctl
 
-build/limesctl: FORCE
+build/limesctl: FORCE | build
 	$(GO) install $(GO_BUILDFLAGS) -ldflags '$(GO_LDFLAGS)' '$(PKG)'
 
 install: FORCE build/limesctl
@@ -46,8 +46,8 @@ test: FORCE
 	$(GO) test $(GO_BUILDFLAGS) -ldflags '$(GO_LDFLAGS)' $(GO_TESTPKGS)
 
 # Test with coverage
-test-coverage: build/cover.out
-build/%.cover.out: FORCE
+test-coverage: FORCE build/cover.out
+build/%.cover.out: FORCE | build
 	@printf "\e[1;34m>> go test $(subst _,/,$*)\e[0m\n"
 	$(GO) test $(GO_BUILDFLAGS) -ldflags '$(GO_LDFLAGS)' -failfast -race -coverprofile=$@ -covermode=atomic -coverpkg=$(subst $(space),$(comma),$(GO_COVERPKGS)) $(subst _,/,$*)
 build/cover.out: $(GO_COVERFILES)
@@ -55,8 +55,11 @@ build/cover.out: $(GO_COVERFILES)
 build/cover.html: build/cover.out
 	$(GO) tool cover -html $< -o $@
 
-build/release-info: CHANGELOG.md
+build/release-info: CHANGELOG.md | build
 	$(GO) run $(GO_BUILDFLAGS) tools/releaseinfo/main.go $< $(shell git describe --tags --abbrev=0) > $@
+
+build:
+	mkdir $@
 
 clean: FORCE
 	rm -rf -- build/*
