@@ -173,7 +173,7 @@ func FindProject(identityV3, limesV1 *gophercloud.ServiceClient, userInputProjec
 	p, err := gopherprojects.Get(identityV3, userInputProject).Extract()
 	if err == nil {
 		if p.IsDomain {
-			return nil, errors.New("the given ID belongs to a domain, usage instructions: limectl domain --help")
+			return nil, errors.New("the given ID belongs to a domain, usage instructions: limesctl domain --help")
 		}
 
 		// get domain name
