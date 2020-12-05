@@ -22,7 +22,6 @@ package main
 import (
 	"fmt"
 	"strings"
-	"time"
 
 	"github.com/alecthomas/kong"
 
@@ -30,12 +29,11 @@ import (
 	"github.com/sapcc/limesctl/internal/core"
 )
 
-// This info identifies a specific build of the app.
-// Version and GitCommitHash are set at compile time.
+// This info identifies a specific build of the app. It is set at compile time.
 var (
-	version       = "unknown"
-	gitCommitHash = "unknown"
-	buildDate     = time.Now().UTC().Format(time.RFC3339)
+	version = "dev"
+	commit  = "unknown"
+	date    = "now"
 )
 
 type cli struct {
@@ -57,8 +55,8 @@ func main() {
 		}),
 		kong.Bind(cmd.VersionFlag{
 			Version:       version,
-			GitCommitHash: gitCommitHash,
-			BuildDate:     buildDate,
+			GitCommitHash: commit,
+			BuildDate:     date,
 		}),
 		kong.Vars{"outputFormats": outputFormats()},
 	)
