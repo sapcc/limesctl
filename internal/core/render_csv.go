@@ -20,10 +20,7 @@
 package core
 
 import (
-	"math"
 	"sort"
-	"strconv"
-	"time"
 
 	"github.com/sapcc/limes"
 	"github.com/sapcc/limesctl/internal/errors"
@@ -319,76 +316,4 @@ func (p *Project) parseToCSV(project *limes.ProjectReport, data *csvData) {
 			*data = append(*data, csvRecord)
 		}
 	}
-}
-
-func timestampToString(timestamp *int64) string {
-	if timestamp == nil {
-		return ""
-	}
-	return time.Unix(*timestamp, 0).UTC().Format(time.RFC3339)
-}
-
-type rawValues map[string]uint64
-type convertedValues map[string]string
-
-func humanReadable(convert bool, unit limes.Unit, rv rawValues) (string, convertedValues) {
-	cv := make(convertedValues, len(rv))
-
-	computeAgainst := smallestNonzeroValue(rv)
-
-	if unit == limes.UnitNone || computeAgainst < 1024 {
-		convert = false
-	}
-	if !convert {
-		for k, v := range rv {
-			cv[k] = strconv.FormatUint(v, 10)
-		}
-		return string(unit), cv
-	}
-
-	oldExp := quotaUnits[unit]
-	usage := computeAgainst
-
-	var diffInExp float64
-	// 2^60 bytes (exbibytes) is the maximum supported unit
-	for diffInExp = 10; diffInExp <= (60 - oldExp); diffInExp += 10 {
-		usageScaled := usage / uint64(math.Exp2(diffInExp))
-
-		if usageScaled < 1024 {
-			break
-		}
-	}
-
-	// determine the new unit
-	var newUnit limes.Unit
-	for k, v := range quotaUnits {
-		if v == (oldExp + diffInExp) {
-			newUnit = k
-		}
-	}
-
-	// convert values to the new unit
-	for k, v := range rv {
-		v := float64(v)
-		v = v / math.Exp2(diffInExp)
-		// round to second decimal place
-		v = math.Round(v*100) / 100
-		cv[k] = strconv.FormatFloat(v, 'f', -1, 64)
-	}
-
-	return string(newUnit), cv
-}
-
-func smallestNonzeroValue(rv rawValues) uint64 {
-	var vals []uint64
-	for _, v := range rv {
-		if v != 0 {
-			vals = append(vals, v)
-		}
-	}
-	if len(vals) == 0 {
-		return 0
-	}
-	sort.Slice(vals, func(i, j int) bool { return vals[i] < vals[j] })
-	return vals[0]
 }
