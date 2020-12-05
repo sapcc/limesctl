@@ -28,11 +28,6 @@ import (
 type jsonData []byte
 
 // getJSON returns the result body of a get/list/update operation.
-func (d *Domain) renderJSON() jsonData {
-	return parseToJSON(d.Result.Body)
-}
-
-// getJSON returns the result body of a get/list/update operation.
 func (p *Project) renderJSON() jsonData {
 	return parseToJSON(p.Result.Body)
 }

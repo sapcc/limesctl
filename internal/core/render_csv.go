@@ -29,39 +29,6 @@ import (
 type csvData [][]string
 
 // renderCSV renders the result of a get/list/set operation in the CSV format.
-func (d *Domain) renderCSV() csvData {
-	var data csvData
-	var labels []string
-
-	switch {
-	case d.Output.Names:
-		labels = []string{"domain name", "service", "resource", "quota", "projects quota", "usage", "unit"}
-	case d.Output.Long:
-		labels = []string{"domain id", "domain name", "area", "service", "category", "resource",
-			"quota", "projects quota", "usage", "physical usage", "burst usage", "unit", "scraped at (UTC)"}
-	default:
-		labels = []string{"domain id", "service", "resource", "quota", "projects quota", "usage", "unit"}
-	}
-	data = append(data, labels)
-
-	if d.IsList {
-		domainList, err := d.Result.ExtractDomains()
-		errors.Handle(err, "could not render the CSV data for domains")
-
-		for _, domain := range domainList {
-			d.parseToCSV(&domain, &data)
-		}
-	} else {
-		domain, err := d.Result.Extract()
-		errors.Handle(err, "could not render the CSV data for domain")
-
-		d.parseToCSV(domain, &data)
-	}
-
-	return data
-}
-
-// renderCSV renders the result of a get/list/set operation in the CSV format.
 func (p *Project) renderCSV() csvData {
 	var data csvData
 	var labels []string
@@ -93,67 +60,6 @@ func (p *Project) renderCSV() csvData {
 	}
 
 	return data
-}
-
-// parseToCSV parses a limes.DomainReport to CSV depending on the output format and assigns it
-// to the aggregate csvData.
-func (d *Domain) parseToCSV(domain *limes.DomainReport, data *csvData) {
-	//serialize service types with ordered keys
-	types := make([]string, 0, len(domain.Services))
-	for typeStr := range domain.Services {
-		types = append(types, typeStr)
-	}
-	sort.Strings(types)
-
-	for _, srv := range types {
-		//serialize resource names with ordered keys
-		names := make([]string, 0, len(domain.Services[srv].Resources))
-		for nameStr := range domain.Services[srv].Resources {
-			names = append(names, nameStr)
-		}
-		sort.Strings(names)
-
-		for _, res := range names {
-			var csvRecord []string
-			// temporary variables to make map lookups easier
-			dSrv := domain.Services[srv]
-			dSrvRes := domain.Services[srv].Resources[res]
-
-			var physicalUsage uint64
-			if dSrvRes.PhysicalUsage != nil {
-				physicalUsage = *dSrvRes.PhysicalUsage
-			}
-
-			unit, val := humanReadable(d.Output.HumanReadable, dSrvRes.ResourceInfo.Unit, rawValues{
-				"domainQuota":   dSrvRes.DomainQuota,
-				"projectsQuota": dSrvRes.ProjectsQuota,
-				"usage":         dSrvRes.Usage,
-				"burstUsage":    dSrvRes.BurstUsage,
-				"physicalUsage": physicalUsage,
-			})
-			if val["physicalUsage"] == "0" {
-				val["physicalUsage"] = ""
-			}
-
-			switch {
-			case d.Output.Names:
-				csvRecord = append(csvRecord, domain.Name, dSrv.ServiceInfo.Type, dSrvRes.ResourceInfo.Name,
-					val["domainQuota"], val["projectsQuota"], val["usage"], unit,
-				)
-			case d.Output.Long:
-				csvRecord = append(csvRecord, domain.UUID, domain.Name, dSrv.ServiceInfo.Area, dSrv.ServiceInfo.Type,
-					dSrvRes.ResourceInfo.Category, dSrvRes.ResourceInfo.Name, val["domainQuota"], val["projectsQuota"],
-					val["usage"], val["physicalUsage"], val["burstUsage"], unit, timestampToString(dSrv.MinScrapedAt),
-				)
-			default:
-				csvRecord = append(csvRecord, domain.UUID, dSrv.ServiceInfo.Type, dSrvRes.ResourceInfo.Name,
-					val["domainQuota"], val["projectsQuota"], val["usage"], unit,
-				)
-			}
-
-			*data = append(*data, csvRecord)
-		}
-	}
 }
 
 // parseToCSV parses a limes.ProjectReport to CSV depending on the output format and assigns it

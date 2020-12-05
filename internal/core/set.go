@@ -23,21 +23,9 @@ import (
 	"fmt"
 
 	"github.com/gophercloud/gophercloud"
-	"github.com/sapcc/gophercloud-sapcc/resources/v1/domains"
 	"github.com/sapcc/gophercloud-sapcc/resources/v1/projects"
 	"github.com/sapcc/limesctl/internal/errors"
 )
-
-// set updates the resource quota(s) for a domain.
-func (d *Domain) set(limesV1 *gophercloud.ServiceClient, q Quotas) {
-	sq := makeServiceQuotas(q)
-
-	err := domains.Update(limesV1, d.ID, domains.UpdateOpts{
-		Cluster:  d.Filter.Cluster,
-		Services: sq,
-	}).ExtractErr()
-	errors.Handle(err, "could not set new quota(s) for domain")
-}
 
 // set updates the resource quota(s) for a project within a specific domain.
 func (p *Project) set(limesV1 *gophercloud.ServiceClient, q Quotas) {

@@ -21,21 +21,9 @@ package core
 
 import (
 	"github.com/gophercloud/gophercloud"
-	"github.com/sapcc/gophercloud-sapcc/resources/v1/domains"
 	"github.com/sapcc/gophercloud-sapcc/resources/v1/projects"
 	"github.com/sapcc/limesctl/internal/errors"
 )
-
-// get retrieves information about a single domain.
-func (d *Domain) get(limesV1 *gophercloud.ServiceClient) {
-	d.Result = domains.Get(limesV1, d.ID, domains.GetOpts{
-		Cluster:  d.Filter.Cluster,
-		Area:     d.Filter.Area,
-		Service:  d.Filter.Service,
-		Resource: d.Filter.Resource,
-	})
-	errors.Handle(d.Result.Err, "could not get domain")
-}
 
 // get retrieves information about a single project within a specific domain.
 func (p *Project) get(limesV1 *gophercloud.ServiceClient) {
