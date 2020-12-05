@@ -13,7 +13,3 @@ var LimesUnits = []limes.Unit{
 	limes.UnitPebibytes,
 	limes.UnitExbibytes,
 }
-
-// ResourceUnits is a map of service name to resource name to the resource's
-// default unit in Limes.
-type ResourceUnits map[string]map[string]limes.Unit

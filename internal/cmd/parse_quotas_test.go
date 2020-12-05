@@ -17,7 +17,7 @@
 *
 *******************************************************************************/
 
-package core
+package cmd
 
 import (
 	"testing"
@@ -74,7 +74,7 @@ func TestParseToQuotaRequest(t *testing.T) {
 		},
 	}
 
-	defaultResUnits := ResourceUnits{
+	defaultResUnits := resourceUnits{
 		"shared": map[string]limes.Unit{
 			"capacity":    limes.UnitMebibytes,
 			"capacityTwo": limes.UnitGibibytes,

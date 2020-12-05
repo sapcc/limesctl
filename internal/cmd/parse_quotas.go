@@ -17,7 +17,7 @@
 *
 *******************************************************************************/
 
-package core
+package cmd
 
 import (
 	"fmt"
@@ -28,7 +28,13 @@ import (
 
 	"github.com/sapcc/go-bits/logg"
 	"github.com/sapcc/limes"
+
+	"github.com/sapcc/limesctl/internal/core"
 )
+
+// resourceUnits is a map of service name to resource name to the resource's
+// default unit in Limes.
+type resourceUnits map[string]map[string]limes.Unit
 
 // quotaRx is used to extract the quota information from user input. See
 // parseToQuotaRequest() for more info.
@@ -43,7 +49,7 @@ var quotaRx = regexp.MustCompile(`^([^:/=]+)/([^:/=]+)=(\d*\.?\d+)([a-zA-Z]+)?$`
 // The input values are expected to be in the format:
 //   service/resource=123(Unit)
 // where unit is optional.
-func parseToQuotaRequest(resUnits ResourceUnits, in []string) (limes.QuotaRequest, error) {
+func parseToQuotaRequest(resUnits resourceUnits, in []string) (limes.QuotaRequest, error) {
 	out := make(limes.QuotaRequest)
 	for _, inputStr := range in {
 		matchList := quotaRx.FindStringSubmatch(inputStr)
@@ -71,14 +77,14 @@ func parseToQuotaRequest(resUnits ResourceUnits, in []string) (limes.QuotaReques
 			}
 			unit = limes.UnitNone
 		} else {
-			for _, v := range LimesUnits {
+			for _, v := range core.LimesUnits {
 				if unitStr == string(v) {
 					unit = v
 					break
 				}
 			}
 			if unit == "" {
-				return nil, fmt.Errorf("expected a unit from %q, got %q", LimesUnits, unitStr)
+				return nil, fmt.Errorf("expected a unit from %q, got %q", core.LimesUnits, unitStr)
 			}
 		}
 
