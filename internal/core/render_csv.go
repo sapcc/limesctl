@@ -29,37 +29,6 @@ import (
 type csvData [][]string
 
 // renderCSV renders the result of a get/list/set operation in the CSV format.
-func (c *Cluster) renderCSV() csvData {
-	var data csvData
-	var labels []string
-
-	switch {
-	case c.Output.Long:
-		labels = []string{"cluster id", "area", "service", "category", "resource", "capacity",
-			"domains quota", "usage", "physical usage", "burst usage", "unit", "comment", "scraped at (UTC)"}
-	default:
-		labels = []string{"cluster id", "service", "resource", "capacity", "domains quota", "usage", "unit"}
-	}
-	data = append(data, labels)
-
-	if c.IsList {
-		clusterList, err := c.Result.ExtractClusters()
-		errors.Handle(err, "could not render the CSV data for clusters")
-
-		for _, cluster := range clusterList {
-			c.parseToCSV(&cluster, &data)
-		}
-	} else {
-		cluster, err := c.Result.Extract()
-		errors.Handle(err, "could not render the CSV data for cluster")
-
-		c.parseToCSV(cluster, &data)
-	}
-
-	return data
-}
-
-// renderCSV renders the result of a get/list/set operation in the CSV format.
 func (d *Domain) renderCSV() csvData {
 	var data csvData
 	var labels []string
@@ -124,67 +93,6 @@ func (p *Project) renderCSV() csvData {
 	}
 
 	return data
-}
-
-// parseToCSV parses a limes.ClusterReport to CSV depending on the output format and assigns it
-// to the aggregate csvData.
-func (c *Cluster) parseToCSV(cluster *limes.ClusterReport, data *csvData) {
-	//serialize service types with ordered keys
-	types := make([]string, 0, len(cluster.Services))
-	for typeStr := range cluster.Services {
-		types = append(types, typeStr)
-	}
-	sort.Strings(types)
-
-	for _, srv := range types {
-		//serialize resource names with ordered keys
-		names := make([]string, 0, len(cluster.Services[srv].Resources))
-		for nameStr := range cluster.Services[srv].Resources {
-			names = append(names, nameStr)
-		}
-		sort.Strings(names)
-
-		for _, res := range names {
-			var csvRecord []string
-			// temporary variables to make map lookups easier
-			cSrv := cluster.Services[srv]
-			cSrvRes := cluster.Services[srv].Resources[res]
-
-			// need to do this check to avoid nil pointers
-			var cap, physicalUsage uint64
-			if cSrvRes.Capacity != nil {
-				cap = *cSrvRes.Capacity
-			}
-			if cSrvRes.PhysicalUsage != nil {
-				physicalUsage = *cSrvRes.PhysicalUsage
-			}
-
-			unit, val := humanReadable(c.Output.HumanReadable, cSrvRes.ResourceInfo.Unit, rawValues{
-				"capacity":      cap,
-				"domainsQuota":  cSrvRes.DomainsQuota,
-				"usage":         cSrvRes.Usage,
-				"burstUsage":    cSrvRes.BurstUsage,
-				"physicalUsage": physicalUsage,
-			})
-			if val["physicalUsage"] == "0" {
-				val["physicalUsage"] = ""
-			}
-
-			switch {
-			case c.Output.Long:
-				csvRecord = append(csvRecord, cluster.ID, cSrv.ServiceInfo.Area, cSrv.ServiceInfo.Type,
-					cSrvRes.ResourceInfo.Category, cSrvRes.ResourceInfo.Name, val["capacity"], val["domainsQuota"],
-					val["usage"], val["physicalUsage"], val["burstUsage"], unit, cSrvRes.Comment, timestampToString(cSrv.MinScrapedAt),
-				)
-			default:
-				csvRecord = append(csvRecord, cluster.ID, cSrv.ServiceInfo.Type, cSrvRes.ResourceInfo.Name,
-					val["capacity"], val["domainsQuota"], val["usage"], unit,
-				)
-			}
-
-			*data = append(*data, csvRecord)
-		}
-	}
 }
 
 // parseToCSV parses a limes.DomainReport to CSV depending on the output format and assigns it

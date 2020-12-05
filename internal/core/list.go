@@ -21,22 +21,10 @@ package core
 
 import (
 	"github.com/gophercloud/gophercloud"
-	"github.com/sapcc/gophercloud-sapcc/resources/v1/clusters"
 	"github.com/sapcc/gophercloud-sapcc/resources/v1/domains"
 	"github.com/sapcc/gophercloud-sapcc/resources/v1/projects"
 	"github.com/sapcc/limesctl/internal/errors"
 )
-
-// list retrieves information about all the clusters within the token scope.
-func (c *Cluster) list(limesV1 *gophercloud.ServiceClient) {
-	c.IsList = true
-	c.Result = clusters.List(limesV1, clusters.ListOpts{
-		Area:     c.Filter.Area,
-		Service:  c.Filter.Service,
-		Resource: c.Filter.Resource,
-	})
-	errors.Handle(c.Result.Err, "could not list clusters")
-}
 
 // list retrieves information about all the domains within the token scope.
 func (d *Domain) list(limesV1 *gophercloud.ServiceClient) {

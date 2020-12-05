@@ -14,25 +14,90 @@
 
 package cmd
 
+import (
+	"github.com/pkg/errors"
+	"github.com/sapcc/gophercloud-sapcc/resources/v1/clusters"
+
+	"github.com/sapcc/limesctl/internal/core"
+)
+
+// ClusterCmd contains the command-line structure for the cluster command.
 type ClusterCmd struct {
 	List clusterListCmd `cmd:"" help:"Display data for all the clusters. Requires a cloud-admin token."`
 	Show clusterShowCmd `cmd:"" help:"Display data for a specific cluster. Requires a cloud-admin token."`
-	Set  clusterSetCmd  `cmd:"" help:"Change capacity values for a specific cluster. Requires a cloud-admin token."`
 }
 
 type clusterListCmd struct {
-	RequestFilterFlags
-	OutputFormatFlags
+	requestFilterFlags
+	outputFormatFlags
+}
+
+// Validate implements the kong.Validatable interface.
+func (c *clusterListCmd) Validate() error {
+	return c.outputFormatFlags.validate()
+}
+
+func (c *clusterListCmd) Run(clients *ServiceClients) error {
+	res := clusters.List(clients.limes, clusters.ListOpts{
+		Area:     c.Area,
+		Service:  c.Service,
+		Resource: c.Resource,
+	})
+	if res.Err != nil {
+		return errors.Wrap(res.Err, "could not get cluster reports")
+	}
+
+	if c.Format == core.OutputFormatJSON {
+		return writeJSON(res.Body)
+	}
+
+	limesReps, err := res.ExtractClusters()
+	if err != nil {
+		return errors.Wrap(err, "could not extract cluster reports")
+	}
+
+	rL := make([]core.LimesReportRenderer, 0, len(limesReps))
+	for _, rep := range limesReps {
+		rep := rep
+		rL = append(rL, core.ClusterReport{ClusterReport: &rep})
+	}
+	return writeReports(c.outputFormatFlags, rL)
 }
 
 type clusterShowCmd struct {
-	RequestFilterFlags
-	OutputFormatFlags
+	requestFilterFlags
+	outputFormatFlags
 
-	NameOrID string `arg:"" optional:"" help:"Name or ID of the cluster (leave empty for current cluster)."`
+	ID string `arg:"" optional:"" help:"ID of the cluster (leave empty for current cluster)."`
 }
 
-type clusterSetCmd struct {
-	Capacities []string `help:"New capacity values. Example: service/resource=256TiB:'Tis a comment' (comment is optional)."`
-	NameOrID   string   `arg:"" optional:"" help:"Name or ID of the cluster (leave empty for current cluster)."`
+// Validate implements the kong.Validatable interface.
+func (c *clusterShowCmd) Validate() error {
+	return c.outputFormatFlags.validate()
+}
+
+func (c *clusterShowCmd) Run(clients *ServiceClients) error {
+	if c.ID == "" {
+		c.ID = "current"
+	}
+	res := clusters.Get(clients.limes, c.ID, clusters.GetOpts{
+		Area:     c.Area,
+		Service:  c.Service,
+		Resource: c.Resource,
+	})
+	if res.Err != nil {
+		return errors.Wrap(res.Err, "could not get cluster report")
+	}
+
+	if c.Format == core.OutputFormatJSON {
+		return writeJSON(res.Body)
+	}
+
+	limesRep, err := res.Extract()
+	if err != nil {
+		return errors.Wrap(err, "could not extract cluster report")
+	}
+
+	rL := []core.LimesReportRenderer{core.ClusterReport{ClusterReport: limesRep}}
+	return writeReports(c.outputFormatFlags, rL)
 }

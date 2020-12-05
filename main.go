@@ -1,6 +1,6 @@
 /*******************************************************************************
 *
-* Copyright 2018 SAP SE
+* Copyright 2018-2020 SAP SE
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -62,14 +62,22 @@ func main() {
 		}),
 		kong.Vars{"outputFormats": outputFormats()},
 	)
-	if err := ctx.Run(&cli.Globals); err != nil {
+
+	clients, err := cli.Globals.Authenticate()
+	if err == nil {
+		err = ctx.Run(clients)
+	}
+	if err != nil {
 		// print error stack trace
 		ctx.FatalIfErrorf(fmt.Errorf("%+v", err))
 	}
 }
 
 func outputFormats() string {
-	f := []string{string(core.OutputFormatCSV),
-		string(core.OutputFormatJSON), string(core.OutputFormatTable)}
+	f := []string{
+		string(core.OutputFormatTable),
+		string(core.OutputFormatCSV),
+		string(core.OutputFormatJSON),
+	}
 	return strings.Join(f, ",")
 }

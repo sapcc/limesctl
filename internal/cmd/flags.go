@@ -15,102 +15,38 @@
 package cmd
 
 import (
-	"fmt"
-	"os"
+	"errors"
 
-	"github.com/alecthomas/kong"
+	"github.com/sapcc/limesctl/internal/core"
 )
 
-type RequestFilterFlags struct {
+// requestFilterFlags define parameters for Limes API requests.
+type requestFilterFlags struct {
 	Area     string `help:"Resource area."`
 	Service  string `help:"Service type."`
 	Resource string `help:"resource name."`
 }
 
-type OutputFormatFlags struct {
-	Format        string `enum:"${outputFormats}" default:"table" help:"Output format (${enum})."`
-	HumanReadable bool   `help:"Show quota and usage values in an user friendly unit."`
-	Long          bool   `help:"Show detailed output."`
-	Names         bool   `help:"Show output with names instead of UUIDs."`
+// outputFormatFlags define how the app will print data.
+type outputFormatFlags struct {
+	Format   core.OutputFormat `short:"f" enum:"${outputFormats}" default:"table" help:"Output format (${enum})."`
+	Humanize bool              `help:"Show quota and usage values in an user friendly unit. Not valid for 'json' output format."`
+	Long     bool              `help:"Show detailed output. Not valid for 'json' output format."`
+	Names    bool              `help:"Show output with names instead of UUIDs. Not valid for 'json' output format."`
+
+	// This is set by the corresponding validate().
+	csvRecFmt core.CSVRecordFormat `kong:"-"`
 }
 
-type Globals struct {
-	Debug   bool        `env:"LIMESCTL_DEBUG" help:"Enable debug mode."`
-	Version VersionFlag `help:"Print version information and quit."`
-	openStackFlags
-}
-
-// VersionFlag is a custom implementation of kong.VersionFlag.
-// It is used to display the version info.
-type VersionFlag struct {
-	Version       string
-	GitCommitHash string
-	BuildDate     string
-}
-
-// Decode implements the kong.MapperValue interface.
-func (v VersionFlag) Decode(ctx *kong.DecodeContext) error { return nil }
-
-// IsBool implements the kong.BoolMapper interface.
-func (v VersionFlag) IsBool() bool { return true }
-
-// BeforeApply writes the version info and terminates with a 0 exit status.
-func (v VersionFlag) BeforeApply(app *kong.Kong, version VersionFlag) error {
-	fmt.Printf("limesctl has version %s built from Git commit %s on %s\n",
-		version.Version, version.GitCommitHash, version.BuildDate)
-	app.Exit(0)
-	return nil
-}
-
-type openStackFlags struct {
-	OSUsername          string `help:"Username."`
-	OSPassword          string `help:"User's Password."`
-	OSUserDomainID      string `help:"User's domain ID."`
-	OSUserDomainName    string `help:"User's domain name."`
-	OSProjectID         string `help:"Project ID to scope to."`
-	OSProjectName       string `help:"Project name to scope to."`
-	OSProjectDomainID   string `help:"Domain ID containing project to scope to."`
-	OSProjectDomainName string `help:"Domain name containing project to scope to."`
-	OSAuthURL           string `help:"Authentication URL."`
-}
-
-func (o *openStackFlags) AfterApply() error {
-	// Overwrite OpenStack environment variables
-	if err := setEnvUnlessEmpty("OS_USERNAME", o.OSUsername); err != nil {
-		return err
+func (o *outputFormatFlags) validate() error {
+	if o.Long && o.Names {
+		return errors.New("'--long' and '--names' flags are mutually exclusive")
 	}
-	if err := setEnvUnlessEmpty("OS_PASSWORD", o.OSPassword); err != nil {
-		return err
+	if o.Long {
+		o.csvRecFmt = core.CSVRecordFormatLong
 	}
-	if err := setEnvUnlessEmpty("OS_USER_DOMAIN_ID", o.OSUserDomainID); err != nil {
-		return err
-	}
-	if err := setEnvUnlessEmpty("OS_USER_DOMAIN_NAME", o.OSUserDomainName); err != nil {
-		return err
-	}
-	if err := setEnvUnlessEmpty("OS_PROJECT_ID", o.OSProjectID); err != nil {
-		return err
-	}
-	if err := setEnvUnlessEmpty("OS_PROJECT_NAME", o.OSProjectName); err != nil {
-		return err
-	}
-	if err := setEnvUnlessEmpty("OS_PROJECT_DOMAIN_ID", o.OSProjectDomainID); err != nil {
-		return err
-	}
-	if err := setEnvUnlessEmpty("OS_PROJECT_DOMAIN_NAME", o.OSProjectDomainName); err != nil {
-		return err
-	}
-	if err := setEnvUnlessEmpty("OS_AUTH_URL", o.OSAuthURL); err != nil {
-		return err
-	}
-	return nil
-}
-
-func setEnvUnlessEmpty(key, val string) error {
-	if val != "" {
-		if err := os.Setenv(key, val); err != nil {
-			return err
-		}
+	if o.Names {
+		o.csvRecFmt = core.CSVRecordFormatNames
 	}
 	return nil
 }
