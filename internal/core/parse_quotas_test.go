@@ -1,6 +1,6 @@
 /*******************************************************************************
 *
-* Copyright 2018 SAP SE
+* Copyright 2018-2020 SAP SE
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -26,17 +26,15 @@ import (
 	"github.com/sapcc/limes"
 )
 
-// TestQuotaValueRx tests if the regular expression used to parse the quota
-// values given at the command line is correct.
-func TestQuotaValueRx(t *testing.T) {
+// TestQuotaRx tests if the regular expression used to parse the quota values
+// given at the command-line is correct.
+func TestQuotaRx(t *testing.T) {
 	tt := []struct {
 		in    string
 		match bool
 	}{
 		{"ser1vice/reso-urce=123456", true},
-		{"serv.ice/reso\\urce=123456:comment", true},
 		{"service/resource=123.456Unit", true},
-		{"service/resource=.456Unit:comment", true},
 
 		{"serv/ice/resource=123", false},
 		{"service/resou=rce=123", false},
@@ -49,7 +47,7 @@ func TestQuotaValueRx(t *testing.T) {
 	}
 
 	for _, tc := range tt {
-		if match := quotaValueRx.MatchString(tc.in); match != tc.match {
+		if match := quotaRx.MatchString(tc.in); match != tc.match {
 			if tc.match {
 				t.Errorf("%q did not match the regular expression. Was expected to match.\n", tc.in)
 			} else {
@@ -59,78 +57,41 @@ func TestQuotaValueRx(t *testing.T) {
 	}
 }
 
-// TestParseCapacities tests if the service capacities given at the
-// command line are being correctly parsed.
-func TestParseCapacities(t *testing.T) {
-	mockRawCapacities := RawQuotas{
-		"shared/capacity=1.1MiB",
-		"unshared/things=120:test comment.",
+// TestParseToQuotaRequest tests if the resource quotas given at the
+// command-line are being correctly parsed.
+func TestParseToQuotaRequest(t *testing.T) {
+	expected := limes.QuotaRequest{
+		"shared": limes.ServiceQuotaRequest{
+			Resources: limes.ResourceQuotaRequest{
+				"capacity":    limes.ValueWithUnit{Value: 1675037245, Unit: limes.UnitBytes},
+				"capacityTwo": limes.ValueWithUnit{Value: 10, Unit: limes.UnitGibibytes},
+			},
+		},
+		"unshared": limes.ServiceQuotaRequest{
+			Resources: limes.ResourceQuotaRequest{
+				"things": limes.ValueWithUnit{Value: 12, Unit: limes.UnitNone},
+			},
+		},
 	}
 
-	c, err := makeMockCluster("./fixtures/cluster-get-west.json")
-	th.AssertNoErr(t, err)
-
-	q, err := ParseRawQuotas(nil, c, mockRawCapacities, true)
-	th.AssertNoErr(t, err)
-
-	actual := makeServiceCapacities(q)
-
-	unitB := limes.UnitBytes
-	unitNone := limes.UnitNone
-	expected := []limes.ServiceCapacityRequest{
-		{Type: "shared", Resources: []limes.ResourceCapacityRequest{
-			{
-				Name:     "capacity",
-				Capacity: 1153433,
-				Unit:     &unitB,
-			},
-		}},
-		{Type: "unshared", Resources: []limes.ResourceCapacityRequest{
-			{
-				Name:     "things",
-				Capacity: 120,
-				Unit:     &unitNone,
-				Comment:  "test comment.",
-			},
-		}},
+	defaultResUnits := ResourceUnits{
+		"shared": map[string]limes.Unit{
+			"capacity":    limes.UnitMebibytes,
+			"capacityTwo": limes.UnitGibibytes,
+		},
+		"unshared": map[string]limes.Unit{
+			"things": limes.UnitNone,
+		},
 	}
-	th.AssertDeepEquals(t, expected, actual)
-}
-
-// TestParseQuotas tests if the service quotas given at the command line
-// are being correctly parsed.
-func TestParseQuotas(t *testing.T) {
-	mockRawQuotas := RawQuotas{
-		"shared/capacity=1.8KiB:this comment should be ignored by the parser.",
+	mock := []string{
+		"shared/capacity=1.56GiB",
+		"shared/capacityTwo=6.6GiB",
 		"unshared/things=12",
 	}
-
-	assertParseQuotas := func(s baseUnitsSetter, rq RawQuotas) {
-		q, err := ParseRawQuotas(nil, s, rq, true)
-		th.AssertNoErr(t, err)
-
-		actual := makeServiceQuotas(q)
-
-		expected := limes.QuotaRequest{
-			"shared": limes.ServiceQuotaRequest{
-				Resources: limes.ResourceQuotaRequest{
-					"capacity": limes.ValueWithUnit{Value: 1843, Unit: limes.UnitBytes},
-				},
-			},
-			"unshared": limes.ServiceQuotaRequest{
-				Resources: limes.ResourceQuotaRequest{
-					"things": limes.ValueWithUnit{Value: 12, Unit: limes.UnitNone},
-				},
-			},
-		}
-		th.AssertDeepEquals(t, expected, actual)
+	actual, err := parseToQuotaRequest(defaultResUnits, mock)
+	if err != nil {
+		t.Error(err)
 	}
 
-	d, err := makeMockDomain("./fixtures/domain-get-germany.json")
-	th.AssertNoErr(t, err)
-	assertParseQuotas(d, mockRawQuotas)
-
-	p, err := makeMockProject("./fixtures/project-get-dresden.json")
-	th.AssertNoErr(t, err)
-	assertParseQuotas(p, mockRawQuotas)
+	th.AssertDeepEquals(t, expected, actual)
 }
