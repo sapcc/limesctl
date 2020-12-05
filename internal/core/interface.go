@@ -1,6 +1,6 @@
 /*******************************************************************************
 *
-* Copyright 2018 SAP SE
+* Copyright 2018-2020 SAP SE
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -19,131 +19,41 @@
 
 package core
 
-import (
-	"os"
+// OutputFormat that the app can print data in.
+type OutputFormat string
 
-	"github.com/gophercloud/gophercloud"
-	"github.com/sapcc/gophercloud-sapcc/resources/v1/clusters"
-	"github.com/sapcc/gophercloud-sapcc/resources/v1/domains"
-	"github.com/sapcc/gophercloud-sapcc/resources/v1/projects"
-	"github.com/sapcc/limesctl/internal/errors"
+// Different types of OutputFormat.
+const (
+	OutputFormatTable OutputFormat = "table"
+	OutputFormatCSV   OutputFormat = "csv"
+	OutputFormatJSON  OutputFormat = "json"
 )
 
-// Cluster contains information regarding a cluster(s).
-// As different methods are called on it, the fields within the structure are updated accordingly.
-// Call its appropriate method to get/list/update a Cluster.
-type Cluster struct {
-	ID     string
-	Result clusters.CommonResult
-	IsList bool
-	Filter Filter
-	Output Output
+// CSVRecordFormat type defines the style of CSV records.
+type CSVRecordFormat int
+
+// Different types of CSVRecordFormat.
+const (
+	CSVRecordFormatLong CSVRecordFormat = iota + 1
+	CSVRecordFormatNames
+)
+
+// CSVRecords is exactly that.
+type CSVRecords [][]string
+
+// LimesReportRenderer is implemented by data types that can render a Limes
+// API report into CSVRecords.
+type LimesReportRenderer interface {
+	getHeaderRow(csvFmt CSVRecordFormat) []string
+	render(csvFmt CSVRecordFormat, humanize bool) CSVRecords
 }
 
-// Domain contains information regarding a domain(s).
-// As different methods are called on it, the fields within the structure are updated accordingly.
-// Call its appropriate method to get/list/update a Domain.
-type Domain struct {
-	ID     string
-	Name   string
-	Result domains.CommonResult
-	IsList bool
-	Filter Filter
-	Output Output
-}
-
-// Project contains information regarding a project(s).
-// As different methods are called on it, the fields within the structure are updated accordingly.
-// Call its appropriate method to get/list/update a Project.
-type Project struct {
-	ID         string
-	Name       string
-	DomainID   string
-	DomainName string
-	Result     projects.CommonResult
-	IsList     bool
-	Filter     Filter
-	Output     Output
-}
-
-// Filter contains different parameters for filtering a get/list/update operation.
-type Filter struct {
-	Cluster  string
-	Area     string
-	Service  string
-	Resource string
-}
-
-// Output contains different options that affect the output of a get/list operation.
-type Output struct {
-	Names         bool
-	Long          bool
-	HumanReadable bool
-}
-
-// Renderer interface type contains different methods for rendering data in
-// different formats.
-type Renderer interface {
-	renderJSON() jsonData
-	renderCSV() csvData
-}
-
-// GetTask is the interface type that abstracts a get operation.
-type GetTask interface {
-	get(*gophercloud.ServiceClient)
-	Renderer
-}
-
-// RunGetTask is the function that operates on a GetTask and shows the output in the respective
-// format that is specified at the command line.
-func RunGetTask(limesV1 *gophercloud.ServiceClient, t GetTask, outputFmt string) {
-	t.get(limesV1)
-	switch outputFmt {
-	case "json":
-		t.renderJSON().write(os.Stdout)
-	case "csv":
-		t.renderCSV().write(os.Stdout)
-	default:
-		t.renderCSV().writeTable(os.Stdout)
+// RenderReports renders multiple reports and returns the aggregate CSVData.
+func RenderReports(rL []LimesReportRenderer, csvFmt CSVRecordFormat, humanize bool) CSVRecords {
+	var recs CSVRecords
+	recs = append(recs, rL[0].getHeaderRow(csvFmt))
+	for _, r := range rL {
+		recs = append(recs, r.render(csvFmt, humanize)...)
 	}
-}
-
-// ListTask is the interface type that abstracts a list operation.
-type ListTask interface {
-	list(*gophercloud.ServiceClient)
-	Renderer
-}
-
-// RunListTask is the function that operates on a ListTask and shows the output in the respective
-// format that is specified at the command line.
-func RunListTask(limesV1 *gophercloud.ServiceClient, t ListTask, outputFmt string) {
-	t.list(limesV1)
-	switch outputFmt {
-	case "json":
-		t.renderJSON().write(os.Stdout)
-	case "csv":
-		t.renderCSV().write(os.Stdout)
-	default:
-		t.renderCSV().writeTable(os.Stdout)
-	}
-}
-
-// SetTask is the interface type that abstracts a put operation.
-type SetTask interface {
-	set(*gophercloud.ServiceClient, Quotas)
-}
-
-// RunSetTask is the function that operates on a SetTask and shows the output in the respective
-// format that is specified at the command line.
-func RunSetTask(limesV1 *gophercloud.ServiceClient, t SetTask, q Quotas) {
-	t.set(limesV1, q)
-}
-
-// RunSyncTask schedules a sync job that pulls quota and usage data for a project from
-// the backing services into Limes' local database.
-func RunSyncTask(limesV1 *gophercloud.ServiceClient, p *Project) {
-	err := projects.Sync(limesV1, p.DomainID, p.ID, projects.SyncOpts{
-		Cluster: p.Filter.Cluster,
-	}).ExtractErr()
-	errors.Handle(err, "could not sync project")
+	return recs
 }
