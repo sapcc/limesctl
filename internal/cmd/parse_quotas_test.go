@@ -63,8 +63,8 @@ func TestParseToQuotaRequest(t *testing.T) {
 	expected := limes.QuotaRequest{
 		"shared": limes.ServiceQuotaRequest{
 			Resources: limes.ResourceQuotaRequest{
-				"capacity":    limes.ValueWithUnit{Value: 1675037245, Unit: limes.UnitBytes},
-				"capacityTwo": limes.ValueWithUnit{Value: 10, Unit: limes.UnitGibibytes},
+				"capacity":    limes.ValueWithUnit{Value: 1597, Unit: limes.UnitMebibytes},
+				"capacityTwo": limes.ValueWithUnit{Value: 6, Unit: limes.UnitGibibytes},
 			},
 		},
 		"unshared": limes.ServiceQuotaRequest{
