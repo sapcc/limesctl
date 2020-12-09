@@ -136,7 +136,7 @@ func convertTo(valStr string, source, target limes.Unit) (limes.ValueWithUnit, e
 	} else {
 		_, sourceMultiple := source.Base()
 		_, targetMultiple := target.Base()
-		if sourceMultiple > targetMultiple {
+		if sourceMultiple < targetMultiple {
 			return limes.ValueWithUnit{}, limes.IncompatibleUnitsError{Source: source, Target: target}
 		}
 		vInBase := math.Floor(v * float64(sourceMultiple))
