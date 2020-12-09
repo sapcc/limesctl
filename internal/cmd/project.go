@@ -113,7 +113,7 @@ func (p *projectListCmd) Run(clients *ServiceClients) error {
 			DomainName:    domainName,
 		})
 	}
-	return writeReports(p.outputFormatFlags, rL)
+	return writeReports(p.outputFormatFlags, rL...)
 }
 
 type projectShowCmd struct {
@@ -160,14 +160,11 @@ func (p *projectShowCmd) Run(clients *ServiceClients) error {
 		return errors.Wrap(err, "could not extract project report")
 	}
 
-	rL := []core.LimesReportRenderer{
-		core.ProjectReport{
-			ProjectReport: limesRep,
-			DomainID:      pInfo.DomainID,
-			DomainName:    pInfo.DomainName,
-		},
-	}
-	return writeReports(p.outputFormatFlags, rL)
+	return writeReports(p.outputFormatFlags, core.ProjectReport{
+		ProjectReport: limesRep,
+		DomainID:      pInfo.DomainID,
+		DomainName:    pInfo.DomainName,
+	})
 }
 
 type projectSetCmd struct {

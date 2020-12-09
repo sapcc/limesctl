@@ -19,6 +19,15 @@
 
 package core
 
+import (
+	"encoding/csv"
+	"io"
+	"os"
+
+	"github.com/olekukonko/tablewriter"
+	"github.com/pkg/errors"
+)
+
 // OutputFormat that the app can print data in.
 type OutputFormat string
 
@@ -41,6 +50,26 @@ const (
 // CSVRecords is exactly that.
 type CSVRecords [][]string
 
+// Write writes CSVRecords to w.
+//
+// Note: the method takes an io.Writer because it is used in unit tests.
+func (d CSVRecords) Write(w io.Writer) error {
+	csvW := csv.NewWriter(w)
+	csvW.Comma = rune(';') // Use semicolon as delimiter
+	if err := csvW.WriteAll(d); err != nil {
+		return errors.Wrap(err, "could not write CSV data")
+	}
+	return nil
+}
+
+// WriteAsTable writes CSVRecords to os.Stdout in table format.
+func (d CSVRecords) WriteAsTable() {
+	t := tablewriter.NewWriter(os.Stdout)
+	t.SetHeader(d[0])
+	t.AppendBulk(d[1:])
+	t.Render()
+}
+
 // LimesReportRenderer is implemented by data types that can render a Limes
 // API report into CSVRecords.
 type LimesReportRenderer interface {
@@ -49,11 +78,16 @@ type LimesReportRenderer interface {
 }
 
 // RenderReports renders multiple reports and returns the aggregate CSVData.
-func RenderReports(rL []LimesReportRenderer, csvFmt CSVRecordFormat, humanize bool) CSVRecords {
+//
+// Note: this function expects all LimesReportRenderer to have the same
+// underlying type.
+func RenderReports(csvFmt CSVRecordFormat, humanize bool, rL ...LimesReportRenderer) CSVRecords {
 	var recs CSVRecords
-	recs = append(recs, rL[0].getHeaderRow(csvFmt))
-	for _, r := range rL {
-		recs = append(recs, r.render(csvFmt, humanize)...)
+	if len(rL) > 0 {
+		recs = append(recs, rL[0].getHeaderRow(csvFmt))
+		for _, r := range rL {
+			recs = append(recs, r.render(csvFmt, humanize)...)
+		}
 	}
 	return recs
 }
