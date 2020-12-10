@@ -32,16 +32,21 @@ func FindProject(identityClient *gophercloud.ServiceClient, domainNameOrID, proj
 	// Strategy 2: assume that projectNameOrID is an ID and try to find in
 	// Keystone.
 	p, err := identityprojects.Get(identityClient, projectNameOrID).Extract()
-	if err == nil && p.ID != "" {
-		dName, err := FindDomainName(identityClient, p.DomainID)
-		if err != nil {
-			return nil, errors.Wrap(err, msgProjectNotFound)
+	if err == nil {
+		if p.IsDomain {
+			return nil, errors.New("the given ID belongs to a domain, usage instructions: limectl domain --help")
 		}
-		return &ProjectInfo{
-			ID:         p.ID,
-			DomainID:   p.DomainID,
-			DomainName: dName,
-		}, nil
+		if p.ID != "" {
+			dName, err := FindDomainName(identityClient, p.DomainID)
+			if err != nil {
+				return nil, errors.Wrap(err, msgProjectNotFound)
+			}
+			return &ProjectInfo{
+				ID:         p.ID,
+				DomainID:   p.DomainID,
+				DomainName: dName,
+			}, nil
+		}
 	}
 
 	// Strategy 3: at this point we know that projectNameOrID is a name so we
