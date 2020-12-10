@@ -113,7 +113,7 @@ func (p *projectListCmd) Run(clients *ServiceClients) error {
 			DomainName:    domainName,
 		})
 	}
-	return writeReports(p.outputFormatFlags, rL...)
+	return writeReports(p.outputFormatFlags, core.LimesProjectsToReportRenderer(limesReps, domainID, domainName)...)
 }
 
 type projectShowCmd struct {

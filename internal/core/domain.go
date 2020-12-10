@@ -11,6 +11,17 @@ type DomainReport struct {
 	*limes.DomainReport
 }
 
+// LimesDomainsToReportRenderer wraps the given limes.DomainReport in a
+// DomainReport and returns a []LimesReportRenderer.
+func LimesDomainsToReportRenderer(in []limes.DomainReport) []LimesReportRenderer {
+	out := make([]LimesReportRenderer, 0, len(in))
+	for _, rep := range in {
+		rep := rep
+		out = append(out, DomainReport{DomainReport: &rep})
+	}
+	return out
+}
+
 var csvHeaderDomainDefault = []string{"domain id", "service", "resource", "quota", "projects quota", "usage", "unit"}
 
 var csvHeaderDomainLong = []string{"domain id", "domain name", "area", "service", "category", "resource",

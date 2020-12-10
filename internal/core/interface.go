@@ -43,7 +43,8 @@ type CSVRecordFormat int
 
 // Different types of CSVRecordFormat.
 const (
-	CSVRecordFormatLong CSVRecordFormat = iota + 1
+	CSVRecordFormatDefault CSVRecordFormat = iota
+	CSVRecordFormatLong
 	CSVRecordFormatNames
 )
 
@@ -77,7 +78,7 @@ type LimesReportRenderer interface {
 	render(csvFmt CSVRecordFormat, humanize bool) CSVRecords
 }
 
-// RenderReports renders multiple reports and returns the aggregate CSVData.
+// RenderReports renders multiple reports and returns the aggregate CSVRecords.
 //
 // Note: this function expects all LimesReportRenderer to have the same
 // underlying type.

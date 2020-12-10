@@ -56,12 +56,7 @@ func (c *clusterListCmd) Run(clients *ServiceClients) error {
 		return errors.Wrap(err, "could not extract cluster reports")
 	}
 
-	rL := make([]core.LimesReportRenderer, 0, len(limesReps))
-	for _, rep := range limesReps {
-		rep := rep
-		rL = append(rL, core.ClusterReport{ClusterReport: &rep})
-	}
-	return writeReports(c.outputFormatFlags, rL...)
+	return writeReports(c.outputFormatFlags, core.LimesClustersToReportRenderer(limesReps)...)
 }
 
 type clusterShowCmd struct {

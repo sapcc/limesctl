@@ -25,6 +25,17 @@ type ClusterReport struct {
 	*limes.ClusterReport
 }
 
+// LimesClustersToReportRenderer wraps the given limes.ClusterReport in a
+// ClusterReport and returns a []LimesReportRenderer.
+func LimesClustersToReportRenderer(in []limes.ClusterReport) []LimesReportRenderer {
+	out := make([]LimesReportRenderer, 0, len(in))
+	for _, rep := range in {
+		rep := rep
+		out = append(out, ClusterReport{ClusterReport: &rep})
+	}
+	return out
+}
+
 var csvHeaderClusterLong = []string{"cluster id", "area", "service", "category", "resource", "capacity",
 	"domains quota", "usage", "physical usage", "burst usage", "unit", "scraped at (UTC)"}
 

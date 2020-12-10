@@ -14,6 +14,21 @@ type ProjectReport struct {
 	DomainName string
 }
 
+// LimesProjectsToReportRenderer wraps the given limes.ProjectReport in a
+// ProjectReport and returns a []LimesReportRenderer.
+func LimesProjectsToReportRenderer(in []limes.ProjectReport, domainID, domainName string) []LimesReportRenderer {
+	out := make([]LimesReportRenderer, 0, len(in))
+	for _, rep := range in {
+		rep := rep
+		out = append(out, ProjectReport{
+			ProjectReport: &rep,
+			DomainID:      domainID,
+			DomainName:    domainName,
+		})
+	}
+	return out
+}
+
 var csvHeaderProjectDefault = []string{"domain id", "project id", "service", "resource", "quota", "usage", "unit"}
 
 var csvHeaderProjectLong = []string{"domain id", "domain name", "project id", "project name", "area", "service",

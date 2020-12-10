@@ -66,7 +66,7 @@ func main() {
 		err = ctx.Run(clients)
 	}
 	if err != nil {
-		// print error stack trace
+		// Print error stack trace.
 		ctx.FatalIfErrorf(fmt.Errorf("%+v", err))
 	}
 }

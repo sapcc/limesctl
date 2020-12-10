@@ -66,12 +66,7 @@ func (d *domainListCmd) Run(clients *ServiceClients) error {
 		return errors.Wrap(err, "could not extract domain reports")
 	}
 
-	rL := make([]core.LimesReportRenderer, 0, len(limesReps))
-	for _, rep := range limesReps {
-		rep := rep
-		rL = append(rL, core.DomainReport{DomainReport: &rep})
-	}
-	return writeReports(d.outputFormatFlags, rL...)
+	return writeReports(d.outputFormatFlags, core.LimesDomainsToReportRenderer(limesReps)...)
 }
 
 type domainShowCmd struct {
