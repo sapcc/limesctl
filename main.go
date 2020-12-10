@@ -20,7 +20,6 @@
 package main
 
 import (
-	"fmt"
 	"strings"
 
 	"github.com/alecthomas/kong"
@@ -66,8 +65,7 @@ func main() {
 		err = ctx.Run(clients)
 	}
 	if err != nil {
-		// Print error stack trace.
-		ctx.FatalIfErrorf(fmt.Errorf("%+v", err))
+		ctx.FatalIfErrorf(err)
 	}
 }
 

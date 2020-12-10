@@ -31,7 +31,7 @@ type ProjectCmd struct {
 	List projectListCmd `cmd:"" help:"Display data for all the projects. Requires a domain-admin token."`
 	Show projectShowCmd `cmd:"" help:"Display data for a specific project. Requires project member permissions."`
 	Set  projectSetCmd  `cmd:"" help:"Change quota values for a specific project. Requires a domain-admin token."`
-	Sync projectSyncCmd `cmd:"" help:"Schedule a sync job that pulls quota and usage data for this project from the backing services into Limes' local database. Requires a project-admin token."`
+	Sync projectSyncCmd `cmd:"" help:"Schedule a sync job that pulls quota and usage data for a specific project from the backing services into Limes' local database. Requires a project-admin token."`
 }
 
 type projectFlags struct {
