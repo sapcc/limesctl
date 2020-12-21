@@ -42,6 +42,7 @@ type resourceUnits map[string]map[string]limes.Unit
 //   matchList == [<full-match>, <service>, <resource>, <value>, <unit>?]
 var quotaRx = regexp.MustCompile(`^([^:/=]+)/([^:/=]+)=(\d*\.?\d+)([a-zA-Z]+)?$`)
 
+//nolint:gocognit
 // parseToQuotaRequest parses a slice of user input quota values, converts the
 // values to the resource's default unit (if needed), and returns a
 // limes.QuotaRequest for use with PUT requests on domains and projects.

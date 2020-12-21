@@ -30,6 +30,7 @@ func getFixtureBytes(fileName string) ([]byte, error) {
 	return ioutil.ReadFile(path)
 }
 
+//nolint:dupl
 func TestClusterReportRender(t *testing.T) {
 	mockJSONBytes, err := getFixtureBytes("cluster-get-west.json")
 	th.AssertNoErr(t, err)

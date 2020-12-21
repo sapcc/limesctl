@@ -31,6 +31,7 @@ type DomainCmd struct {
 	Set  domainSetCmd  `cmd:"" help:"Change quota values for a specific domain. Requires a cloud-admin token."`
 }
 
+//nolint:lll
 type domainClusterFlag struct {
 	ClusterID string `short:"c" name:"cluster" help:"Cluster ID. When this option is used, the domain must be identified by ID (name won't work)."`
 }

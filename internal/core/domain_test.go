@@ -23,6 +23,7 @@ import (
 	"github.com/sapcc/limes"
 )
 
+//nolint:dupl
 func TestDomainReportRender(t *testing.T) {
 	mockJSONBytes, err := getFixtureBytes("domain-get-germany.json")
 	th.AssertNoErr(t, err)

@@ -26,6 +26,7 @@ import (
 	"github.com/sapcc/limesctl/internal/core"
 )
 
+//nolint:lll
 // ProjectCmd contains the command-line structure for the project command.
 type ProjectCmd struct {
 	List projectListCmd `cmd:"" help:"Display data for all the projects. Requires a domain-admin token."`
@@ -34,6 +35,7 @@ type ProjectCmd struct {
 	Sync projectSyncCmd `cmd:"" help:"Schedule a sync job that pulls quota and usage data for a specific project from the backing services into Limes' local database. Requires a project-admin token."`
 }
 
+//nolint:lll
 type projectFlags struct {
 	ClusterID      string `short:"c" name:"cluster" help:"Cluster ID. When this option is used, the domain and project must be identified by ID (names won't work)."`
 	DomainNameOrID string `short:"d" name:"domain" help:"Name or ID of the domain. Required if using '--cluster' flag."`
@@ -104,15 +106,6 @@ func (p *projectListCmd) Run(clients *ServiceClients) error {
 		return errors.Wrap(err, "could not extract project reports")
 	}
 
-	rL := make([]core.LimesReportRenderer, 0, len(limesReps))
-	for _, rep := range limesReps {
-		rep := rep
-		rL = append(rL, core.ProjectReport{
-			ProjectReport: &rep,
-			DomainID:      domainID,
-			DomainName:    domainName,
-		})
-	}
 	return writeReports(p.outputFormatFlags, core.LimesProjectsToReportRenderer(limesReps, domainID, domainName)...)
 }
 
