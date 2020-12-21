@@ -54,7 +54,7 @@ func parseToQuotaRequest(resUnits resourceUnits, in []string) (limes.QuotaReques
 	for _, inputStr := range in {
 		matchList := quotaRx.FindStringSubmatch(inputStr)
 		if matchList == nil {
-			return nil, fmt.Errorf("expected a quota/capacity with optional unit and comment in the format: service/resource=value(unit):comment, got %q", inputStr)
+			return nil, fmt.Errorf("expected a quota with optional unit in the format: service/resource=value(unit), got %q", inputStr)
 		}
 
 		// Validate input service/resource.
@@ -96,10 +96,6 @@ func parseToQuotaRequest(resUnits resourceUnits, in []string) (limes.QuotaReques
 			var err error
 			vWithUnit, err = convertTo(valStr, unit, defaultUnit)
 			if err != nil {
-				if _, ok := err.(limes.IncompatibleUnitsError); ok {
-					err = fmt.Errorf("can not convert %s %s, minimum accepted unit for %s/%s is %s",
-						valStr, unit, service, resource, defaultUnit)
-				}
 				return nil, err
 			}
 		} else {
@@ -121,6 +117,20 @@ func parseToQuotaRequest(resUnits resourceUnits, in []string) (limes.QuotaReques
 	return out, nil
 }
 
+// smallerThanMinimumUnitError is returned by convertTo() when a value has a
+// source unit that is smaller than the default unit for that particular
+// resource.
+type smallerThanDefaultUnitError struct {
+	Value           string
+	Source          limes.Unit
+	ResourceDefault limes.Unit
+}
+
+// Error implements the error interface.
+func (e smallerThanDefaultUnitError) Error() string {
+	return fmt.Sprintf("cannot convert %s %s, minimum accepted unit for this resource is %s", e.Value, e.Source, e.ResourceDefault)
+}
+
 // convertTo converts the given value from source to target unit and returns
 // the truncated result in limes.ValueWithUnit.
 // i.e: 22.65 TiB -> 23193 GiB (instead of 23193.6 GiB)
@@ -134,10 +144,13 @@ func convertTo(valStr string, source, target limes.Unit) (limes.ValueWithUnit, e
 	if source == target {
 		newV = math.Floor(v)
 	} else {
-		_, sourceMultiple := source.Base()
-		_, targetMultiple := target.Base()
-		if sourceMultiple < targetMultiple {
+		sourceBase, sourceMultiple := source.Base()
+		targetBase, targetMultiple := target.Base()
+		if sourceBase != targetBase {
 			return limes.ValueWithUnit{}, limes.IncompatibleUnitsError{Source: source, Target: target}
+		}
+		if sourceMultiple < targetMultiple {
+			return limes.ValueWithUnit{}, smallerThanDefaultUnitError{Value: valStr, Source: source, ResourceDefault: target}
 		}
 		vInBase := math.Floor(v * float64(sourceMultiple))
 		newV = math.Floor(vInBase / float64(targetMultiple))
