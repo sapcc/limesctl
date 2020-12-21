@@ -17,11 +17,13 @@ package cmd
 import (
 	"fmt"
 	"net/http"
+	"os"
 
 	"github.com/alecthomas/kong"
 	"github.com/gophercloud/gophercloud"
 	"github.com/gophercloud/gophercloud/openstack"
 	"github.com/gophercloud/utils/client"
+	"github.com/gophercloud/utils/openstack/clientconfig"
 	"github.com/pkg/errors"
 	"github.com/sapcc/gophercloud-sapcc/clients"
 )
@@ -57,15 +59,15 @@ func (v VersionFlag) BeforeApply(app *kong.Kong, version VersionFlag) error {
 
 // openstackFlags holds the values for the required
 type openStackFlags struct {
-	OSAuthURL           string `env:"OS_AUTH_URL" help:"Authentication URL."`
-	OSUsername          string `env:"OS_USERNAME" help:"Username."`
-	OSPassword          string `env:"OS_PASSWORD" help:"User's Password."`
-	OSUserDomainID      string `env:"OS_USER_DOMAIN_ID" help:"User's domain ID."`
-	OSUserDomainName    string `env:"OS_USER_DOMAIN_NAME" help:"User's domain name."`
-	OSProjectID         string `env:"OS_PROJECT_ID" help:"Project ID to scope to."`
-	OSProjectName       string `env:"OS_PROJECT_NAME" help:"Project name to scope to."`
-	OSProjectDomainID   string `env:"OS_PROJECT_DOMAIN_ID" help:"Domain ID containing project to scope to."`
-	OSProjectDomainName string `env:"OS_PROJECT_DOMAIN_NAME" help:"Domain name containing project to scope to."`
+	OSAuthURL           string `help:"Authentication URL."`
+	OSUsername          string `help:"Username."`
+	OSPassword          string `help:"User's Password."`
+	OSUserDomainID      string `help:"User's domain ID."`
+	OSUserDomainName    string `help:"User's domain name."`
+	OSProjectID         string `help:"Project ID to scope to."`
+	OSProjectName       string `help:"Project name to scope to."`
+	OSProjectDomainID   string `help:"Domain ID containing project to scope to."`
+	OSProjectDomainName string `help:"Domain name containing project to scope to."`
 }
 
 // ServiceClients holds the service clients for v3 identity service and Limes.
@@ -77,14 +79,15 @@ type ServiceClients struct {
 // Authenticate authenticates against OpenStack and returns the necessary
 // service clients.
 func (g *Globals) Authenticate() (*ServiceClients, error) {
-	ao := gophercloud.AuthOptions{
-		IdentityEndpoint: g.OSAuthURL,
-		Username:         g.OSUsername,
-		Password:         g.OSPassword,
-		TenantID:         g.OSProjectID,
-		TenantName:       g.OSProjectName,
-		DomainID:         g.OSUserDomainID,
-		DomainName:       g.OSUserDomainName,
+	// Update OpenStack environment variables, if value provided as flag.
+	err := updateOpenStackEnvVars(&g.openStackFlags)
+	if err != nil {
+		return nil, err
+	}
+
+	ao, err := clientconfig.AuthOptions(nil)
+	if err != nil {
+		return nil, errors.Wrap(err, "could not get auth variables")
 	}
 
 	provider, err := openstack.NewClient(ao.IdentityEndpoint)
@@ -100,7 +103,7 @@ func (g *Globals) Authenticate() (*ServiceClients, error) {
 		}
 	}
 
-	err = openstack.Authenticate(provider, ao)
+	err = openstack.Authenticate(provider, *ao)
 	if err != nil {
 		return nil, errors.Wrap(err, "cannot connect to OpenStack")
 	}
@@ -119,4 +122,42 @@ func (g *Globals) Authenticate() (*ServiceClients, error) {
 		identity: identityClient,
 		limes:    limesClient,
 	}, nil
+}
+
+func setenvIfVal(key, val string) error {
+	if val == "" {
+		return nil
+	}
+	return os.Setenv(key, val)
+}
+
+func updateOpenStackEnvVars(v *openStackFlags) error {
+	if err := setenvIfVal("OS_AUTH_URL", v.OSAuthURL); err != nil {
+		return err
+	}
+	if err := setenvIfVal("OS_USERNAME", v.OSUsername); err != nil {
+		return err
+	}
+	if err := setenvIfVal("OS_PASSWORD", v.OSPassword); err != nil {
+		return err
+	}
+	if err := setenvIfVal("OS_USER_DOMAIN_ID", v.OSUserDomainID); err != nil {
+		return err
+	}
+	if err := setenvIfVal("OS_USER_DOMAIN_NAME", v.OSUserDomainName); err != nil {
+		return err
+	}
+	if err := setenvIfVal("OS_PROJECT_ID", v.OSProjectID); err != nil {
+		return err
+	}
+	if err := setenvIfVal("OS_PROJECT_NAME", v.OSProjectName); err != nil {
+		return err
+	}
+	if err := setenvIfVal("OS_PROJECT_DOMAIN_ID", v.OSProjectDomainID); err != nil {
+		return err
+	}
+	if err := setenvIfVal("OS_PROJECT_DOMAIN_NAME", v.OSProjectDomainName); err != nil {
+		return err
+	}
+	return nil
 }
