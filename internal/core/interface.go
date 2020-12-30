@@ -1,6 +1,6 @@
 /*******************************************************************************
 *
-* Copyright 2018 SAP SE
+* Copyright 2018-2020 SAP SE
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -20,130 +20,75 @@
 package core
 
 import (
+	"encoding/csv"
+	"io"
 	"os"
 
-	"github.com/gophercloud/gophercloud"
-	"github.com/sapcc/gophercloud-sapcc/resources/v1/clusters"
-	"github.com/sapcc/gophercloud-sapcc/resources/v1/domains"
-	"github.com/sapcc/gophercloud-sapcc/resources/v1/projects"
-	"github.com/sapcc/limesctl/internal/errors"
+	"github.com/olekukonko/tablewriter"
+	"github.com/pkg/errors"
 )
 
-// Cluster contains information regarding a cluster(s).
-// As different methods are called on it, the fields within the structure are updated accordingly.
-// Call its appropriate method to get/list/update a Cluster.
-type Cluster struct {
-	ID     string
-	Result clusters.CommonResult
-	IsList bool
-	Filter Filter
-	Output Output
-}
+// OutputFormat that the app can print data in.
+type OutputFormat string
 
-// Domain contains information regarding a domain(s).
-// As different methods are called on it, the fields within the structure are updated accordingly.
-// Call its appropriate method to get/list/update a Domain.
-type Domain struct {
-	ID     string
-	Name   string
-	Result domains.CommonResult
-	IsList bool
-	Filter Filter
-	Output Output
-}
+// Different types of OutputFormat.
+const (
+	OutputFormatTable OutputFormat = "table"
+	OutputFormatCSV   OutputFormat = "csv"
+	OutputFormatJSON  OutputFormat = "json"
+)
 
-// Project contains information regarding a project(s).
-// As different methods are called on it, the fields within the structure are updated accordingly.
-// Call its appropriate method to get/list/update a Project.
-type Project struct {
-	ID         string
-	Name       string
-	DomainID   string
-	DomainName string
-	Result     projects.CommonResult
-	IsList     bool
-	Filter     Filter
-	Output     Output
-}
+// CSVRecordFormat type defines the style of CSV records.
+type CSVRecordFormat int
 
-// Filter contains different parameters for filtering a get/list/update operation.
-type Filter struct {
-	Cluster  string
-	Area     string
-	Service  string
-	Resource string
-}
+// Different types of CSVRecordFormat.
+const (
+	CSVRecordFormatDefault CSVRecordFormat = iota
+	CSVRecordFormatLong
+	CSVRecordFormatNames
+)
 
-// Output contains different options that affect the output of a get/list operation.
-type Output struct {
-	Names         bool
-	Long          bool
-	HumanReadable bool
-}
+// CSVRecords is exactly that.
+type CSVRecords [][]string
 
-// Renderer interface type contains different methods for rendering data in
-// different formats.
-type Renderer interface {
-	renderJSON() jsonData
-	renderCSV() csvData
-}
-
-// GetTask is the interface type that abstracts a get operation.
-type GetTask interface {
-	get(*gophercloud.ServiceClient)
-	Renderer
-}
-
-// RunGetTask is the function that operates on a GetTask and shows the output in the respective
-// format that is specified at the command line.
-func RunGetTask(limesV1 *gophercloud.ServiceClient, t GetTask, outputFmt string) {
-	t.get(limesV1)
-	switch outputFmt {
-	case "json":
-		t.renderJSON().write(os.Stdout)
-	case "csv":
-		t.renderCSV().write(os.Stdout)
-	default:
-		t.renderCSV().writeTable(os.Stdout)
+// Write writes CSVRecords to w.
+//
+// Note: the method takes an io.Writer because it is used in unit tests.
+func (d CSVRecords) Write(w io.Writer) error {
+	csvW := csv.NewWriter(w)
+	csvW.Comma = rune(';') // Use semicolon as delimiter
+	if err := csvW.WriteAll(d); err != nil {
+		return errors.Wrap(err, "could not write CSV data")
 	}
+	return nil
 }
 
-// ListTask is the interface type that abstracts a list operation.
-type ListTask interface {
-	list(*gophercloud.ServiceClient)
-	Renderer
+// WriteAsTable writes CSVRecords to os.Stdout in table format.
+func (d CSVRecords) WriteAsTable() {
+	t := tablewriter.NewWriter(os.Stdout)
+	t.SetHeader(d[0])
+	t.AppendBulk(d[1:])
+	t.Render()
 }
 
-// RunListTask is the function that operates on a ListTask and shows the output in the respective
-// format that is specified at the command line.
-func RunListTask(limesV1 *gophercloud.ServiceClient, t ListTask, outputFmt string) {
-	t.list(limesV1)
-	switch outputFmt {
-	case "json":
-		t.renderJSON().write(os.Stdout)
-	case "csv":
-		t.renderCSV().write(os.Stdout)
-	default:
-		t.renderCSV().writeTable(os.Stdout)
+// LimesReportRenderer is implemented by data types that can render a Limes
+// API report into CSVRecords.
+type LimesReportRenderer interface {
+	getHeaderRow(csvFmt CSVRecordFormat) []string
+	render(csvFmt CSVRecordFormat, humanize bool) CSVRecords
+}
+
+// RenderReports renders multiple reports and returns the aggregate CSVRecords.
+//
+// Note: this function expects all LimesReportRenderer to have the same
+// underlying type.
+func RenderReports(csvFmt CSVRecordFormat, humanize bool, rL ...LimesReportRenderer) CSVRecords {
+	var recs CSVRecords
+	if len(rL) > 0 {
+		recs = append(recs, rL[0].getHeaderRow(csvFmt))
+		for _, r := range rL {
+			recs = append(recs, r.render(csvFmt, humanize)...)
+		}
 	}
-}
-
-// SetTask is the interface type that abstracts a put operation.
-type SetTask interface {
-	set(*gophercloud.ServiceClient, Quotas)
-}
-
-// RunSetTask is the function that operates on a SetTask and shows the output in the respective
-// format that is specified at the command line.
-func RunSetTask(limesV1 *gophercloud.ServiceClient, t SetTask, q Quotas) {
-	t.set(limesV1, q)
-}
-
-// RunSyncTask schedules a sync job that pulls quota and usage data for a project from
-// the backing services into Limes' local database.
-func RunSyncTask(limesV1 *gophercloud.ServiceClient, p *Project) {
-	err := projects.Sync(limesV1, p.DomainID, p.ID, projects.SyncOpts{
-		Cluster: p.Filter.Cluster,
-	}).ExtractErr()
-	errors.Handle(err, "could not sync project")
+	return recs
 }

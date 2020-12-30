@@ -1,46 +1,22 @@
 # limesctl
 
-[![GitHub release](https://img.shields.io/github/release/sapcc/limesctl.svg)](https://github.com/sapcc/limesctl/releases/latest)
-![Build and Test](https://github.com/sapcc/limesctl/workflows/Build%20and%20Test/badge.svg)
+[![GitHub Release](https://img.shields.io/github/v/release/sapcc/limesctl)](https://github.com/sapcc/limesctl/releases/latest)
+[![GitHub Workflow Status](https://img.shields.io/github/workflow/status/sapcc/limesctl/Build%20and%20Test)](https://github.com/sapcc/limesctl/actions?query=workflow%3A%22Build+and+Test%22)
 [![Go Report Card](https://goreportcard.com/badge/github.com/sapcc/limesctl)](https://goreportcard.com/report/github.com/sapcc/limesctl)
 
-`limesctl` is the command-line client for [Limes](https://github.com/sapcc/limes).
-
-## Installation
-
-### Pre-compiled binaries
-
-Pre-compiled binaries are avaiable on the [releases
-page](https://github.com/sapcc/limesctl/releases/latest).
-
-### Building from source
-
-The only required build dependency is [Go](https://golang.org/).
-
-```
-$ git clone https://github.com/sapcc/limesctl.git
-$ cd limesctl
-$ make install
-```
-
-This will put the binary in `/usr/bin/limesctl` on Linux and
-`/usr/local/bin/limesctl` for macOS.
-
-Alternatively, you can also build `limesctl` directly with the `go get` command
-without manually cloning the repository:
-
-```
-$ go get -u github.com/sapcc/limesctl
-```
-
-This will put the binary in `$GOPATH/bin/limesctl`.
+`limesctl` is the command-line interface for [Limes](https://github.com/sapcc/limes).
 
 ## Usage
 
-To get an overview of all the commands:
+You can download pre-compiled binaries for the [latest release](https://github.com/sapcc/limesctl/releases/latest).
+
+Alternatively, you can build with `make`, install with `make install`, or `go get`.
+
+For usage instructions:
 
 ```
 $ limesctl --help
 ```
 
-**Note**: `limesctl` requires a valid Keystone token for all its operations.
+**Note**: `limesctl` requires the full set of OpenStack auth environment
+variables. See [documentation for openstackclient](https://docs.openstack.org/python-openstackclient/latest/cli/man/openstack.html) for details.
