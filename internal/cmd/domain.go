@@ -26,9 +26,9 @@ import (
 
 // DomainCmd contains the command-line structure for the domain command.
 type DomainCmd struct {
-	List domainListCmd `cmd:"" help:"Display data for all the domains. Requires a cloud-admin token."`
-	Show domainShowCmd `cmd:"" help:"Display data for a specific domain. Requires a domain-admin token."`
-	Set  domainSetCmd  `cmd:"" help:"Change quota values for a specific domain. Requires a cloud-admin token."`
+	List domainListCmd `cmd:"" help:"Display resource usage data for all the domains. Requires a cloud-admin token."`
+	Show domainShowCmd `cmd:"" help:"Display resource usage data for a specific domain. Requires a domain-admin token."`
+	Set  domainSetCmd  `cmd:"" help:"Change resource quota values for a specific domain. Requires a cloud-admin token."`
 }
 
 //nolint:lll
@@ -38,13 +38,13 @@ type domainClusterFlag struct {
 
 type domainListCmd struct {
 	domainClusterFlag
-	requestFilterFlags
-	outputFormatFlags
+	resourceFilterFlags
+	resourceOutputFmtFlags
 }
 
 // Validate implements the kong.Validatable interface.
 func (d *domainListCmd) Validate() error {
-	return d.outputFormatFlags.validate()
+	return d.resourceOutputFmtFlags.validate()
 }
 
 func (d *domainListCmd) Run(clients *ServiceClients) error {
@@ -67,20 +67,20 @@ func (d *domainListCmd) Run(clients *ServiceClients) error {
 		return errors.Wrap(err, "could not extract domain reports")
 	}
 
-	return writeReports(d.outputFormatFlags, core.LimesDomainsToReportRenderer(limesReps)...)
+	return writeReports(d.commonOutputFmtFlags, d.Humanize, core.LimesDomainsToReportRenderer(limesReps)...)
 }
 
 type domainShowCmd struct {
 	domainClusterFlag
-	requestFilterFlags
-	outputFormatFlags
+	resourceFilterFlags
+	resourceOutputFmtFlags
 
 	NameOrID string `arg:"" optional:"" help:"Name or ID of the domain. Required if using '--cluster' flag."`
 }
 
 // Validate implements the kong.Validatable interface.
 func (d *domainShowCmd) Validate() error {
-	if err := d.outputFormatFlags.validate(); err != nil {
+	if err := d.resourceOutputFmtFlags.validate(); err != nil {
 		return err
 	}
 	if d.ClusterID != "" && d.NameOrID == "" {
@@ -118,7 +118,7 @@ func (d *domainShowCmd) Run(clients *ServiceClients) error {
 		return errors.Wrap(err, "could not extract domain report")
 	}
 
-	return writeReports(d.outputFormatFlags, core.DomainReport{DomainReport: limesRep})
+	return writeReports(d.commonOutputFmtFlags, d.Humanize, core.DomainReport{DomainReport: limesRep})
 }
 
 type domainSetCmd struct {

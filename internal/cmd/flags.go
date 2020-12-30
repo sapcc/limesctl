@@ -20,31 +20,53 @@ import (
 	"github.com/sapcc/limesctl/internal/core"
 )
 
-// requestFilterFlags define parameters for Limes API requests.
-type requestFilterFlags struct {
-	Area     string `help:"Resource area."`
+// resourceFilterFlags define parameters for Limes API requests that concern
+// resources.
+type resourceFilterFlags struct {
 	Service  string `help:"Service type."`
-	Resource string `help:"resource name."`
+	Area     string `help:"Resource area."`
+	Resource string `help:"Resource name."`
 }
 
-// outputFormatFlags define how the app will print data.
-type outputFormatFlags struct {
-	Format   core.OutputFormat `short:"f" enum:"${outputFormats}" default:"table" help:"Output format (${enum})."`
-	Humanize bool              `help:"Show quota and usage values in an user friendly unit. Not valid for 'json' output format."`
-	Long     bool              `help:"Show detailed output. Not valid for 'json' output format."`
-	Names    bool              `help:"Show output with names instead of UUIDs. Not valid for 'json' output format."`
+// rateFilterFlags define parameters for Limes API requests that concern rates.
+type rateFilterFlags struct {
+	Service string `help:"Service type."`
+}
+
+type commonOutputFmtFlags struct {
+	Format core.OutputFormat `short:"f" enum:"${outputFormats}" default:"table" help:"Output format (${enum})."`
+	Names  bool              `help:"Show output with names instead of UUIDs. Not valid for 'json' output format."`
 
 	// This is set by the corresponding validate().
 	csvRecFmt core.CSVRecordFormat `kong:"-"`
 }
 
-func (o *outputFormatFlags) validate() error {
+// resourceOutputFmtFlags define how the app will print resource data.
+type resourceOutputFmtFlags struct {
+	commonOutputFmtFlags
+	Long     bool `help:"Show detailed output. Not valid for 'json' output format."`
+	Humanize bool `help:"Show quota and usage values in an user friendly unit. Not valid for 'json' output format."`
+}
+
+func (o *resourceOutputFmtFlags) validate() error {
 	if o.Long && o.Names {
 		return errors.New("'--long' and '--names' flags are mutually exclusive")
 	}
 	if o.Long {
 		o.csvRecFmt = core.CSVRecordFormatLong
 	}
+	if o.Names {
+		o.csvRecFmt = core.CSVRecordFormatNames
+	}
+	return nil
+}
+
+// rateOutputFmtFlags define how the app will print rate data.
+type rateOutputFmtFlags struct {
+	commonOutputFmtFlags
+}
+
+func (o *rateOutputFmtFlags) validate() error {
 	if o.Names {
 		o.csvRecFmt = core.CSVRecordFormatNames
 	}

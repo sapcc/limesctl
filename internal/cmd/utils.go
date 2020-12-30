@@ -37,8 +37,8 @@ func writeJSON(d interface{}) error {
 	return nil
 }
 
-func writeReports(opts outputFormatFlags, reports ...core.LimesReportRenderer) error {
-	d := core.RenderReports(opts.csvRecFmt, opts.Humanize, reports...)
+func writeReports(opts commonOutputFmtFlags, humanize bool, reports ...core.LimesReportRenderer) error {
+	d := core.RenderReports(opts.csvRecFmt, humanize, reports...)
 	var err error
 	if opts.Format == core.OutputFormatCSV {
 		err = d.Write(os.Stdout)

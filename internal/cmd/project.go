@@ -29,10 +29,11 @@ import (
 //nolint:lll
 // ProjectCmd contains the command-line structure for the project command.
 type ProjectCmd struct {
-	List projectListCmd `cmd:"" help:"Display data for all the projects. Requires a domain-admin token."`
-	Show projectShowCmd `cmd:"" help:"Display data for a specific project. Requires project member permissions."`
-	Set  projectSetCmd  `cmd:"" help:"Change quota values for a specific project. Requires a domain-admin token."`
-	Sync projectSyncCmd `cmd:"" help:"Schedule a sync job that pulls quota and usage data for a specific project from the backing services into Limes' local database. Requires a project-admin token."`
+	List      projectListCmd      `cmd:"" help:"Display resource usage data for all the projects. Requires a domain-admin token."`
+	Show      projectShowCmd      `cmd:"" help:"Display resource usage data for a specific project. Requires project member permissions."`
+	ShowRates projectShowRatesCmd `cmd:"" help:"Display rate limits for a specific project. Requires project member permissions."`
+	Set       projectSetCmd       `cmd:"" help:"Change resource quota values for a specific project. Requires a domain-admin token."`
+	Sync      projectSyncCmd      `cmd:"" help:"Schedule a sync job that pulls quota and usage data for a specific project from the backing services into Limes' local database. Requires a project-admin token."`
 }
 
 //nolint:lll
@@ -58,13 +59,13 @@ func (pf *projectFlags) validateWithNameID(nameOrID string) error {
 
 type projectListCmd struct {
 	projectFlags
-	requestFilterFlags
-	outputFormatFlags
+	resourceFilterFlags
+	resourceOutputFmtFlags
 }
 
 // Validate implements the kong.Validatable interface.
 func (p *projectListCmd) Validate() error {
-	if err := p.outputFormatFlags.validate(); err != nil {
+	if err := p.resourceOutputFmtFlags.validate(); err != nil {
 		return err
 	}
 	if p.ClusterID != "" && p.DomainNameOrID == "" {
@@ -106,20 +107,20 @@ func (p *projectListCmd) Run(clients *ServiceClients) error {
 		return errors.Wrap(err, "could not extract project reports")
 	}
 
-	return writeReports(p.outputFormatFlags, core.LimesProjectsToReportRenderer(limesReps, domainID, domainName)...)
+	return writeReports(p.commonOutputFmtFlags, p.Humanize, core.LimesProjectsToReportRenderer(limesReps, domainID, domainName)...)
 }
 
 type projectShowCmd struct {
 	projectFlags
-	requestFilterFlags
-	outputFormatFlags
+	resourceFilterFlags
+	resourceOutputFmtFlags
 
 	NameOrID string `arg:"" optional:"" help:"Name or ID of the project. Required if using '--cluster' or '--domain' flag."`
 }
 
 // Validate implements the kong.Validatable interface.
 func (p *projectShowCmd) Validate() error {
-	if err := p.outputFormatFlags.validate(); err != nil {
+	if err := p.resourceOutputFmtFlags.validate(); err != nil {
 		return err
 	}
 	if err := p.projectFlags.validateWithNameID(p.NameOrID); err != nil {
@@ -153,7 +154,58 @@ func (p *projectShowCmd) Run(clients *ServiceClients) error {
 		return errors.Wrap(err, "could not extract project report")
 	}
 
-	return writeReports(p.outputFormatFlags, core.ProjectReport{
+	return writeReports(p.commonOutputFmtFlags, p.Humanize, core.ProjectReport{
+		ProjectReport: limesRep,
+		DomainID:      pInfo.DomainID,
+		DomainName:    pInfo.DomainName,
+	})
+}
+
+type projectShowRatesCmd struct {
+	projectFlags
+	rateFilterFlags
+	rateOutputFmtFlags
+
+	NameOrID string `arg:"" optional:"" help:"Name or ID of the project. Required if using '--cluster' or '--domain' flag."`
+}
+
+// Validate implements the kong.Validatable interface.
+func (p *projectShowRatesCmd) Validate() error {
+	if err := p.rateOutputFmtFlags.validate(); err != nil {
+		return err
+	}
+	if err := p.projectFlags.validateWithNameID(p.NameOrID); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (p *projectShowRatesCmd) Run(clients *ServiceClients) error {
+	pInfo, err := getProjectInfo(clients, p.ClusterID, p.DomainNameOrID, p.NameOrID)
+	if err != nil {
+		return err
+	}
+
+	res := projects.Get(clients.limes, pInfo.DomainID, pInfo.ID, projects.GetOpts{
+		Cluster:  p.ClusterID,
+		Area:     p.Area,
+		Service:  p.Service,
+		Resource: p.Resource,
+	})
+	if res.Err != nil {
+		return errors.Wrap(res.Err, "could not get project report")
+	}
+
+	if p.Format == core.OutputFormatJSON {
+		return writeJSON(res.Body)
+	}
+
+	limesRep, err := res.Extract()
+	if err != nil {
+		return errors.Wrap(err, "could not extract project report")
+	}
+
+	return writeReports(p.commonOutputFmtFlags, p.Humanize, core.ProjectReport{
 		ProjectReport: limesRep,
 		DomainID:      pInfo.DomainID,
 		DomainName:    pInfo.DomainName,
