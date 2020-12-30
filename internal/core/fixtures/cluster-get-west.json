@@ -11,10 +11,15 @@
             "name": "capacity",
             "unit": "B",
             "capacity": 185,
-            "comment": "hand-counted",
             "domains_quota": 50,
             "usage": 8,
             "physical_usage": 7
+          },
+          {
+            "name": "capacity_portion",
+            "unit": "B",
+            "contained_in": "capacity_portion",
+            "usage": 4
           },
           {
             "name": "external_things",
@@ -30,7 +35,9 @@
           }
         ],
         "max_scraped_at": 66,
-        "min_scraped_at": 22
+        "min_scraped_at": 22,
+        "max_rates_scraped_at": 45,
+        "min_rates_scraped_at": 23
       },
       {
         "type": "unshared",
@@ -43,14 +50,34 @@
             "usage": 6
           },
           {
+            "name": "capacity_portion",
+            "unit": "B",
+            "contained_in": "capacity_portion",
+            "usage": 3
+          },
+          {
             "name": "things",
             "capacity": 139,
+            "per_availability_zone": [
+              {
+                "name": "az-one",
+                "capacity": 69,
+                "usage": 13
+              },
+              {
+                "name": "az-two",
+                "capacity": 69,
+                "usage": 13
+              }
+            ],
             "domains_quota": 70,
             "usage": 6
           }
         ],
         "max_scraped_at": 55,
-        "min_scraped_at": 11
+        "min_scraped_at": 11,
+        "max_rates_scraped_at": 34,
+        "min_rates_scraped_at": 12
       }
     ],
     "max_scraped_at": 1100,

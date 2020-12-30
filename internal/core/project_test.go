@@ -24,7 +24,7 @@ import (
 )
 
 func TestProjectReportRender(t *testing.T) {
-	mockJSONBytes, err := getFixtureBytes("project-get-dresden.json")
+	mockJSONBytes, err := fixtureBytes("project-get-dresden.json")
 	th.AssertNoErr(t, err)
 	var data struct {
 		Project limes.ProjectReport `json:"project"`
@@ -40,10 +40,7 @@ func TestProjectReportRender(t *testing.T) {
 	}
 	err = RenderReports(CSVRecordFormatDefault, false, rep).Write(&actual)
 	th.AssertNoErr(t, err)
-
-	mockCSVBytes, err := getFixtureBytes("project-get-dresden.csv")
-	th.AssertNoErr(t, err)
-	th.AssertEquals(t, string(mockCSVBytes), actual.String())
+	assertEquals(t, "project-get-dresden.csv", actual.Bytes())
 }
 
 func TestProjectReportsRender(t *testing.T) {
@@ -54,7 +51,7 @@ func TestProjectReportsRender(t *testing.T) {
 	domainName := "germany"
 
 	// List
-	mockJSONBytes, err := getFixtureBytes("project-list.json")
+	mockJSONBytes, err := fixtureBytes("project-list.json")
 	th.AssertNoErr(t, err)
 	var data listData
 	err = json.Unmarshal(mockJSONBytes, &data)
@@ -64,13 +61,10 @@ func TestProjectReportsRender(t *testing.T) {
 	reps := LimesProjectsToReportRenderer(data.Projects, domainID, domainName)
 	err = RenderReports(CSVRecordFormatDefault, false, reps...).Write(&actual)
 	th.AssertNoErr(t, err)
-
-	mockCSVBytes, err := getFixtureBytes("project-list.csv")
-	th.AssertNoErr(t, err)
-	th.AssertEquals(t, string(mockCSVBytes), actual.String())
+	assertEquals(t, "project-list.csv", actual.Bytes())
 
 	// Filtered list with long CSV format and human-readable values
-	mockJSONBytes, err = getFixtureBytes("project-list-filtered.json")
+	mockJSONBytes, err = fixtureBytes("project-list-filtered.json")
 	th.AssertNoErr(t, err)
 	var filteredData listData
 	err = json.Unmarshal(mockJSONBytes, &filteredData)
@@ -80,8 +74,5 @@ func TestProjectReportsRender(t *testing.T) {
 	reps = LimesProjectsToReportRenderer(filteredData.Projects, domainID, domainName)
 	err = RenderReports(CSVRecordFormatLong, true, reps...).Write(&actual)
 	th.AssertNoErr(t, err)
-
-	mockCSVBytes, err = getFixtureBytes("project-list-filtered.csv")
-	th.AssertNoErr(t, err)
-	th.AssertEquals(t, string(mockCSVBytes), actual.String())
+	assertEquals(t, "project-list-filtered.csv", actual.Bytes())
 }

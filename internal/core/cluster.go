@@ -84,16 +84,18 @@ func (c ClusterReport) render(csvFmt CSVRecordFormat, humanize bool) CSVRecords 
 				cSrvRes.Usage, cSrvRes.BurstUsage,
 			})
 
+			capStr := emptyStrIfZero(valToStr(cap))
 			physicalUsageStr := emptyStrIfZero(valToStr(physicalUsage))
+			domainsQuotaStr := emptyStrIfZero(valToStr(domainsQuota))
 
 			if csvFmt == CSVRecordFormatLong {
-				r = append(r, c.ID, cSrv.Area, cSrv.Type, cSrvRes.Category, cSrvRes.Name, valToStr(cap),
-					valToStr(domainsQuota), valToStr(cSrvRes.Usage), physicalUsageStr,
+				r = append(r, c.ID, cSrv.Area, cSrv.Type, cSrvRes.Category, cSrvRes.Name, capStr,
+					domainsQuotaStr, valToStr(cSrvRes.Usage), physicalUsageStr,
 					valToStr(cSrvRes.BurstUsage), string(unit), timestampToString(cSrv.MinScrapedAt),
 				)
 			} else {
-				r = append(r, c.ID, cSrv.Type, cSrvRes.Name, valToStr(cap),
-					valToStr(domainsQuota), valToStr(cSrvRes.Usage), string(unit),
+				r = append(r, c.ID, cSrv.Type, cSrvRes.Name, capStr,
+					domainsQuotaStr, valToStr(cSrvRes.Usage), string(unit),
 				)
 			}
 

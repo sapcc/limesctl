@@ -10,5 +10,5 @@ require (
 	github.com/pkg/errors v0.9.1
 	github.com/sapcc/go-bits v0.0.0-20201203204854-32575942fc71
 	github.com/sapcc/gophercloud-sapcc v0.0.0-20201205201040-3739d487e866
-	github.com/sapcc/limes v0.0.0-20201204120550-94e3e29c7558
+	github.com/sapcc/limes v0.0.0-20201216123251-042614936125
 )

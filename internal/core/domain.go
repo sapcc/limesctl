@@ -80,7 +80,6 @@ func (d DomainReport) render(csvFmt CSVRecordFormat, humanize bool) CSVRecords {
 			dSrv := d.Services[srv]
 			dSrvRes := d.Services[srv].Resources[res]
 
-			// This check is necessary to avoid nil pointer dereference.
 			physicalUsage := valFromPtr(dSrvRes.PhysicalUsage)
 			domainQuota := valFromPtr(dSrvRes.DomainQuota)
 			projectsQuota := valFromPtr(dSrvRes.ProjectsQuota)
@@ -91,10 +90,12 @@ func (d DomainReport) render(csvFmt CSVRecordFormat, humanize bool) CSVRecords {
 			})
 
 			physicalUsageStr := emptyStrIfZero(valToStr(physicalUsage))
+			domainQuotaStr := emptyStrIfZero(valToStr(domainQuota))
+			projectsQuotaStr := emptyStrIfZero(valToStr(projectsQuota))
 
 			if csvFmt == CSVRecordFormatLong {
 				r = append(r, d.UUID, d.Name, dSrv.Area, dSrv.Type, dSrvRes.Category, dSrvRes.Name,
-					valToStr(domainQuota), valToStr(projectsQuota), valToStr(dSrvRes.Usage),
+					domainQuotaStr, projectsQuotaStr, valToStr(dSrvRes.Usage),
 					physicalUsageStr, valToStr(dSrvRes.BurstUsage), string(unit), timestampToString(dSrv.MinScrapedAt),
 				)
 			} else {
@@ -102,8 +103,8 @@ func (d DomainReport) render(csvFmt CSVRecordFormat, humanize bool) CSVRecords {
 				if csvFmt == CSVRecordFormatNames {
 					nameOrID = d.Name
 				}
-				r = append(r, nameOrID, dSrv.Type, dSrvRes.Name, valToStr(domainQuota),
-					valToStr(projectsQuota), valToStr(dSrvRes.Usage), string(unit),
+				r = append(r, nameOrID, dSrv.Type, dSrvRes.Name, domainQuotaStr,
+					projectsQuotaStr, valToStr(dSrvRes.Usage), string(unit),
 				)
 			}
 
