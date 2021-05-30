@@ -23,17 +23,16 @@ func timestampToString(timestamp *int64) string {
 	return time.Unix(*timestamp, 0).UTC().Format(time.RFC3339)
 }
 
-func valFromPtr(ptr *uint64) uint64 {
-	var v uint64
-	if ptr != nil {
-		v = *ptr
+func zeroIfNil(ptr *uint64) uint64 {
+	if ptr == nil {
+		return 0
 	}
-	return v
+	return *ptr
 }
 
-func emptyStrIfZero(s string) string {
-	if s == "0" {
-		s = ""
+func emptyStrIfNil(ptr *uint64, valToStr valToStrFunc) string {
+	if ptr == nil {
+		return ""
 	}
-	return s
+	return valToStr(*ptr)
 }

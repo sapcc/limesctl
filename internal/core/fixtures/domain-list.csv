@@ -1,8 +1,8 @@
 domain id;service;resource;quota;projects quota;usage;unit
-uuid-for-france;shared;capacity;;10;2;B
+uuid-for-france;shared;capacity;0;10;2;B
 uuid-for-france;shared;capacity_portion;;;1;B
 uuid-for-france;shared;external_things;1;1;0;
-uuid-for-france;shared;things;;10;2;
+uuid-for-france;shared;things;0;10;2;
 uuid-for-france;unshared;capacity;55;10;2;B
 uuid-for-france;unshared;capacity_portion;;;1;B
 uuid-for-france;unshared;things;20;10;2;

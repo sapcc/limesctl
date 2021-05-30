@@ -88,30 +88,27 @@ func (p ProjectReport) render(csvFmt CSVRecordFormat, humanize bool) CSVRecords 
 			pSrv := p.Services[srv]
 			pSrvRes := p.Services[srv].Resources[res]
 
-			physicalUsage := valFromPtr(pSrvRes.PhysicalUsage)
-			quota := valFromPtr(pSrvRes.Quota)
+			physU := pSrvRes.PhysicalUsage
+			quota := pSrvRes.Quota
 			usage := pSrvRes.Usage
 
 			var burstQuota, burstUsage uint64
 			if p.Bursting != nil && p.Bursting.Enabled {
-				burstQuota = p.Bursting.Multiplier.ApplyTo(quota)
-				if usage > quota {
-					burstUsage = usage - quota
+				q := zeroIfNil(quota)
+				burstQuota = p.Bursting.Multiplier.ApplyTo(q)
+				if usage > q {
+					burstUsage = usage - q
 				}
 			}
 
 			valToStr, unit := getValToStrFunc(humanize, pSrvRes.Unit, []uint64{
-				burstQuota, burstUsage, physicalUsage, quota, usage,
+				burstQuota, burstUsage, zeroIfNil(physU), zeroIfNil(quota), usage,
 			})
-
-			physicalUsageStr := emptyStrIfZero(valToStr(physicalUsage))
-			quotaStr := emptyStrIfZero(valToStr(quota))
-			burstQuotaStr := emptyStrIfZero(valToStr(burstQuota))
 
 			if csvFmt == CSVRecordFormatLong {
 				r = append(r, p.DomainID, p.DomainName, p.UUID, p.Name, pSrv.Area, pSrv.Type, pSrvRes.Category,
-					pSrvRes.Name, quotaStr, burstQuotaStr, valToStr(usage),
-					physicalUsageStr, valToStr(burstUsage), string(unit), timestampToString(pSrv.ScrapedAt),
+					pSrvRes.Name, emptyStrIfNil(quota, valToStr), valToStr(burstQuota), valToStr(usage),
+					emptyStrIfNil(physU, valToStr), valToStr(burstUsage), string(unit), timestampToString(pSrv.ScrapedAt),
 				)
 			} else {
 				projectNameOrID := p.UUID
@@ -121,7 +118,7 @@ func (p ProjectReport) render(csvFmt CSVRecordFormat, humanize bool) CSVRecords 
 					domainNameOrID = p.DomainName
 				}
 				r = append(r, domainNameOrID, projectNameOrID, pSrv.Type, pSrvRes.Name,
-					quotaStr, valToStr(usage), string(unit),
+					emptyStrIfNil(quota, valToStr), valToStr(usage), string(unit),
 				)
 			}
 
