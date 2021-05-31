@@ -92,22 +92,27 @@ func (p ProjectReport) render(csvFmt CSVRecordFormat, humanize bool) CSVRecords 
 			quota := pSrvRes.Quota
 			usage := pSrvRes.Usage
 
-			var burstQuota, burstUsage uint64
-			if p.Bursting != nil && p.Bursting.Enabled {
-				q := zeroIfNil(quota)
-				burstQuota = p.Bursting.Multiplier.ApplyTo(q)
+			// We use a *uint64 for burstQuota instead of an uint64 for
+			// consistency with Limes' API, i.e. if quota has a null value
+			// then burstQuota should also be null instead of zero.
+			var burstQuota *uint64
+			var burstUsage uint64
+			if quota != nil && p.Bursting != nil && p.Bursting.Enabled {
+				q := *quota
+				bq := p.Bursting.Multiplier.ApplyTo(q)
+				burstQuota = &bq
 				if usage > q {
 					burstUsage = usage - q
 				}
 			}
 
 			valToStr, unit := getValToStrFunc(humanize, pSrvRes.Unit, []uint64{
-				burstQuota, burstUsage, zeroIfNil(physU), zeroIfNil(quota), usage,
+				zeroIfNil(burstQuota), burstUsage, zeroIfNil(physU), zeroIfNil(quota), usage,
 			})
 
 			if csvFmt == CSVRecordFormatLong {
 				r = append(r, p.DomainID, p.DomainName, p.UUID, p.Name, pSrv.Area, pSrv.Type, pSrvRes.Category,
-					pSrvRes.Name, emptyStrIfNil(quota, valToStr), valToStr(burstQuota), valToStr(usage),
+					pSrvRes.Name, emptyStrIfNil(quota, valToStr), emptyStrIfNil(burstQuota, valToStr), valToStr(usage),
 					emptyStrIfNil(physU, valToStr), valToStr(burstUsage), string(unit), timestampToString(pSrv.ScrapedAt),
 				)
 			} else {
