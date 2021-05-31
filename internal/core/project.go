@@ -88,27 +88,32 @@ func (p ProjectReport) render(csvFmt CSVRecordFormat, humanize bool) CSVRecords 
 			pSrv := p.Services[srv]
 			pSrvRes := p.Services[srv].Resources[res]
 
-			physicalUsage := valFromPtr(pSrvRes.PhysicalUsage)
-			quota := valFromPtr(pSrvRes.Quota)
+			physU := pSrvRes.PhysicalUsage
+			quota := pSrvRes.Quota
+			usage := pSrvRes.Usage
 
-			var burstQuota, burstUsage uint64
-			if p.Bursting != nil && p.Bursting.Enabled {
-				burstQuota = p.Bursting.Multiplier.ApplyTo(quota)
-				if pSrvRes.Usage > quota {
-					burstUsage = pSrvRes.Usage - quota
+			// We use a *uint64 for burstQuota instead of an uint64 for
+			// consistency with Limes' API, i.e. if quota has a null value
+			// then burstQuota should also be null instead of zero.
+			var burstQuota *uint64
+			var burstUsage uint64
+			if quota != nil && p.Bursting != nil && p.Bursting.Enabled {
+				q := *quota
+				bq := p.Bursting.Multiplier.ApplyTo(q)
+				burstQuota = &bq
+				if usage > q {
+					burstUsage = usage - q
 				}
 			}
 
 			valToStr, unit := getValToStrFunc(humanize, pSrvRes.Unit, []uint64{
-				burstQuota, burstUsage, physicalUsage, quota, pSrvRes.Usage,
+				zeroIfNil(burstQuota), burstUsage, zeroIfNil(physU), zeroIfNil(quota), usage,
 			})
-
-			physicalUsageStr := emptyStrIfZero(valToStr(physicalUsage))
 
 			if csvFmt == CSVRecordFormatLong {
 				r = append(r, p.DomainID, p.DomainName, p.UUID, p.Name, pSrv.Area, pSrv.Type, pSrvRes.Category,
-					pSrvRes.Name, valToStr(quota), valToStr(burstQuota), valToStr(pSrvRes.Usage),
-					physicalUsageStr, valToStr(burstUsage), string(unit), timestampToString(pSrv.ScrapedAt),
+					pSrvRes.Name, emptyStrIfNil(quota, valToStr), emptyStrIfNil(burstQuota, valToStr), valToStr(usage),
+					emptyStrIfNil(physU, valToStr), valToStr(burstUsage), string(unit), timestampToString(pSrv.ScrapedAt),
 				)
 			} else {
 				projectNameOrID := p.UUID
@@ -118,7 +123,7 @@ func (p ProjectReport) render(csvFmt CSVRecordFormat, humanize bool) CSVRecords 
 					domainNameOrID = p.DomainName
 				}
 				r = append(r, domainNameOrID, projectNameOrID, pSrv.Type, pSrvRes.Name,
-					valToStr(quota), valToStr(pSrvRes.Usage), string(unit),
+					emptyStrIfNil(quota, valToStr), valToStr(usage), string(unit),
 				)
 			}
 

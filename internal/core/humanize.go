@@ -57,6 +57,9 @@ func suitableUnit(v uint64, u limes.Unit) limes.Unit {
 //
 // Use suitableUnit() to find an appropriate new unit for a specific value.
 func convertValue(v uint64, source, target limes.Unit) string {
+	if v == 0 {
+		return "0"
+	}
 	_, sourceMultiple := source.Base()
 	_, targetMultiple := target.Base()
 	valueInBase := v * sourceMultiple

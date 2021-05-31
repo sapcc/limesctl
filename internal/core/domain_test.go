@@ -25,7 +25,7 @@ import (
 
 //nolint:dupl
 func TestDomainReportRender(t *testing.T) {
-	mockJSONBytes, err := getFixtureBytes("domain-get-germany.json")
+	mockJSONBytes, err := fixtureBytes("domain-get-germany.json")
 	th.AssertNoErr(t, err)
 	var data struct {
 		Domain limes.DomainReport `json:"domain"`
@@ -37,10 +37,7 @@ func TestDomainReportRender(t *testing.T) {
 	rep := DomainReport{&data.Domain}
 	err = RenderReports(CSVRecordFormatDefault, false, rep).Write(&actual)
 	th.AssertNoErr(t, err)
-
-	mockCSVBytes, err := getFixtureBytes("domain-get-germany.csv")
-	th.AssertNoErr(t, err)
-	th.AssertEquals(t, string(mockCSVBytes), actual.String())
+	assertEquals(t, "domain-get-germany.csv", actual.Bytes())
 }
 
 func TestDomainReportsRender(t *testing.T) {
@@ -49,7 +46,7 @@ func TestDomainReportsRender(t *testing.T) {
 	}
 
 	// List
-	mockJSONBytes, err := getFixtureBytes("domain-list.json")
+	mockJSONBytes, err := fixtureBytes("domain-list.json")
 	th.AssertNoErr(t, err)
 	var data listData
 	err = json.Unmarshal(mockJSONBytes, &data)
@@ -59,13 +56,10 @@ func TestDomainReportsRender(t *testing.T) {
 	reps := LimesDomainsToReportRenderer(data.Domains)
 	err = RenderReports(CSVRecordFormatDefault, false, reps...).Write(&actual)
 	th.AssertNoErr(t, err)
-
-	mockCSVBytes, err := getFixtureBytes("domain-list.csv")
-	th.AssertNoErr(t, err)
-	th.AssertEquals(t, string(mockCSVBytes), actual.String())
+	assertEquals(t, "domain-list.csv", actual.Bytes())
 
 	// Filtered list with long CSV format and human-readable values
-	mockJSONBytes, err = getFixtureBytes("domain-list-filtered.json")
+	mockJSONBytes, err = fixtureBytes("domain-list-filtered.json")
 	th.AssertNoErr(t, err)
 	var filteredData listData
 	err = json.Unmarshal(mockJSONBytes, &filteredData)
@@ -75,8 +69,5 @@ func TestDomainReportsRender(t *testing.T) {
 	reps = LimesDomainsToReportRenderer(filteredData.Domains)
 	err = RenderReports(CSVRecordFormatLong, true, reps...).Write(&actual)
 	th.AssertNoErr(t, err)
-
-	mockCSVBytes, err = getFixtureBytes("domain-list-filtered.csv")
-	th.AssertNoErr(t, err)
-	th.AssertEquals(t, string(mockCSVBytes), actual.String())
+	assertEquals(t, "domain-list-filtered.csv", actual.Bytes())
 }

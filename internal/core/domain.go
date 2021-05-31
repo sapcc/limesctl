@@ -80,30 +80,27 @@ func (d DomainReport) render(csvFmt CSVRecordFormat, humanize bool) CSVRecords {
 			dSrv := d.Services[srv]
 			dSrvRes := d.Services[srv].Resources[res]
 
-			// This check is necessary to avoid nil pointer dereference.
-			physicalUsage := valFromPtr(dSrvRes.PhysicalUsage)
-			domainQuota := valFromPtr(dSrvRes.DomainQuota)
-			projectsQuota := valFromPtr(dSrvRes.ProjectsQuota)
+			physU := dSrvRes.PhysicalUsage
+			domQ := dSrvRes.DomainQuota
+			projectsQ := dSrvRes.ProjectsQuota
 
 			valToStr, unit := getValToStrFunc(humanize, dSrvRes.Unit, []uint64{
-				physicalUsage, domainQuota, projectsQuota,
+				zeroIfNil(physU), zeroIfNil(domQ), zeroIfNil(projectsQ),
 				dSrvRes.Usage, dSrvRes.BurstUsage,
 			})
 
-			physicalUsageStr := emptyStrIfZero(valToStr(physicalUsage))
-
 			if csvFmt == CSVRecordFormatLong {
 				r = append(r, d.UUID, d.Name, dSrv.Area, dSrv.Type, dSrvRes.Category, dSrvRes.Name,
-					valToStr(domainQuota), valToStr(projectsQuota), valToStr(dSrvRes.Usage),
-					physicalUsageStr, valToStr(dSrvRes.BurstUsage), string(unit), timestampToString(dSrv.MinScrapedAt),
+					emptyStrIfNil(domQ, valToStr), emptyStrIfNil(projectsQ, valToStr), valToStr(dSrvRes.Usage),
+					emptyStrIfNil(physU, valToStr), valToStr(dSrvRes.BurstUsage), string(unit), timestampToString(dSrv.MinScrapedAt),
 				)
 			} else {
 				nameOrID := d.UUID
 				if csvFmt == CSVRecordFormatNames {
 					nameOrID = d.Name
 				}
-				r = append(r, nameOrID, dSrv.Type, dSrvRes.Name, valToStr(domainQuota),
-					valToStr(projectsQuota), valToStr(dSrvRes.Usage), string(unit),
+				r = append(r, nameOrID, dSrv.Type, dSrvRes.Name, emptyStrIfNil(domQ, valToStr),
+					emptyStrIfNil(projectsQ, valToStr), valToStr(dSrvRes.Usage), string(unit),
 				)
 			}
 

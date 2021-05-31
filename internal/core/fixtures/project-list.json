@@ -17,6 +17,12 @@
               "usage": 2
             },
             {
+              "name": "capacity_portion",
+              "unit": "B",
+              "contained_in": "capacity",
+              "usage": 1
+            },
+            {
               "name": "external_things",
               "externally_managed": true,
               "quota": 1,
@@ -42,6 +48,12 @@
               "quota": 10,
               "usable_quota": 10,
               "usage": 2
+            },
+            {
+              "name": "capacity_portion",
+              "unit": "B",
+              "contained_in": "capacity",
+              "usage": 1
             },
             {
               "name": "things",
@@ -77,6 +89,12 @@
               "backend_quota": 100
             },
             {
+              "name": "capacity_portion",
+              "unit": "B",
+              "contained_in": "capacity",
+              "usage": 1
+            },
+            {
               "name": "external_things",
               "externally_managed": true,
               "quota": 1,
@@ -110,6 +128,12 @@
               "quota": 10,
               "usable_quota": 10,
               "usage": 2
+            },
+            {
+              "name": "capacity_portion",
+              "unit": "B",
+              "contained_in": "capacity",
+              "usage": 1
             },
             {
               "name": "things",

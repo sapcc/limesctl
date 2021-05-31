@@ -1,11 +1,15 @@
 cluster id;service;resource;capacity;domains quota;usage;unit
 east;shared;capacity;185;50;8;B
-east;shared;external_things;0;1;0;
+east;shared;capacity_portion;;;4;B
+east;shared;external_things;;1;0;
 east;shared;things;246;90;8;
 east;unshared;capacity;1000;15;2;B
+east;unshared;capacity_portion;;;1;B
 east;unshared;things;385;10;2;
 west;shared;capacity;185;50;8;B
-west;shared;external_things;0;3;0;
+west;shared;capacity_portion;;;4;B
+west;shared;external_things;;3;0;
 west;shared;things;246;90;8;
-west;unshared;capacity;0;100;6;B
+west;unshared;capacity;;100;6;B
+west;unshared;capacity_portion;;;3;B
 west;unshared;things;139;70;6;
