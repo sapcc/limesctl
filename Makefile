@@ -9,8 +9,7 @@ VERSION     := $(shell git describe --abbrev=7)
 COMMIT_HASH := $(shell git rev-parse --verify HEAD)
 BUILD_DATE  := $(shell date -u +"%Y-%m-%dT%H:%M:%S%Z")
 
-build/release-info: CHANGELOG.md
-	@mkdir -p build
+build/release-info: build CHANGELOG.md
 	go run $(GO_BUILDFLAGS) tools/releaseinfo.go $< $(shell git describe --tags --abbrev=0) > $@
 
 build-all: build/limesctl
@@ -48,13 +47,16 @@ static-check: FORCE
 	@printf "\e[1;36m>> golangci-lint\e[0m\n"
 	@golangci-lint run
 
-build/cover.out: FORCE
+build/cover.out: build FORCE
 	@printf "\e[1;36m>> go test\e[0m\n"
 	@env $(GO_TESTENV) go test $(GO_BUILDFLAGS) -ldflags '-s -w $(GO_LDFLAGS)' -p 1 -coverprofile=$@ -covermode=count -coverpkg=$(subst $(space),$(comma),$(GO_COVERPKGS)) $(GO_TESTPKGS)
 
 build/cover.html: build/cover.out
 	@printf "\e[1;36m>> go tool cover > build/cover.html\e[0m\n"
 	@go tool cover -html $< -o $@
+
+build:
+	@mkdir $@
 
 tidy-deps: FORCE
 	go mod tidy

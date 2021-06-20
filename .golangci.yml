@@ -91,3 +91,6 @@ linters-settings:
   whitespace:
     # Enforce newlines (or comments) after multi-line function signature.
     multi-func: true
+  gocritic:
+    disabled-checks:
+      - commentFormatting

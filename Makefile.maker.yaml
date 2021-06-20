@@ -3,20 +3,29 @@ binaries:
     fromPackage: .
     installTo: bin/
 
-vendoring:
-  enabled: false
-
 staticCheck:
   golangciLint: true
 
 variables:
   GO_LDFLAGS: "-X main.version=$(VERSION) -X main.commit=$(COMMIT_HASH) -X main.date=$(BUILD_DATE)"
 
+githubWorkflows:
+  global:
+    ignorePaths: [ "**.md" ]
+  ci:
+    enabled: true
+    coveralls: true
+  license:
+    enabled: true
+    patterns: [ "**.go" ]
+  spellCheck:
+    enabled: true
+    ignorePaths: []
+
 verbatim: |
   VERSION     := $(shell git describe --abbrev=7)
   COMMIT_HASH := $(shell git rev-parse --verify HEAD)
   BUILD_DATE  := $(shell date -u +"%Y-%m-%dT%H:%M:%S%Z")
 
-  build/release-info: CHANGELOG.md
-    @mkdir -p build
+  build/release-info: build CHANGELOG.md
     go run $(GO_BUILDFLAGS) tools/releaseinfo.go $< $(shell git describe --tags --abbrev=0) > $@
