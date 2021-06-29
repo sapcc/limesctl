@@ -19,7 +19,6 @@ jobs:
   addlicense:
     name: Check
     runs-on: ubuntu-latest
-    if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
     - name: Check out code
       uses: actions/checkout@v2
@@ -30,5 +29,5 @@ jobs:
     - name: Check if source code files have license header
       run: |
         GO111MODULE=off go get -u github.com/google/addlicense
-        addlicense --check -- **.go
+        find * \( -name vendor -type d -prune \) -o \( -name \*.go -exec addlicense --check -- {} + \)
 
