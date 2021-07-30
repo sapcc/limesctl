@@ -132,7 +132,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - For the `--cluster` flag, the domain/project must be identified by ID.
-  Specifiying a domain/project name will not work.
+  Specifying a domain/project name will not work.
 
 ### Fixed
 
