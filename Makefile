@@ -9,7 +9,7 @@ VERSION     := $(shell git describe --abbrev=7)
 COMMIT_HASH := $(shell git rev-parse --verify HEAD)
 BUILD_DATE  := $(shell date -u +"%Y-%m-%dT%H:%M:%S%Z")
 
-build/release-info: build CHANGELOG.md
+build/release-info: CHANGELOG.md | build
 	go run $(GO_BUILDFLAGS) tools/releaseinfo.go $< $(shell git describe --tags --abbrev=0) > $@
 
 build-all: build/limesctl
