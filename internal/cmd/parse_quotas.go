@@ -78,6 +78,14 @@ func parseToQuotaRequest(resValues resourceQuotas, in []string) (limes.QuotaRequ
 			return nil, fmt.Errorf("invalid resource: %s/%s does not exist in Limes", service, resource)
 		}
 
+		// Check if the same resource was given multiple times.
+		if srv, ok := out[service]; ok {
+			if _, ok := srv.Resources[resource]; ok {
+				return nil, fmt.Errorf("%s/%s was given multiple times, limesctl only supports a single change for a specific resource for a given request",
+					service, resource)
+			}
+		}
+
 		// Validate input value.
 		valueUnitML := quotaValueRe.FindStringSubmatch(matchList[3])
 		if valueUnitML == nil {
