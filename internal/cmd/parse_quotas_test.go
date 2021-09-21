@@ -26,29 +26,61 @@ import (
 	"github.com/sapcc/limes"
 )
 
-// TestQuotaRx tests if the regular expression used to parse the quota values
-// given at the command-line is correct.
-func TestQuotaRx(t *testing.T) {
+// TestSplitQuotaRe tests the `splitQuotaRe` regular expression.
+func TestSplitQuotaRe(t *testing.T) {
 	tt := []struct {
-		in    string
-		match bool
+		in          string
+		shouldMatch bool
 	}{
-		{"ser1vice/reso-urce=123456", true},
 		{"service/resource=123.456Unit", true},
+		{"service/resource-=123.456Unit", true},
+		{"service/resource+=123.456Unit", true},
+		{"service/resource*=123.456Unit", true},
+		{"service/resource/=123.456Unit", true},
 
-		{"serv/ice/resource=123", false},
-		{"service/resou=rce=123", false},
-		{"service/reso:urce=123", false},
-		{"service?resource=123", false},
-		{"service/resource?123", false},
-		{"service/resource=g123", false},
-		{"service/resource=123g456", false},
-		{"service/resource=123,456Unit", false},
+		{"service/resource:123.456Unit", false},
+		{"service/resource+123.456Unit", false},
+		{"service/resource-123.456Unit", false},
+		{"service/resource*123.456Unit", false},
+		{"service/resource/123.456Unit", false},
 	}
 
 	for _, tc := range tt {
-		if match := quotaRx.MatchString(tc.in); match != tc.match {
-			if tc.match {
+		if match := splitQuotaRe.MatchString(tc.in); match != tc.shouldMatch {
+			if tc.shouldMatch {
+				t.Errorf("%q did not match the regular expression. Was expected to match.\n", tc.in)
+			} else {
+				t.Errorf("%q matched the regular expression. Was expected not to match.\n", tc.in)
+			}
+		}
+	}
+}
+
+// TestQuotaValueRe tests the `quotaValueRe` regular expression.
+func TestQuotaValueRe(t *testing.T) {
+	tt := []struct {
+		in          string
+		shouldMatch bool
+	}{
+		{"123456", true},
+		{"123456Unit", true},
+		{"123.456", true},
+		{"123.456Unit", true},
+		{"0.456", true},
+		{"0.456Unit", true},
+		{".456", true},
+		{".456Unit", true},
+
+		{"123456Un1t", false},
+		{"123456Un-t", false},
+		{"123a456Unit", false},
+		{"123456-Unit", false},
+		{"+123456Unit", false},
+	}
+
+	for _, tc := range tt {
+		if match := quotaValueRe.MatchString(tc.in); match != tc.shouldMatch {
+			if tc.shouldMatch {
 				t.Errorf("%q did not match the regular expression. Was expected to match.\n", tc.in)
 			} else {
 				t.Errorf("%q matched the regular expression. Was expected not to match.\n", tc.in)
@@ -63,35 +95,53 @@ func TestParseToQuotaRequest(t *testing.T) {
 	expected := limes.QuotaRequest{
 		"shared": limes.ServiceQuotaRequest{
 			Resources: limes.ResourceQuotaRequest{
-				"capacity":    limes.ValueWithUnit{Value: 1597, Unit: limes.UnitMebibytes},
-				"capacityTwo": limes.ValueWithUnit{Value: 6, Unit: limes.UnitGibibytes},
+				"capacity":  limes.ValueWithUnit{Value: 1597, Unit: limes.UnitMebibytes},
+				"capacity2": limes.ValueWithUnit{Value: 30, Unit: limes.UnitGibibytes},
 			},
 		},
 		"unshared": limes.ServiceQuotaRequest{
 			Resources: limes.ResourceQuotaRequest{
-				"things": limes.ValueWithUnit{Value: 12, Unit: limes.UnitNone},
+				"things":  limes.ValueWithUnit{Value: 12, Unit: limes.UnitNone},
+				"things2": limes.ValueWithUnit{Value: 20, Unit: limes.UnitNone},
+				"things3": limes.ValueWithUnit{Value: 4, Unit: limes.UnitNone},
 			},
 		},
 	}
 
-	defaultResUnits := resourceUnits{
-		"shared": map[string]limes.Unit{
-			"capacity":    limes.UnitMebibytes,
-			"capacityTwo": limes.UnitGibibytes,
+	resQuotas := resourceQuotas{
+		"shared": map[string]limes.ValueWithUnit{
+			"capacity":  {Value: 1024, Unit: limes.UnitMebibytes},
+			"capacity2": {Value: 3, Unit: limes.UnitGibibytes},
 		},
-		"unshared": map[string]limes.Unit{
-			"things": limes.UnitNone,
+		"unshared": map[string]limes.ValueWithUnit{
+			"things":  {Value: 10, Unit: limes.UnitNone},
+			"things2": {Value: 10, Unit: limes.UnitNone},
+			"things3": {Value: 44, Unit: limes.UnitNone},
 		},
 	}
-	mock := []string{
-		"shared/capacity=1.56GiB",
-		"shared/capacityTwo=6.6GiB",
+
+	successMock := []string{
+		"shared/capacity+=.56GiB",
+		"shared/capacity2*=10.2567GiB",
 		"unshared/things=12",
+		"unshared/things2+=10",
+		"unshared/things3/=10",
 	}
-	actual, err := parseToQuotaRequest(defaultResUnits, mock)
+	actual, err := parseToQuotaRequest(resQuotas, successMock)
 	if err != nil {
 		t.Error(err)
 	}
-
 	th.AssertDeepEquals(t, expected, actual)
+
+	failureMocks := [][]string{
+		{"unshared/things=12.12"}, // counted resources need to be an integer
+		{"unshared/things2-=12"},  // will result in a quota value < 0
+		{"unshared/things3/=45"},  // will result in a quota value < 0
+	}
+	for _, mock := range failureMocks {
+		_, err := parseToQuotaRequest(resQuotas, mock)
+		if err == nil {
+			t.Error("expected an error, got nil.")
+		}
+	}
 }
