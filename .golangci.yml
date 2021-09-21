@@ -27,20 +27,18 @@ linters:
     - gocyclo
     - gofmt
     - goimports
-    - golint
+    - revive
     - goprintffuncname
     - gosec
     - gosimple
     - govet
     - ineffassign
-    - interfacer
     - lll
-    - maligned
     - misspell
     - nakedret
     - prealloc
     - rowserrcheck
-    - scopelint
+    - exportloopref
     - staticcheck
     - structcheck
     - stylecheck
@@ -70,8 +68,8 @@ linters-settings:
     # exclude: ./.errcheck-excludes
 
   funlen:
-      lines: 100
-      statements: 50
+      lines: 120
+      statements: 60
 
   gci:
     # Put imports beginning with prefix after 3rd-party packages. It's a
@@ -84,13 +82,10 @@ linters-settings:
   lll:
     line-length: 140
 
-  maligned:
-    # Print structs with more effective memory layout or not, false by default.
-    suggest-new: true
-
   whitespace:
     # Enforce newlines (or comments) after multi-line function signature.
     multi-func: true
+
   gocritic:
     disabled-checks:
       - commentFormatting

@@ -81,7 +81,8 @@ func parseToQuotaRequest(resValues resourceQuotas, in []string) (limes.QuotaRequ
 		// Check if the same resource was given multiple times.
 		if srv, ok := out[service]; ok {
 			if _, ok := srv.Resources[resource]; ok {
-				return nil, fmt.Errorf("%s/%s was given multiple times, limesctl only supports a single change for a specific resource for a given request",
+				return nil, fmt.Errorf(
+					"%s/%s was given multiple times, limesctl only supports a single change for a specific resource for a given request",
 					service, resource)
 			}
 		}
