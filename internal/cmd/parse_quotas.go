@@ -40,8 +40,8 @@ type resourceQuotas map[string]map[string]limes.ValueWithUnit
 // Reference:
 //   The following user input: service/resource+=123.456Unit
 //   will result in:
-//     matchList == [<full-match>, "service/resource", "+", "123.456Unit"]
-var splitQuotaRe = regexp.MustCompile(`^(\S*[^-+*:/=])(\+|-|\*|/)?=(\S*)$`)
+//     matchList == [<full-match>, "service/resource", "+=", "123.456Unit"]
+var splitQuotaRe = regexp.MustCompile(`^(\S*?)([-+*/]?=)(\S*)$`)
 
 // quotaValueRe is used to extract quota value and unit.
 // Reference:
@@ -133,17 +133,17 @@ func parseToQuotaRequest(resValues resourceQuotas, in []string) (limes.QuotaRequ
 		}
 
 		switch matchList[2] {
-		case "+":
+		case "+=":
 			newValWithUnit.Value += currentValWithUnit.Value
-		case "-":
+		case "-=":
 			if newValWithUnit.Value > currentValWithUnit.Value {
 				return nil, fmt.Errorf("invalid quota value: subtraction of %s %s for %s/%s will result in a value < 0",
 					valStr, unit, service, resource)
 			}
 			newValWithUnit.Value = currentValWithUnit.Value - newValWithUnit.Value
-		case "*":
+		case "*=":
 			newValWithUnit.Value *= currentValWithUnit.Value
-		case "/":
+		case "/=":
 			if newValWithUnit.Value > currentValWithUnit.Value {
 				return nil, fmt.Errorf("invalid quota value: division by %s %s for %s/%s will result in a value < 0",
 					valStr, unit, service, resource)
