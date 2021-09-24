@@ -1,6 +1,6 @@
 /*******************************************************************************
 *
-* Copyright 2018-2020 SAP SE
+* Copyright 2018 SAP SE
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -32,17 +32,24 @@ import (
 	"github.com/sapcc/limesctl/internal/core"
 )
 
-// resourceUnits is a map of service name to resource name to the resource's
-// default unit in Limes.
-type resourceUnits map[string]map[string]limes.Unit
+// resourceQuotas is a map of service name to resource name to the resource's
+// quota value and unit.
+type resourceQuotas map[string]map[string]limes.ValueWithUnit
 
-// quotaRx is used to extract the quota information from user input. See
-// parseToQuotaRequest() for more info.
+// splitQuotaRe is used to split the user input around the equality sign.
 // Reference:
-//   matchList == [<full-match>, <service>, <resource>, <value>, <unit>?]
-var quotaRx = regexp.MustCompile(`^([^:/=]+)/([^:/=]+)=(\d*\.?\d+)([a-zA-Z]+)?$`)
+//   The following user input: service/resource+=123.456Unit
+//   will result in:
+//     matchList == [<full-match>, "service/resource", "+=", "123.456Unit"]
+var splitQuotaRe = regexp.MustCompile(`^(\S*?)([-+*/]?=)(\S*)$`)
 
-//nolint:gocognit
+// quotaValueRe is used to extract quota value and unit.
+// Reference:
+//   The following user input: 123.456Unit
+//   will result in:
+//     matchList == [<full-match>, "123.456", "Unit"]
+var quotaValueRe = regexp.MustCompile(`^(\d*\.?\d+)([a-zA-Z]*)$`)
+
 // parseToQuotaRequest parses a slice of user input quota values, converts the
 // values to the resource's default unit (if needed), and returns a
 // limes.QuotaRequest for use with PUT requests on domains and projects.
@@ -50,27 +57,45 @@ var quotaRx = regexp.MustCompile(`^([^:/=]+)/([^:/=]+)=(\d*\.?\d+)([a-zA-Z]+)?$`
 // The input values are expected to be in the format:
 //   service/resource=123(Unit)
 // where unit is optional.
-func parseToQuotaRequest(resUnits resourceUnits, in []string) (limes.QuotaRequest, error) {
+func parseToQuotaRequest(resValues resourceQuotas, in []string) (limes.QuotaRequest, error) {
 	out := make(limes.QuotaRequest)
 	for _, inputStr := range in {
-		matchList := quotaRx.FindStringSubmatch(inputStr)
+		matchList := splitQuotaRe.FindStringSubmatch(inputStr)
 		if matchList == nil {
-			return nil, fmt.Errorf("expected a quota with optional unit in the format: service/resource=value(unit), got %q", inputStr)
+			return out, fmt.Errorf("expected a quota with optional unit in the format: service/resource=value(unit), got %q", inputStr)
 		}
 
 		// Validate input service/resource.
-		service := matchList[1]
-		resource := matchList[2]
-		defaultUnit, ok := resUnits[service][resource]
+		serviceResource := strings.Split(matchList[1], "/")
+		if len(serviceResource) > 2 {
+			return out, fmt.Errorf("expected a quota with service resource in the format: service/resource, got %q", matchList[1])
+		}
+		service := serviceResource[0]
+		resource := serviceResource[1]
+		currentValWithUnit, ok := resValues[service][resource]
 		if !ok {
 			return nil, fmt.Errorf("invalid resource: %s/%s does not exist in Limes", service, resource)
 		}
 
-		valStr := matchList[3]
+		// Check if the same resource was given multiple times.
+		if srv, ok := out[service]; ok {
+			if _, ok := srv.Resources[resource]; ok {
+				return nil, fmt.Errorf(
+					"%s/%s was given multiple times, limesctl only supports a single change for a specific resource for a given request",
+					service, resource)
+			}
+		}
+
+		// Validate input value.
+		valueUnitML := quotaValueRe.FindStringSubmatch(matchList[3])
+		if valueUnitML == nil {
+			return out, fmt.Errorf("expected a quota value with optional unit in the format: value(unit), got %q", matchList[3])
+		}
+		valStr := valueUnitML[1]
 		isFloatVal := strings.Contains(valStr, ".")
-		unitStr := matchList[4]
 
 		// Validate input unit.
+		unitStr := valueUnitML[2]
 		var unit limes.Unit
 		if unitStr == "" {
 			if isFloatVal {
@@ -90,12 +115,12 @@ func parseToQuotaRequest(resUnits resourceUnits, in []string) (limes.QuotaReques
 		}
 
 		// Validate and convert (if needed) input value.
-		var vWithUnit limes.ValueWithUnit
+		var newValWithUnit limes.ValueWithUnit
 		if isFloatVal {
-			logg.Info("Limes only accepts integer values, will attempt to convert %s %s to a suitable unit for %s/%s)",
+			logg.Info("Limes only accepts integer values, will attempt to convert %s %s to a suitable unit for %s/%s",
 				valStr, unit, service, resource)
 			var err error
-			vWithUnit, err = convertTo(valStr, unit, defaultUnit)
+			newValWithUnit, err = convertTo(valStr, unit, currentValWithUnit.Unit)
 			if err != nil {
 				return nil, err
 			}
@@ -104,7 +129,26 @@ func parseToQuotaRequest(resUnits resourceUnits, in []string) (limes.QuotaReques
 			if err != nil {
 				return nil, err
 			}
-			vWithUnit = limes.ValueWithUnit{Value: v, Unit: unit}
+			newValWithUnit = limes.ValueWithUnit{Value: v, Unit: unit}
+		}
+
+		switch matchList[2] {
+		case "+=":
+			newValWithUnit.Value += currentValWithUnit.Value
+		case "-=":
+			if newValWithUnit.Value > currentValWithUnit.Value {
+				return nil, fmt.Errorf("invalid quota value: subtraction of %s %s for %s/%s will result in a value < 0",
+					valStr, unit, service, resource)
+			}
+			newValWithUnit.Value = currentValWithUnit.Value - newValWithUnit.Value
+		case "*=":
+			newValWithUnit.Value *= currentValWithUnit.Value
+		case "/=":
+			if newValWithUnit.Value > currentValWithUnit.Value {
+				return nil, fmt.Errorf("invalid quota value: division by %s %s for %s/%s will result in a value < 1",
+					valStr, unit, service, resource)
+			}
+			newValWithUnit.Value = currentValWithUnit.Value / newValWithUnit.Value
 		}
 
 		if _, ok := out[service]; !ok {
@@ -112,7 +156,7 @@ func parseToQuotaRequest(resUnits resourceUnits, in []string) (limes.QuotaReques
 				Resources: make(limes.ResourceQuotaRequest),
 			}
 		}
-		out[service].Resources[resource] = vWithUnit
+		out[service].Resources[resource] = newValWithUnit
 	}
 
 	return out, nil

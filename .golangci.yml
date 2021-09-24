@@ -8,7 +8,6 @@ run:
   modules-download-mode: readonly
 
 linters:
-  # Do not use 'enable-all', it is deprecated.
   # We use 'disable-all' and enable linters explicitly so that a newer version
   # will not introduce new linters unexpectedly.
   disable-all: true
@@ -19,28 +18,25 @@ linters:
     - dogsled
     - dupl
     - errcheck
+    - exportloopref
     - funlen
     - gochecknoinits
-    - gocognit
     - goconst
     - gocritic
     - gocyclo
     - gofmt
     - goimports
-    - golint
     - goprintffuncname
     - gosec
     - gosimple
     - govet
     - ineffassign
-    - interfacer
     - lll
-    - maligned
     - misspell
     - nakedret
+    - noctx
     - prealloc
     - rowserrcheck
-    - scopelint
     - staticcheck
     - structcheck
     - stylecheck
@@ -65,13 +61,9 @@ linters-settings:
     #   `a := b.(MyStruct)`;
     check-type-assertions: true
 
-    # Path to a file containing a list of functions to exclude from checking.
-    # See https://github.com/kisielk/errcheck#excluding-functions for details.
-    # exclude: ./.errcheck-excludes
-
   funlen:
-      lines: 100
-      statements: 50
+      lines: 120
+      statements: 60
 
   gci:
     # Put imports beginning with prefix after 3rd-party packages. It's a
@@ -84,13 +76,10 @@ linters-settings:
   lll:
     line-length: 140
 
-  maligned:
-    # Print structs with more effective memory layout or not, false by default.
-    suggest-new: true
-
   whitespace:
     # Enforce newlines (or comments) after multi-line function signature.
     multi-func: true
+
   gocritic:
     disabled-checks:
       - commentFormatting

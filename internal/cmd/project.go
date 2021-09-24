@@ -178,11 +178,11 @@ func (p *projectSetCmd) Run(clients *ServiceClients) error {
 		return err
 	}
 
-	resUnits, err := getProjectDefaultUnits(clients.limes, p.ClusterID, pInfo)
+	resQuotas, err := getProjectResourceQuotas(clients.limes, p.ClusterID, pInfo)
 	if err != nil {
 		return errors.Wrap(err, "could not get default units")
 	}
-	qc, err := parseToQuotaRequest(resUnits, p.Quotas)
+	qc, err := parseToQuotaRequest(resQuotas, p.Quotas)
 	if err != nil {
 		return errors.Wrap(err, "could not parse quota values")
 	}
@@ -248,7 +248,7 @@ func getProjectInfo(clients *ServiceClients, clusterID, domainNameOrID, projectN
 	return &pInfo, nil
 }
 
-func getProjectDefaultUnits(limesClient *gophercloud.ServiceClient, clusterID string, pInfo *auth.ProjectInfo) (resourceUnits, error) {
+func getProjectResourceQuotas(limesClient *gophercloud.ServiceClient, clusterID string, pInfo *auth.ProjectInfo) (resourceQuotas, error) {
 	rep, err := projects.Get(limesClient, pInfo.DomainID, pInfo.ID, projects.GetOpts{
 		Cluster: clusterID,
 	}).Extract()
@@ -256,14 +256,18 @@ func getProjectDefaultUnits(limesClient *gophercloud.ServiceClient, clusterID st
 		return nil, err
 	}
 
-	units := make(resourceUnits)
+	result := make(resourceQuotas)
 	for srv, srvReport := range rep.Services {
 		for res, resReport := range srvReport.Resources {
-			if _, ok := units[srv]; !ok {
-				units[srv] = make(map[string]limes.Unit)
+			if _, ok := result[srv]; !ok {
+				result[srv] = make(map[string]limes.ValueWithUnit)
 			}
-			units[srv][res] = resReport.ResourceInfo.Unit
+			var val uint64
+			if resReport.Quota != nil {
+				val = *resReport.Quota
+			}
+			result[srv][res] = limes.ValueWithUnit{Value: val, Unit: resReport.ResourceInfo.Unit}
 		}
 	}
-	return units, nil
+	return result, nil
 }

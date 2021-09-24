@@ -10,6 +10,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Support for resources without quota.
+- Support for relative quota adjustment. The following operators are supported: `+=`,
+  `-=`, `*=`, `/=`.
+
+  Example:
+
+  ```
+  limesctl project set -q compute/cores+=100
+  ```
 
 ### Changed
 
