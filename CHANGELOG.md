@@ -16,7 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   Example:
 
   ```
-  limesctl project set -q compute/core+=100
+  limesctl project set -q compute/cores+=100
   ```
 
 ### Changed

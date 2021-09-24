@@ -145,7 +145,7 @@ func parseToQuotaRequest(resValues resourceQuotas, in []string) (limes.QuotaRequ
 			newValWithUnit.Value *= currentValWithUnit.Value
 		case "/=":
 			if newValWithUnit.Value > currentValWithUnit.Value {
-				return nil, fmt.Errorf("invalid quota value: division by %s %s for %s/%s will result in a value < 0",
+				return nil, fmt.Errorf("invalid quota value: division by %s %s for %s/%s will result in a value < 1",
 					valStr, unit, service, resource)
 			}
 			newValWithUnit.Value = currentValWithUnit.Value / newValWithUnit.Value
