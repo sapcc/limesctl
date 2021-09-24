@@ -8,7 +8,6 @@ run:
   modules-download-mode: readonly
 
 linters:
-  # Do not use 'enable-all', it is deprecated.
   # We use 'disable-all' and enable linters explicitly so that a newer version
   # will not introduce new linters unexpectedly.
   disable-all: true
@@ -19,15 +18,14 @@ linters:
     - dogsled
     - dupl
     - errcheck
+    - exportloopref
     - funlen
     - gochecknoinits
-    - gocognit
     - goconst
     - gocritic
     - gocyclo
     - gofmt
     - goimports
-    - revive
     - goprintffuncname
     - gosec
     - gosimple
@@ -36,9 +34,9 @@ linters:
     - lll
     - misspell
     - nakedret
+    - noctx
     - prealloc
     - rowserrcheck
-    - exportloopref
     - staticcheck
     - structcheck
     - stylecheck
@@ -62,10 +60,6 @@ linters-settings:
     # Report about not checking of errors in type assertions:
     #   `a := b.(MyStruct)`;
     check-type-assertions: true
-
-    # Path to a file containing a list of functions to exclude from checking.
-    # See https://github.com/kisielk/errcheck#excluding-functions for details.
-    # exclude: ./.errcheck-excludes
 
   funlen:
       lines: 120

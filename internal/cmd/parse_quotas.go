@@ -50,7 +50,6 @@ var splitQuotaRe = regexp.MustCompile(`^(\S*[^-+*:/=])(\+|-|\*|/)?=(\S*)$`)
 //     matchList == [<full-match>, "123.456", "Unit"]
 var quotaValueRe = regexp.MustCompile(`^(\d*\.?\d+)([a-zA-Z]*)$`)
 
-//nolint:gocognit
 // parseToQuotaRequest parses a slice of user input quota values, converts the
 // values to the resource's default unit (if needed), and returns a
 // limes.QuotaRequest for use with PUT requests on domains and projects.

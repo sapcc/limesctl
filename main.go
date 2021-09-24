@@ -35,7 +35,7 @@ var (
 	date    = "now"
 )
 
-type cli struct {
+type rootCmd struct {
 	cmd.Globals
 
 	Cluster cmd.ClusterCmd `cmd:"" help:"Do some action on cluster(s)."`
@@ -44,7 +44,7 @@ type cli struct {
 }
 
 func main() {
-	var cli cli
+	var cli rootCmd
 	ctx := kong.Parse(&cli,
 		kong.Name("limesctl"),
 		kong.Description("Command-line client for Limes."),
