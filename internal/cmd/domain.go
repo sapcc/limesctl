@@ -123,7 +123,7 @@ func (d *domainShowCmd) Run(clients *ServiceClients) error {
 
 type domainSetCmd struct {
 	domainClusterFlag
-	Quotas []string `short:"q" help:"New quotas values. Example: service/resource=120GiB."`
+	Quotas []string `short:"q" help:"New quotas values. For relative quota adjustment, use one of the following operators: [+=, -=, *=, /=]. Example: service/resource=10GiB."`
 
 	NameOrID string `arg:"" optional:"" help:"Name or ID of the domain. Required if using '--cluster' flag."`
 }
