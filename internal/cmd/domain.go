@@ -52,10 +52,10 @@ func (d *domainListCmd) Run(clients *ServiceClients) error {
 	}
 
 	res := domains.List(clients.limes, domains.ListOpts{
-		Cluster:  d.ClusterID,
-		Area:     d.Area,
-		Service:  d.Service,
-		Resource: d.Resource,
+		Cluster:   d.ClusterID,
+		Areas:     d.Areas,
+		Services:  d.Services,
+		Resources: d.Resources,
 	})
 	if res.Err != nil {
 		return errors.Wrap(res.Err, "could not get domain reports")
@@ -108,10 +108,10 @@ func (d *domainShowCmd) Run(clients *ServiceClients) error {
 	}
 
 	res := domains.Get(clients.limes, domainID, domains.GetOpts{
-		Cluster:  d.ClusterID,
-		Area:     d.Area,
-		Service:  d.Service,
-		Resource: d.Resource,
+		Cluster:   d.ClusterID,
+		Areas:     d.Areas,
+		Services:  d.Services,
+		Resources: d.Resources,
 	})
 	if res.Err != nil {
 		return errors.Wrap(res.Err, "could not get domain report")

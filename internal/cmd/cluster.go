@@ -42,9 +42,9 @@ func (c *clusterListCmd) Run(clients *ServiceClients) error {
 	}
 
 	res := clusters.List(clients.limes, clusters.ListOpts{
-		Area:     c.Area,
-		Service:  c.Service,
-		Resource: c.Resource,
+		Areas:     c.Areas,
+		Services:  c.Services,
+		Resources: c.Resources,
 	})
 	if res.Err != nil {
 		return errors.Wrap(res.Err, "could not get cluster reports")
@@ -82,9 +82,9 @@ func (c *clusterShowCmd) Run(clients *ServiceClients) error {
 		c.ID = "current"
 	}
 	res := clusters.Get(clients.limes, c.ID, clusters.GetOpts{
-		Area:     c.Area,
-		Service:  c.Service,
-		Resource: c.Resource,
+		Areas:     c.Areas,
+		Services:  c.Services,
+		Resources: c.Resources,
 	})
 	if res.Err != nil {
 		return errors.Wrap(res.Err, "could not get cluster report")

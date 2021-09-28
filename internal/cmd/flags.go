@@ -24,15 +24,15 @@ import (
 // Limes' API request filter flags.
 
 type commonFilterFlags struct {
-	Service string `help:"Service type."`
+	Services []string `sep:"," help:"Service type(s)."`
 }
 
 // resourceFilterFlags define parameters for Limes API requests that concern
 // resources.
 type resourceFilterFlags struct {
+	Areas []string `sep:"," help:"Service area(s)."`
 	commonFilterFlags
-	Area     string `help:"Resource area."`
-	Resource string `help:"Resource name."`
+	Resources []string `sep:"," help:"Resource name(s)."`
 }
 
 // rateFilterFlags define parameters for Limes API requests that concern rates.

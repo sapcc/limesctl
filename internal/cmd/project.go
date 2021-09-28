@@ -94,10 +94,10 @@ func (p *projectListCmd) Run(clients *ServiceClients) error {
 	}
 
 	res := projects.List(clients.limes, domainID, projects.ListOpts{
-		Cluster:  p.ClusterID,
-		Area:     p.Area,
-		Service:  p.Service,
-		Resource: p.Resource,
+		Cluster:   p.ClusterID,
+		Areas:     p.Areas,
+		Services:  p.Services,
+		Resources: p.Resources,
 	})
 	if res.Err != nil {
 		return errors.Wrap(res.Err, "could not get project reports")
@@ -152,9 +152,9 @@ func (p *projectListRatesCmd) Run(clients *ServiceClients) error {
 	}
 
 	res := projects.List(clients.limes, domainID, projects.ListOpts{
-		Cluster: p.ClusterID,
-		Service: p.Service,
-		Rates:   "only",
+		Cluster:  p.ClusterID,
+		Services: p.Services,
+		Rates:    projects.OnlyRates,
 	})
 	if res.Err != nil {
 		return errors.Wrap(res.Err, "could not get project reports")
@@ -204,10 +204,10 @@ func (p *projectShowCmd) Run(clients *ServiceClients) error {
 	}
 
 	res := projects.Get(clients.limes, pInfo.DomainID, pInfo.ID, projects.GetOpts{
-		Cluster:  p.ClusterID,
-		Area:     p.Area,
-		Service:  p.Service,
-		Resource: p.Resource,
+		Cluster:   p.ClusterID,
+		Areas:     p.Areas,
+		Services:  p.Services,
+		Resources: p.Resources,
 	})
 	if res.Err != nil {
 		return errors.Wrap(res.Err, "could not get project report")
@@ -260,9 +260,9 @@ func (p *projectShowRatesCmd) Run(clients *ServiceClients) error {
 	}
 
 	res := projects.Get(clients.limes, pInfo.DomainID, pInfo.ID, projects.GetOpts{
-		Cluster: p.ClusterID,
-		Service: p.Service,
-		Rates:   "only",
+		Cluster:  p.ClusterID,
+		Services: p.Services,
+		Rates:    projects.OnlyRates,
 	})
 	if res.Err != nil {
 		return errors.Wrap(res.Err, "could not get project report")
