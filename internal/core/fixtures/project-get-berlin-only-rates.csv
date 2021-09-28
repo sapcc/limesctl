@@ -1,0 +1,8 @@
+domain id;domain name;project id;project name;area;service;rate;limit;default limit;window;default window;usage;unit;scraped at (UTC)
+uuid-for-germany;germany;uuid-for-berlin;berlin;shared;shared;service/shared/objects:create;5;0;1m;;;;1970-01-01T00:00:23Z
+uuid-for-germany;germany;uuid-for-berlin;berlin;shared;shared;service/shared/objects:delete;2;1;1m;1m;23456;MiB;1970-01-01T00:00:23Z
+uuid-for-germany;germany;uuid-for-berlin;berlin;shared;shared;service/shared/objects:read/list;3;0;1s;;;;1970-01-01T00:00:23Z
+uuid-for-germany;germany;uuid-for-berlin;berlin;shared;shared;service/shared/objects:update;2;2;1m;1s;;;1970-01-01T00:00:23Z
+uuid-for-germany;germany;uuid-for-berlin;berlin;unshared;unshared;service/unshared/instances:create;5;0;1m;;;;1970-01-01T00:00:12Z
+uuid-for-germany;germany;uuid-for-berlin;berlin;unshared;unshared;service/unshared/instances:delete;2;1;1m;1m;12345;;1970-01-01T00:00:12Z
+uuid-for-germany;germany;uuid-for-berlin;berlin;unshared;unshared;service/unshared/instances:update;2;2;1m;1s;;;1970-01-01T00:00:12Z

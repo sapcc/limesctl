@@ -35,16 +35,8 @@ var (
 	date    = "now"
 )
 
-type rootCmd struct {
-	cmd.Globals
-
-	Cluster cmd.ClusterCmd `cmd:"" help:"Do some action on cluster(s)."`
-	Domain  cmd.DomainCmd  `cmd:"" help:"Do some action on domain(s)."`
-	Project cmd.ProjectCmd `cmd:"" help:"Do some action on project(s)."`
-}
-
 func main() {
-	var cli rootCmd
+	var cli cmd.CLI
 	ctx := kong.Parse(&cli,
 		kong.Name("limesctl"),
 		kong.Description("Command-line client for Limes."),
@@ -60,7 +52,7 @@ func main() {
 		kong.Vars{"outputFormats": outputFormats()},
 	)
 
-	clients, err := cli.Globals.Authenticate()
+	clients, err := cli.Authenticate()
 	if err == nil {
 		err = ctx.Run(clients)
 	}

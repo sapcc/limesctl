@@ -33,9 +33,13 @@ func TestDomainReportRender(t *testing.T) {
 	err = json.Unmarshal(mockJSONBytes, &data)
 	th.AssertNoErr(t, err)
 
+	opts := &OutputOpts{
+		CSVRecFmt: CSVRecordFormatDefault,
+		Humanize:  false,
+	}
 	var actual bytes.Buffer
 	rep := DomainReport{&data.Domain}
-	err = RenderReports(CSVRecordFormatDefault, false, rep).Write(&actual)
+	err = RenderReports(opts, rep).Write(&actual)
 	th.AssertNoErr(t, err)
 	assertEquals(t, "domain-get-germany.csv", actual.Bytes())
 }
@@ -52,9 +56,13 @@ func TestDomainReportsRender(t *testing.T) {
 	err = json.Unmarshal(mockJSONBytes, &data)
 	th.AssertNoErr(t, err)
 
+	opts := &OutputOpts{
+		CSVRecFmt: CSVRecordFormatDefault,
+		Humanize:  false,
+	}
 	var actual bytes.Buffer
 	reps := LimesDomainsToReportRenderer(data.Domains)
-	err = RenderReports(CSVRecordFormatDefault, false, reps...).Write(&actual)
+	err = RenderReports(opts, reps...).Write(&actual)
 	th.AssertNoErr(t, err)
 	assertEquals(t, "domain-list.csv", actual.Bytes())
 
@@ -65,9 +73,11 @@ func TestDomainReportsRender(t *testing.T) {
 	err = json.Unmarshal(mockJSONBytes, &filteredData)
 	th.AssertNoErr(t, err)
 
+	opts.CSVRecFmt = CSVRecordFormatLong
+	opts.Humanize = true
 	actual.Reset()
 	reps = LimesDomainsToReportRenderer(filteredData.Domains)
-	err = RenderReports(CSVRecordFormatLong, true, reps...).Write(&actual)
+	err = RenderReports(opts, reps...).Write(&actual)
 	th.AssertNoErr(t, err)
 	assertEquals(t, "domain-list-filtered.csv", actual.Bytes())
 }

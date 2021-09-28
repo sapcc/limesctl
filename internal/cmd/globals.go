@@ -28,8 +28,16 @@ import (
 	"github.com/sapcc/gophercloud-sapcc/clients"
 )
 
-// Globals holds app level (global) flags.
-type Globals struct {
+type CLI struct {
+	globalFlags
+
+	Cluster clusterCmd `cmd:"" help:"Do some action on cluster(s)."`
+	Domain  domainCmd  `cmd:"" help:"Do some action on domain(s)."`
+	Project projectCmd `cmd:"" help:"Do some action on project(s)."`
+}
+
+// globalFlags holds app level (global) flags.
+type globalFlags struct {
 	Debug   bool        `env:"LIMESCTL_DEBUG" help:"Enable debug mode (will print API requests and responses)."`
 	Version VersionFlag `help:"Print version information and quit."`
 	openStackFlags
@@ -78,9 +86,9 @@ type ServiceClients struct {
 
 // Authenticate authenticates against OpenStack and returns the necessary
 // service clients.
-func (g *Globals) Authenticate() (*ServiceClients, error) {
+func (cli *CLI) Authenticate() (*ServiceClients, error) {
 	// Update OpenStack environment variables, if value provided as flag.
-	err := updateOpenStackEnvVars(&g.openStackFlags)
+	err := updateOpenStackEnvVars(&cli.openStackFlags)
 	if err != nil {
 		return nil, err
 	}
@@ -94,7 +102,7 @@ func (g *Globals) Authenticate() (*ServiceClients, error) {
 	if err != nil {
 		return nil, errors.Wrap(err, "cannot create an OpenStack client")
 	}
-	if g.Debug {
+	if cli.Debug {
 		provider.HTTPClient = http.Client{
 			Transport: &client.RoundTripper{
 				Rt:     &http.Transport{},

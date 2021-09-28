@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Support for specifying multiple area, service, resource values for the respective flags.
 - Support for resources without quota.
 - Support for relative quota adjustment. The following operators are supported: `+=`,
   `-=`, `*=`, `/=`.
@@ -33,8 +34,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   limesctl project set compute/cores=250 compute/ram=20GiB
   ```
 
-  New style:
+  New style option 1, use `--quotas` flag with comma-separated values:
 
+  ```
+  limesctl project set --quotas=compute/cores=250,compute/ram=20GiB
+  ```
+
+  New style option 2, use `-q` shorthand flag for each new quota value:
   ```
   limesctl project set -q compute/cores=250 -q compute/ram=20GiB
   ```

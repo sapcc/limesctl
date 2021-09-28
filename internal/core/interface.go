@@ -71,23 +71,29 @@ func (d CSVRecords) WriteAsTable() {
 	t.Render()
 }
 
+type OutputOpts struct {
+	Fmt       OutputFormat
+	CSVRecFmt CSVRecordFormat
+	Humanize  bool
+}
+
 // LimesReportRenderer is implemented by data types that can render a Limes
 // API report into CSVRecords.
 type LimesReportRenderer interface {
-	getHeaderRow(csvFmt CSVRecordFormat) []string
-	render(csvFmt CSVRecordFormat, humanize bool) CSVRecords
+	getHeaderRow(opts *OutputOpts) []string
+	render(opts *OutputOpts) CSVRecords
 }
 
 // RenderReports renders multiple reports and returns the aggregate CSVRecords.
 //
-// Note: this function expects all LimesReportRenderer to have the same
-// underlying type.
-func RenderReports(csvFmt CSVRecordFormat, humanize bool, rL ...LimesReportRenderer) CSVRecords {
+// Note: if multiple LimesReportRenderer are given then they must have the same underlying
+// type.
+func RenderReports(opts *OutputOpts, rL ...LimesReportRenderer) CSVRecords {
 	var recs CSVRecords
 	if len(rL) > 0 {
-		recs = append(recs, rL[0].getHeaderRow(csvFmt))
+		recs = append(recs, rL[0].getHeaderRow(opts))
 		for _, r := range rL {
-			recs = append(recs, r.render(csvFmt, humanize)...)
+			recs = append(recs, r.render(opts)...)
 		}
 	}
 	return recs

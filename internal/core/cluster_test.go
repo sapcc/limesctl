@@ -33,9 +33,13 @@ func TestClusterReportRender(t *testing.T) {
 	err = json.Unmarshal(mockJSONBytes, &data)
 	th.AssertNoErr(t, err)
 
+	opts := &OutputOpts{
+		CSVRecFmt: CSVRecordFormatDefault,
+		Humanize:  false,
+	}
 	var actual bytes.Buffer
 	rep := ClusterReport{&data.Cluster}
-	err = RenderReports(CSVRecordFormatDefault, false, rep).Write(&actual)
+	err = RenderReports(opts, rep).Write(&actual)
 	th.AssertNoErr(t, err)
 	assertEquals(t, "cluster-get-west.csv", actual.Bytes())
 }
@@ -53,9 +57,13 @@ func TestClusterReportsRender(t *testing.T) {
 	err = json.Unmarshal(mockJSONBytes, &data)
 	th.AssertNoErr(t, err)
 
+	opts := &OutputOpts{
+		CSVRecFmt: CSVRecordFormatDefault,
+		Humanize:  false,
+	}
 	var actual bytes.Buffer
 	reps := LimesClustersToReportRenderer(data.Clusters)
-	err = RenderReports(CSVRecordFormatDefault, false, reps...).Write(&actual)
+	err = RenderReports(opts, reps...).Write(&actual)
 	th.AssertNoErr(t, err)
 	assertEquals(t, "cluster-list.csv", actual.Bytes())
 
@@ -66,9 +74,11 @@ func TestClusterReportsRender(t *testing.T) {
 	err = json.Unmarshal(mockJSONBytes, &filteredData)
 	th.AssertNoErr(t, err)
 
+	opts.CSVRecFmt = CSVRecordFormatLong
+	opts.Humanize = true
 	actual.Reset()
 	reps = LimesClustersToReportRenderer(filteredData.Clusters)
-	err = RenderReports(CSVRecordFormatLong, true, reps...).Write(&actual)
+	err = RenderReports(opts, reps...).Write(&actual)
 	th.AssertNoErr(t, err)
 	assertEquals(t, "cluster-list-filtered.csv", actual.Bytes())
 }
