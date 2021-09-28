@@ -3,6 +3,13 @@
 # Edit Makefile.maker.yaml instead.                                            #
 ################################################################################
 
+MAKEFLAGS=--warn-undefined-variables
+# /bin/sh is dash on Debian which does not support all features of ash/bash
+# to fix that we use /bin/bash only on Debian to not break Alpine
+ifneq ($(shell grep -c debian /etc/os-release),0)
+SHELL := /bin/bash
+endif
+
 default: build-all
 
 VERSION     := $(shell git describe --abbrev=7)
@@ -32,7 +39,7 @@ install: FORCE build/limesctl
 	install -D -m 0755 build/limesctl "$(DESTDIR)$(PREFIX)/bin/limesctl"
 
 # which packages to test with "go test"
-GO_TESTPKGS := $(shell go list -f '{{if .TestGoFiles}}{{.ImportPath}}{{end}}' ./...)
+GO_TESTPKGS := $(shell go list -f '{{if or .TestGoFiles .XTestGoFiles}}{{.ImportPath}}{{end}}' ./...)
 # which packages to measure coverage for
 GO_COVERPKGS := $(shell go list ./...)
 # to get around weird Makefile syntax restrictions, we need variables containing a space and comma
@@ -63,7 +70,7 @@ tidy-deps: FORCE
 	go mod verify
 
 license-headers: FORCE
-	@if ! hash addlicense 2>/dev/null; then printf "\e[1;36m>> Installing addlicense...\e[0m\n"; GO111MODULE=off go get -u github.com/google/addlicense; fi
+	@if ! hash addlicense 2>/dev/null; then printf "\e[1;36m>> Installing addlicense...\e[0m\n"; go install github.com/google/addlicense@latest; fi
 	find * \( -name vendor -type d -prune \) -o \( -name \*.go -exec addlicense -c "SAP SE" -- {} + \)
 
 clean: FORCE
