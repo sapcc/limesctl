@@ -6,11 +6,20 @@
 
 `limesctl` is the command-line interface for [Limes](https://github.com/sapcc/limes).
 
-## Usage
+## Installation
 
 You can download pre-compiled binaries for the [latest release](https://github.com/sapcc/limesctl/releases/latest).
 
 Alternatively, you can build with `make`, install with `make install`, or `go get`.
+
+If you're a **Homebrew** user, then you can install it with a custom tap:
+
+ ```
+ $ brew tap sapcc/limesctl https://github.com/sapcc/limesctl.git
+ $ brew install sapcc/limesctl/limesctl
+```
+
+## Usage
 
 For usage instructions:
 
