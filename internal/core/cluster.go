@@ -36,22 +36,26 @@ func LimesClustersToReportRenderer(in []limes.ClusterReport) []LimesReportRender
 	return out
 }
 
-var csvHeaderClusterLong = []string{"cluster id", "area", "service", "category", "resource", "capacity",
-	"domains quota", "usage", "physical usage", "burst usage", "unit", "scraped at (UTC)"}
+var csvHeaderClusterLong = []string{
+	"cluster id", "area", "service", "category", "resource", "capacity",
+	"domains quota", "usage", "physical usage", "burst usage", "unit", "scraped at (UTC)",
+}
 
-var csvHeaderClusterDefault = []string{"cluster id", "service", "resource", "capacity", "domains quota",
-	"usage", "unit"}
+var csvHeaderClusterDefault = []string{
+	"cluster id", "service", "resource", "capacity", "domains quota",
+	"usage", "unit",
+}
 
 // GetHeaderRow implements the LimesReportRenderer interface.
-func (c ClusterReport) getHeaderRow(csvFmt CSVRecordFormat) []string {
-	if csvFmt == CSVRecordFormatLong {
+func (c ClusterReport) getHeaderRow(opts *OutputOpts) []string {
+	if opts.CSVRecFmt == CSVRecordFormatLong {
 		return csvHeaderClusterLong
 	}
 	return csvHeaderClusterDefault
 }
 
 // Render implements the LimesReportRenderer interface.
-func (c ClusterReport) render(csvFmt CSVRecordFormat, humanize bool) CSVRecords {
+func (c ClusterReport) render(opts *OutputOpts) CSVRecords {
 	var records CSVRecords
 
 	// Serialize service types with ordered keys
@@ -79,12 +83,12 @@ func (c ClusterReport) render(csvFmt CSVRecordFormat, humanize bool) CSVRecords 
 			physU := cSrvRes.PhysicalUsage
 			domsQ := cSrvRes.DomainsQuota
 
-			valToStr, unit := getValToStrFunc(humanize, cSrvRes.Unit, []uint64{
+			valToStr, unit := getValToStrFunc(opts.Humanize, cSrvRes.Unit, []uint64{
 				zeroIfNil(cap), zeroIfNil(physU), zeroIfNil(domsQ),
 				cSrvRes.Usage, cSrvRes.BurstUsage,
 			})
 
-			if csvFmt == CSVRecordFormatLong {
+			if opts.CSVRecFmt == CSVRecordFormatLong {
 				r = append(r, c.ID, cSrv.Area, cSrv.Type, cSrvRes.Category, cSrvRes.Name, emptyStrIfNil(cap, valToStr),
 					emptyStrIfNil(domsQ, valToStr), valToStr(cSrvRes.Usage), emptyStrIfNil(physU, valToStr),
 					valToStr(cSrvRes.BurstUsage), string(unit), timestampToString(cSrv.MinScrapedAt),

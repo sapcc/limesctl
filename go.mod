@@ -12,3 +12,5 @@ require (
 	github.com/sapcc/gophercloud-sapcc v0.0.0-20210519124902-12e14f430faf
 	github.com/sapcc/limes v0.0.0-20210730100523-f761e2bd83bc
 )
+
+replace github.com/sapcc/gophercloud-sapcc => ../gophercloud-sapcc

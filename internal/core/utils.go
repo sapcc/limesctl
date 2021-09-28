@@ -14,7 +14,14 @@
 
 package core
 
-import "time"
+import (
+	"io/ioutil"
+	"path/filepath"
+	"testing"
+	"time"
+
+	th "github.com/gophercloud/gophercloud/testhelper"
+)
 
 func timestampToString(timestamp *int64) string {
 	if timestamp == nil {
@@ -35,4 +42,30 @@ func emptyStrIfNil(ptr *uint64, valToStr valToStrFunc) string {
 		return ""
 	}
 	return valToStr(*ptr)
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Helper functions for unit tests.
+
+func fixturePath(filename string) string {
+	return filepath.Join("fixtures", filename)
+}
+
+func fixtureBytes(filename string) ([]byte, error) {
+	return ioutil.ReadFile(filepath.Join("fixtures", filename))
+}
+
+// assertEquals is like testhelper.AssertEquals() but also writes actual
+// content to file to make it easy to copy the computed result over to the
+// fixture path when a new test is added or an existing one is modified.
+func assertEquals(t *testing.T, fixtureFilename string, actual []byte) {
+	fixturePathAbs, err := filepath.Abs(fixturePath(fixtureFilename))
+	th.AssertNoErr(t, err)
+	actualPathAbs := fixturePathAbs + ".actual"
+	err = ioutil.WriteFile(actualPathAbs, actual, 0600)
+	th.AssertNoErr(t, err)
+
+	expected, err := ioutil.ReadFile(fixturePathAbs)
+	th.AssertNoErr(t, err)
+	th.AssertEquals(t, string(expected), string(actual))
 }

@@ -21,23 +21,26 @@ import (
 	"github.com/sapcc/limesctl/internal/core"
 )
 
-// ClusterCmd contains the command-line structure for the cluster command.
-type ClusterCmd struct {
-	List clusterListCmd `cmd:"" help:"Display data for all the clusters. Requires a cloud-admin token."`
-	Show clusterShowCmd `cmd:"" help:"Display data for a specific cluster. Requires a cloud-admin token."`
+// clusterCmd contains the command-line structure for the cluster command.
+type clusterCmd struct {
+	List clusterListCmd `cmd:"" help:"Display resource usage data for all the clusters. Requires a cloud-admin token."`
+	Show clusterShowCmd `cmd:"" help:"Display resource usage data for a specific cluster. Requires a cloud-admin token."`
 }
+
+///////////////////////////////////////////////////////////////////////////////
+// Cluster list.
 
 type clusterListCmd struct {
-	requestFilterFlags
-	outputFormatFlags
-}
-
-// Validate implements the kong.Validatable interface.
-func (c *clusterListCmd) Validate() error {
-	return c.outputFormatFlags.validate()
+	resourceFilterFlags
+	resourceOutputFmtFlags
 }
 
 func (c *clusterListCmd) Run(clients *ServiceClients) error {
+	outputOpts, err := c.resourceOutputFmtFlags.validate()
+	if err != nil {
+		return err
+	}
+
 	res := clusters.List(clients.limes, clusters.ListOpts{
 		Area:     c.Area,
 		Service:  c.Service,
@@ -56,22 +59,25 @@ func (c *clusterListCmd) Run(clients *ServiceClients) error {
 		return errors.Wrap(err, "could not extract cluster reports")
 	}
 
-	return writeReports(c.outputFormatFlags, core.LimesClustersToReportRenderer(limesReps)...)
+	return writeReports(outputOpts, core.LimesClustersToReportRenderer(limesReps)...)
 }
 
+///////////////////////////////////////////////////////////////////////////////
+// Cluster show.
+
 type clusterShowCmd struct {
-	requestFilterFlags
-	outputFormatFlags
+	resourceFilterFlags
+	resourceOutputFmtFlags
 
 	ID string `arg:"" optional:"" help:"ID of the cluster (leave empty for current cluster)."`
 }
 
-// Validate implements the kong.Validatable interface.
-func (c *clusterShowCmd) Validate() error {
-	return c.outputFormatFlags.validate()
-}
-
 func (c *clusterShowCmd) Run(clients *ServiceClients) error {
+	outputOpts, err := c.resourceOutputFmtFlags.validate()
+	if err != nil {
+		return err
+	}
+
 	if c.ID == "" {
 		c.ID = "current"
 	}
@@ -93,5 +99,5 @@ func (c *clusterShowCmd) Run(clients *ServiceClients) error {
 		return errors.Wrap(err, "could not extract cluster report")
 	}
 
-	return writeReports(c.outputFormatFlags, core.ClusterReport{ClusterReport: limesRep})
+	return writeReports(outputOpts, core.ClusterReport{ClusterReport: limesRep})
 }

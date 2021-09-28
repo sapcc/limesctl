@@ -38,17 +38,21 @@ func LimesDomainsToReportRenderer(in []limes.DomainReport) []LimesReportRenderer
 
 var csvHeaderDomainDefault = []string{"domain id", "service", "resource", "quota", "projects quota", "usage", "unit"}
 
-var csvHeaderDomainLong = []string{"domain id", "domain name", "area", "service", "category", "resource",
-	"quota", "projects quota", "usage", "physical usage", "burst usage", "unit", "scraped at (UTC)"}
+var csvHeaderDomainLong = []string{
+	"domain id", "domain name", "area", "service", "category", "resource",
+	"quota", "projects quota", "usage", "physical usage", "burst usage", "unit", "scraped at (UTC)",
+}
+
+const domainName = "domain name"
 
 // GetHeaderRow implements the LimesReportRenderer interface.
-func (d DomainReport) getHeaderRow(csvFmt CSVRecordFormat) []string {
-	switch csvFmt {
+func (d DomainReport) getHeaderRow(opts *OutputOpts) []string {
+	switch opts.CSVRecFmt {
 	case CSVRecordFormatLong:
 		return csvHeaderDomainLong
 	case CSVRecordFormatNames:
 		h := csvHeaderDomainDefault
-		h[0] = "domain name"
+		h[0] = domainName
 		return h
 	default:
 		return csvHeaderDomainDefault
@@ -56,7 +60,7 @@ func (d DomainReport) getHeaderRow(csvFmt CSVRecordFormat) []string {
 }
 
 // Render implements the LimesReportRenderer interface.
-func (d DomainReport) render(csvFmt CSVRecordFormat, humanize bool) CSVRecords {
+func (d DomainReport) render(opts *OutputOpts) CSVRecords {
 	var records CSVRecords
 
 	// Serialize service types with ordered keys
@@ -84,19 +88,19 @@ func (d DomainReport) render(csvFmt CSVRecordFormat, humanize bool) CSVRecords {
 			domQ := dSrvRes.DomainQuota
 			projectsQ := dSrvRes.ProjectsQuota
 
-			valToStr, unit := getValToStrFunc(humanize, dSrvRes.Unit, []uint64{
+			valToStr, unit := getValToStrFunc(opts.Humanize, dSrvRes.Unit, []uint64{
 				zeroIfNil(physU), zeroIfNil(domQ), zeroIfNil(projectsQ),
 				dSrvRes.Usage, dSrvRes.BurstUsage,
 			})
 
-			if csvFmt == CSVRecordFormatLong {
+			if opts.CSVRecFmt == CSVRecordFormatLong {
 				r = append(r, d.UUID, d.Name, dSrv.Area, dSrv.Type, dSrvRes.Category, dSrvRes.Name,
 					emptyStrIfNil(domQ, valToStr), emptyStrIfNil(projectsQ, valToStr), valToStr(dSrvRes.Usage),
 					emptyStrIfNil(physU, valToStr), valToStr(dSrvRes.BurstUsage), string(unit), timestampToString(dSrv.MinScrapedAt),
 				)
 			} else {
 				nameOrID := d.UUID
-				if csvFmt == CSVRecordFormatNames {
+				if opts.CSVRecFmt == CSVRecordFormatNames {
 					nameOrID = d.Name
 				}
 				r = append(r, nameOrID, dSrv.Type, dSrvRes.Name, emptyStrIfNil(domQ, valToStr),
