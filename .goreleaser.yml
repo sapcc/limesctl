@@ -14,13 +14,16 @@ builds:
       - arm64
     ldflags:
       - -s -w -X main.version={{.Version}} -X main.commit={{.FullCommit}} -X main.date={{.CommitDate}}
-    mod_timestamp: '{{ .CommitTimestamp }}' # Ensure builds are reproducible
-
-archives:
-  - name_template: '{{ .ProjectName }}-{{ replace .Version "v" "" }}-{{ .Os }}-{{ .Arch }}'
-
-checksum:
-  name_template: 'checksums.txt'
+    mod_timestamp: "{{ .CommitTimestamp }}" # Ensure builds are reproducible
 
 snapshot:
   name_template: "{{ .Tag }}-next"
+
+checksum:
+  name_template: "checksums.txt"
+
+archives:
+  - name_template: '{{ .ProjectName }}-{{ replace .Version "v" "" }}-{{ .Os }}-{{ .Arch }}'
+    format_overrides:
+      - goos: windows
+        format: zip
