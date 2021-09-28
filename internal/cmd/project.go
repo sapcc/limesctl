@@ -291,7 +291,7 @@ func (p *projectShowRatesCmd) Run(clients *ServiceClients) error {
 //nolint:lll
 type projectSetCmd struct {
 	projectFlags
-	Quotas []string `short:"q" help:"New quotas values. For relative quota adjustment, use one of the following operators: [+=, -=, *=, /=]. Example: service/resource=120GiB."`
+	Quotas []string `short:"q" sep:"," help:"New quotas values. For relative quota adjustment, use one of the following operators: [+=, -=, *=, /=]. Example: service/resource=120GiB."`
 
 	NameOrID string `arg:"" optional:"" help:"Name or ID of the project. Required if using '--cluster' or '--domain' flag."`
 }
