@@ -27,3 +27,20 @@ archives:
     format_overrides:
       - goos: windows
         format: zip
+
+brews:
+  - tap:
+      owner: sapcc
+      name: limesctl
+    folder: Formula
+    homepage: https://github.com/sapcc/limesctl
+    description: Command-line interface for Limes
+    license: Apache-2.0
+    dependencies:
+      - name: go
+        type: optional
+    install: |
+      bin.install "limesctl"
+    test: |
+      system "#{bin}/limesctl --version"
+    commit_msg_template: "Homebrew: update formula to {{ .Tag }}"
