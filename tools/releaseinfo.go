@@ -20,7 +20,7 @@
 //
 // Usage: releaseinfo path-to-changelog vX.Y.Z
 
-// +build ignore
+//go:build ignore
 
 package main
 
