@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.0.0] - 2021-09-28
+
 ### Added
 
 - Support for specifying multiple area, service, resource values for the respective flags.
@@ -167,7 +169,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial release.
 
-[unreleased]: https://github.com/sapcc/limesctl/compare/v1.6.2...HEAD
+[unreleased]: https://github.com/sapcc/limesctl/compare/v2.0.0...HEAD
+[2.0.0]: https://github.com/sapcc/limesctl/compare/v1.6.2...v2.0.0
 [1.6.2]: https://github.com/sapcc/limesctl/compare/v1.6.1...v1.6.2
 [1.6.1]: https://github.com/sapcc/limesctl/compare/v1.6.0...v1.6.1
 [1.6.0]: https://github.com/sapcc/limesctl/compare/v1.5.3...v1.6.0

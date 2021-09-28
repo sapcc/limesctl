@@ -32,7 +32,7 @@ brews:
   - tap:
       owner: sapcc
       name: limesctl
-    folder: Formula
+    folder: HomebrewFormula
     homepage: https://github.com/sapcc/limesctl
     description: Command-line interface for Limes
     license: Apache-2.0
