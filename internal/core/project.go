@@ -77,11 +77,11 @@ func (p ProjectReport) getHeaderRow(opts *OutputOpts) []string {
 	}
 }
 
-var csvHeaderProjectRatesDefault = []string{"domain id", "project id", "service", "rate", "limit", "window", "usage as bigint", "unit"}
+var csvHeaderProjectRatesDefault = []string{"domain id", "project id", "service", "rate", "limit", "window", "usage", "unit"}
 
 var csvHeaderProjectRatesLong = []string{
 	"domain id", "domain name", "project id", "project name", "area", "service",
-	"rate", "limit", "default limit", "window", "default window", "usage as bigint", "unit", "scraped at (UTC)",
+	"rate", "limit", "default limit", "window", "default window", "usage", "unit", "scraped at (UTC)",
 }
 
 func (p ProjectReport) getRatesHeaderRow(opts *OutputOpts) []string {
