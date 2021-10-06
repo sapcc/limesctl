@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.0.1] - 2021-10-06
+
 ### Fixed
 
 - Convert given quota value to resource's base unit during relative quota change.
@@ -180,7 +182,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial release.
 
-[unreleased]: https://github.com/sapcc/limesctl/compare/v2.0.0...HEAD
+[unreleased]: https://github.com/sapcc/limesctl/compare/v2.0.1...HEAD
+[2.0.1]: https://github.com/sapcc/limesctl/compare/v2.0.0...v2.0.1
 [2.0.0]: https://github.com/sapcc/limesctl/compare/v1.6.2...v2.0.0
 [1.6.2]: https://github.com/sapcc/limesctl/compare/v1.6.1...v1.6.2
 [1.6.1]: https://github.com/sapcc/limesctl/compare/v1.6.0...v1.6.1
