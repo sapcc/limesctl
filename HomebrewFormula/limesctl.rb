@@ -5,29 +5,29 @@
 class Limesctl < Formula
   desc "Command-line interface for Limes"
   homepage "https://github.com/sapcc/limesctl"
-  version "2.0.0"
+  version "2.0.1"
   license "Apache-2.0"
   bottle :unneeded
 
   on_macos do
     if Hardware::CPU.intel?
-      url "https://github.com/sapcc/limesctl/releases/download/v2.0.0/limesctl-2.0.0-darwin-amd64.tar.gz"
-      sha256 "8ec55ffd8d28113c3453508488feec4a2f9d78ef1f96a8de397756091a3293e4"
+      url "https://github.com/sapcc/limesctl/releases/download/v2.0.1/limesctl-2.0.1-darwin-amd64.tar.gz"
+      sha256 "9792804acf8c6db974d59d371ca7b8b27ed5a95eae17f804eefc7ada3b8bdf93"
     end
     if Hardware::CPU.arm?
-      url "https://github.com/sapcc/limesctl/releases/download/v2.0.0/limesctl-2.0.0-darwin-arm64.tar.gz"
-      sha256 "f21b1557ebbf6afe84a3afca81f25d539872a7e09691a24b4183a07a18f8b053"
+      url "https://github.com/sapcc/limesctl/releases/download/v2.0.1/limesctl-2.0.1-darwin-arm64.tar.gz"
+      sha256 "dee0c4a314ef42bd2fe42c6276a2d027975e1956ff4776351d52ba52a747597c"
     end
   end
 
   on_linux do
     if Hardware::CPU.intel?
-      url "https://github.com/sapcc/limesctl/releases/download/v2.0.0/limesctl-2.0.0-linux-amd64.tar.gz"
-      sha256 "88f31c610a6d969f87cb1b9c7078226c0b845c25a55ad4e4424ecd926e119a90"
+      url "https://github.com/sapcc/limesctl/releases/download/v2.0.1/limesctl-2.0.1-linux-amd64.tar.gz"
+      sha256 "69ae0e31f7558374d6bb17b944f503448d63e735bd26d13e958ff9aa55ba0313"
     end
     if Hardware::CPU.arm? && Hardware::CPU.is_64_bit?
-      url "https://github.com/sapcc/limesctl/releases/download/v2.0.0/limesctl-2.0.0-linux-arm64.tar.gz"
-      sha256 "72449c86b6c10f9bdabe6c098577b1d779e67dfe0d71881ed443e71b328d007b"
+      url "https://github.com/sapcc/limesctl/releases/download/v2.0.1/limesctl-2.0.1-linux-arm64.tar.gz"
+      sha256 "db04cb33f24213d47c86009da49a3586c9b33517be0192b33b9ce40b1986529f"
     end
   end
 
