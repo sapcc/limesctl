@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Convert given quota value to resource's base unit during relative quota change.
+
 ## [2.0.0] - 2021-09-28
 
 ### Added

@@ -115,14 +115,20 @@ func parseToQuotaRequest(resValues resourceQuotas, in []string) (limes.QuotaRequ
 		}
 
 		// Validate and convert (if needed) input value.
+		operation := matchList[2]
 		var newValWithUnit limes.ValueWithUnit
-		if isFloatVal {
-			logg.Info("Limes only accepts integer values, will attempt to convert %s %s to a suitable unit for %s/%s",
-				valStr, unit, service, resource)
+		if isFloatVal || operation != "=" {
+			if isFloatVal {
+				logg.Info("Limes only accepts integer values, will attempt to convert %s %s to a suitable unit for %s/%s",
+					valStr, unit, service, resource)
+			}
 			var err error
 			newValWithUnit, err = convertTo(valStr, unit, currentValWithUnit.Unit)
 			if err != nil {
 				return nil, err
+			}
+			if isFloatVal {
+				logg.Info("%s %s -> %s", valStr, unit, newValWithUnit.String())
 			}
 		} else {
 			v, err := strconv.ParseUint(valStr, 10, 64)
@@ -132,7 +138,7 @@ func parseToQuotaRequest(resValues resourceQuotas, in []string) (limes.QuotaRequ
 			newValWithUnit = limes.ValueWithUnit{Value: v, Unit: unit}
 		}
 
-		switch matchList[2] {
+		switch operation {
 		case "+=":
 			newValWithUnit.Value += currentValWithUnit.Value
 		case "-=":
@@ -201,7 +207,6 @@ func convertTo(valStr string, source, target limes.Unit) (limes.ValueWithUnit, e
 		newV = math.Floor(vInBase / float64(targetMultiple))
 	}
 
-	logg.Info("%s %s -> %.0f %s", valStr, source, newV, target)
 	return limes.ValueWithUnit{
 		Value: uint64(newV),
 		Unit:  target,
