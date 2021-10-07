@@ -95,9 +95,8 @@ func parseToQuotaRequest(resValues resourceQuotas, in []string) (limes.QuotaRequ
 		isFloatVal := strings.Contains(valStr, ".")
 
 		// Validate input unit.
-		unitStr := valueUnitML[2]
 		var unit limes.Unit
-		if unitStr == "" {
+		if unitStr := valueUnitML[2]; unitStr == "" {
 			if isFloatVal {
 				return nil, fmt.Errorf("counted (i.e. resource without any unit) values must be an integer, got %q", valStr)
 			}
