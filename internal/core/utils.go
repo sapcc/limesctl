@@ -15,7 +15,7 @@
 package core
 
 import (
-	"io/ioutil"
+	"os"
 	"path/filepath"
 	"testing"
 	"time"
@@ -52,7 +52,7 @@ func fixturePath(filename string) string {
 }
 
 func fixtureBytes(filename string) ([]byte, error) {
-	return ioutil.ReadFile(filepath.Join("fixtures", filename))
+	return os.ReadFile(filepath.Join("fixtures", filename))
 }
 
 // assertEquals is like testhelper.AssertEquals() but also writes actual
@@ -62,10 +62,10 @@ func assertEquals(t *testing.T, fixtureFilename string, actual []byte) {
 	fixturePathAbs, err := filepath.Abs(fixturePath(fixtureFilename))
 	th.AssertNoErr(t, err)
 	actualPathAbs := fixturePathAbs + ".actual"
-	err = ioutil.WriteFile(actualPathAbs, actual, 0600)
+	err = os.WriteFile(actualPathAbs, actual, 0600)
 	th.AssertNoErr(t, err)
 
-	expected, err := ioutil.ReadFile(fixturePathAbs)
+	expected, err := os.ReadFile(fixturePathAbs)
 	th.AssertNoErr(t, err)
 	th.AssertEquals(t, string(expected), string(actual))
 }
