@@ -17,13 +17,14 @@ COMMIT_HASH := $(shell git rev-parse --verify HEAD)
 BUILD_DATE  := $(shell date -u +"%Y-%m-%dT%H:%M:%S%Z")
 
 build/release-info: CHANGELOG.md | build
-	go run $(GO_BUILDFLAGS) tools/releaseinfo.go $< $(shell git describe --tags --abbrev=0) > $@
+	@if ! hash release-info 2>/dev/null; then printf "\e[1;36m>> Installing release-info...\e[0m\n"; go install github.com/sapcc/go-bits/tools/release-info@latest; fi
+	release-info $< $(shell git describe --tags --abbrev=0) > $@
 
 build-all: build/limesctl
 
-GO_BUILDFLAGS = 
+GO_BUILDFLAGS =
 GO_LDFLAGS = -X main.version=$(VERSION) -X main.commit=$(COMMIT_HASH) -X main.date=$(BUILD_DATE)
-GO_TESTENV = 
+GO_TESTENV =
 
 build/limesctl: FORCE
 	go build $(GO_BUILDFLAGS) -ldflags '-s -w $(GO_LDFLAGS)' -o build/limesctl .
@@ -50,7 +51,7 @@ check: build-all static-check build/cover.html FORCE
 	@printf "\e[1;32m>> All checks successful.\e[0m\n"
 
 static-check: FORCE
-	@command -v golangci-lint >/dev/null 2>&1 || { echo >&2 "Error: golangci-lint is not installed. See: https://golangci-lint.run/usage/install/"; exit 1; }
+	@if ! hash golangci-lint 2>/dev/null; then printf "\e[1;36m>> Installing golangci-lint...\e[0m\n"; curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(shell go env GOPATH)/bin; fi
 	@printf "\e[1;36m>> golangci-lint\e[0m\n"
 	@golangci-lint run
 
