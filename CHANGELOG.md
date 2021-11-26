@@ -2,18 +2,20 @@
 
 All notable changes to this project will be documented in this file.
 
+The sections should follow the order `Added`, `Changed`, `Fixed`, `Removed`, and `Deprecated`.
+
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [Unreleased](https://github.com/sapcc/limesctl/compare/v2.0.1...HEAD)
 
-## [2.0.1] - 2021-10-06
+## 2.0.1 - 2021-10-06
 
 ### Fixed
 
 - Convert given quota value to resource's base unit during relative quota change.
 
-## [2.0.0] - 2021-09-28
+## 2.0.0 - 2021-09-28
 
 ### Added
 
@@ -64,20 +66,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - `cluster set` command, Limes' API no longer accepts cluster `PUT` requests.
 
-## [1.6.2] - 2020-11-12
+## 1.6.2 - 2020-11-12
 
 ### Fixed
 
 - Show error if domain ID is used for project subcommands.
 
-## [1.6.1] - 2020-07-29
+## 1.6.1 - 2020-07-29
 
 ### Changed
 
 - Migrate from gophercloud-limes to gophercloud-sapcc.
 - Version flag now prints the Git commit hash and build date.
 
-## [1.6.0] - 2019-11-18
+## 1.6.0 - 2019-11-18
 
 ### Added
 
@@ -96,28 +98,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Do not crash when unknown service/resource are used with `set` subcommand.
 
-## [1.5.3] - 2019-08-20
+## 1.5.3 - 2019-08-20
 
 ### Fixed
 
 - Do not throw segmentation fault error for invalid service names while setting
   quota(s).
 
-## [1.5.2] - 2019-07-17
+## 1.5.2 - 2019-07-17
 
 ### Fixed
 
 - A typo that resulted in a previous instance of error not being properly
   recycled.
 
-## [1.5.1] - 2019-06-26
+## 1.5.1 - 2019-06-26
 
 ### Changed
 
 - Report non-existent `physical_usage` data as an empty string in the table and
   csv format.
 
-## [1.5.0] - 2019-06-19
+## 1.5.0 - 2019-06-19
 
 ### Added
 
@@ -129,21 +131,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   explicitly given then they are extracted from the current authorization
   token.
 
-## [1.4.1] - 2019-06-12
+## 1.4.1 - 2019-06-12
 
 ### Changed
 
 - Do not fail project operations when Keystone permissions for domain listing
   are missing.
 
-## [1.4.0] - 2019-03-28
+## 1.4.0 - 2019-03-28
 
 ### Changed
 
 - Avoid extra requests to Keystone to resolve a domain name into an ID, when
   the token scope already contains the correct domain ID.
 
-## [1.3.0] - 2019-01-07
+## 1.3.0 - 2019-01-07
 
 ### Changed
 
@@ -151,7 +153,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Allow fractional quota values for the `set` subcommand.
 - Optimize library dependencies. Binary size has been reduced by over 20%.
 
-## [1.2.0] - 2018-11-05
+## 1.2.0 - 2018-11-05
 
 ### Added
 
@@ -167,7 +169,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - `--cluster` flag now works as expected.
 
-## [1.1.0] - 2018-10-29
+## 1.1.0 - 2018-10-29
 
 ### Added
 
@@ -176,25 +178,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   table/CSV output and can be combined with other output flags: `--names` or
   `--long`.
 
-## [1.0.0] - 2018-10-24
+## 1.0.0 - 2018-10-24
 
 ### Added
 
 - Initial release.
-
-[unreleased]: https://github.com/sapcc/limesctl/compare/v2.0.1...HEAD
-[2.0.1]: https://github.com/sapcc/limesctl/compare/v2.0.0...v2.0.1
-[2.0.0]: https://github.com/sapcc/limesctl/compare/v1.6.2...v2.0.0
-[1.6.2]: https://github.com/sapcc/limesctl/compare/v1.6.1...v1.6.2
-[1.6.1]: https://github.com/sapcc/limesctl/compare/v1.6.0...v1.6.1
-[1.6.0]: https://github.com/sapcc/limesctl/compare/v1.5.3...v1.6.0
-[1.5.3]: https://github.com/sapcc/limesctl/compare/v1.5.2...v1.5.3
-[1.5.2]: https://github.com/sapcc/limesctl/compare/v1.5.1...v1.5.2
-[1.5.1]: https://github.com/sapcc/limesctl/compare/v1.5.0...v1.5.1
-[1.5.0]: https://github.com/sapcc/limesctl/compare/v1.4.1...v1.5.0
-[1.4.1]: https://github.com/sapcc/limesctl/compare/v1.4.0...v1.4.1
-[1.4.0]: https://github.com/sapcc/limesctl/compare/v1.3.0...v1.4.0
-[1.3.0]: https://github.com/sapcc/limesctl/compare/v1.2.0...v1.3.0
-[1.2.0]: https://github.com/sapcc/limesctl/compare/v1.1.0...v1.2.0
-[1.1.0]: https://github.com/sapcc/limesctl/compare/v1.0.0...v1.1.0
-[1.0.0]: https://github.com/sapcc/limesctl/releases/tag/v1.0.0
