@@ -10,7 +10,7 @@
 
 You can download pre-compiled binaries for the [latest release](https://github.com/sapcc/limesctl/releases/latest).
 
-Alternatively, you can build with `make`, install with `make install`, or `go get`.
+Alternatively, you can build with `make`, install with `make install`, or `go install`.
 
 If you're a **Homebrew** user, then you can install it with a custom tap:
 
