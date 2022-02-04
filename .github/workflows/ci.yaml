@@ -48,11 +48,16 @@ jobs:
       uses: actions/setup-go@v2
       with:
         go-version: "1.17"
-    - name: Run golangci-lint
-      uses: golangci/golangci-lint-action@v2
+    - name: Cache Go modules
+      uses: actions/cache@v2
       with:
-        skip-go-installation: true
-        version: latest
+        key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+        path: |
+          ~/go/pkg/mod
+          ~/.cache/go-build
+        restore-keys: ${{ runner.os }}-go-
+    - name: Run gofmt, go vet, staticcheck
+      run: make static-check
   test:
     name: Test
     needs:
