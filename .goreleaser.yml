@@ -35,9 +35,6 @@ brews:
     homepage: https://github.com/sapcc/limesctl
     description: Command-line interface for Limes
     license: Apache-2.0
-    dependencies:
-      - name: go
-        type: optional
     install: |
       bin.install "limesctl"
     test: |

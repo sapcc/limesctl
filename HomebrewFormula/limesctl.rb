@@ -7,7 +7,6 @@ class Limesctl < Formula
   homepage "https://github.com/sapcc/limesctl"
   version "2.0.1"
   license "Apache-2.0"
-  bottle :unneeded
 
   on_macos do
     if Hardware::CPU.intel?
@@ -30,8 +29,6 @@ class Limesctl < Formula
       sha256 "db04cb33f24213d47c86009da49a3586c9b33517be0192b33b9ce40b1986529f"
     end
   end
-
-  depends_on "go" => :optional
 
   def install
     bin.install "limesctl"
