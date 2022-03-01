@@ -6,6 +6,9 @@ binaries:
 variables:
   GO_LDFLAGS: "-X main.version=$(VERSION) -X main.commit=$(COMMIT_HASH) -X main.date=$(BUILD_DATE)"
 
+staticCheck:
+  golangciLint: true
+
 githubWorkflows:
   global:
     ignorePaths: [ "**.md" ] # all Markdown files
