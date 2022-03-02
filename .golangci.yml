@@ -7,6 +7,28 @@ run:
   # such as in a continuous integration and testing system.
   modules-download-mode: readonly
 
+linters-settings:
+  dupl:
+    threshold: 100 # 150 by default
+  errcheck:
+    check-blank: true
+    check-type-assertions: true
+  forbidigo:
+    forbid:
+      - ^ioutil\..*$
+  funlen:
+    lines: 120
+    statements: 60
+  gofumpt:
+    extra-rules: true
+  goimports:
+    # Put imports beginning with prefix after 3rd-party packages.
+    local-prefixes: github.com/sapcc/limesctl
+  govet:
+    check-shadowing: true
+  lll:
+    line-length: 140
+
 linters:
   # We use 'disable-all' and enable linters explicitly so that a newer version
   # will not introduce new linters unexpectedly.
@@ -14,72 +36,44 @@ linters:
   enable:
     - bodyclose
     - deadcode
-    - depguard
     - dogsled
     - dupl
     - errcheck
+    - errname
     - exportloopref
+    - forbidigo
     - funlen
     - gochecknoinits
     - goconst
     - gocritic
     - gocyclo
+    - godot
     - gofmt
+    - gofumpt
     - goimports
     - goprintffuncname
     - gosec
     - gosimple
     - govet
+    - ifshort
+    - importas
     - ineffassign
     - lll
     - misspell
     - nakedret
+    - nilerr
     - noctx
+    - nolintlint
     - prealloc
     - rowserrcheck
     - staticcheck
     - structcheck
     - stylecheck
+    - thelper
     - typecheck
     - unconvert
     - unparam
     - unused
     - varcheck
+    - wastedassign
     - whitespace
-
-linters-settings:
-  dupl:
-    # Tokens count to trigger issue, 150 by default.
-    threshold: 100
-
-  errcheck:
-    # Report about assignment of errors to blank identifier:
-    #   `num, _ := strconv.Atoi(numStr)`;
-    check-blank: true
-
-    # Report about not checking of errors in type assertions:
-    #   `a := b.(MyStruct)`;
-    check-type-assertions: true
-
-  funlen:
-      lines: 120
-      statements: 60
-
-  gci:
-    # Put imports beginning with prefix after 3rd-party packages. It's a
-    # comma-separated list of prefixes.
-    local-prefixes: github.com/sapcc/limesctl
-
-  goimports:
-    local-prefixes: github.com/sapcc/limesctl
-
-  lll:
-    line-length: 140
-
-  whitespace:
-    # Enforce newlines (or comments) after multi-line function signature.
-    multi-func: true
-
-  gocritic:
-    disabled-checks:
-      - commentFormatting
