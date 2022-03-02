@@ -35,8 +35,8 @@ type ProjectReport struct {
 func LimesProjectsToReportRenderer(
 	in []limes.ProjectReport,
 	domainID, domainName string,
-	hasRatesOnly bool) []LimesReportRenderer {
-
+	hasRatesOnly bool,
+) []LimesReportRenderer {
 	out := make([]LimesReportRenderer, 0, len(in))
 	for _, rep := range in {
 		rep := rep

@@ -100,7 +100,6 @@ func (d *domainShowCmd) Run(clients *ServiceClients) error {
 
 	domainID := d.NameOrID
 	if d.ClusterID == "" {
-		var err error
 		domainID, err = auth.FindDomainID(clients.identity, d.NameOrID)
 		if err != nil {
 			return err

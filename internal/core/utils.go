@@ -59,10 +59,11 @@ func fixtureBytes(filename string) ([]byte, error) {
 // content to file to make it easy to copy the computed result over to the
 // fixture path when a new test is added or an existing one is modified.
 func assertEquals(t *testing.T, fixtureFilename string, actual []byte) {
+	t.Helper()
 	fixturePathAbs, err := filepath.Abs(fixturePath(fixtureFilename))
 	th.AssertNoErr(t, err)
 	actualPathAbs := fixturePathAbs + ".actual"
-	err = os.WriteFile(actualPathAbs, actual, 0600)
+	err = os.WriteFile(actualPathAbs, actual, 0o600)
 	th.AssertNoErr(t, err)
 
 	expected, err := os.ReadFile(fixturePathAbs)

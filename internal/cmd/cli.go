@@ -65,7 +65,7 @@ func (v VersionFlag) BeforeApply(app *kong.Kong, version VersionFlag) error {
 	return nil
 }
 
-// openstackFlags holds the values for the required
+// openstackFlags holds the values for the required.
 type openStackFlags struct {
 	OSAuthURL           string `help:"Authentication URL."`
 	OSUsername          string `help:"Username."`

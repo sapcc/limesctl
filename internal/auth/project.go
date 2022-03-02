@@ -51,7 +51,8 @@ func FindProject(identityClient *gophercloud.ServiceClient, domainNameOrID, proj
 			return nil, errors.New("the given ID belongs to a domain, usage instructions: limectl domain --help")
 		}
 		if p.ID != "" {
-			dName, err := FindDomainName(identityClient, p.DomainID)
+			var dName string
+			dName, err = FindDomainName(identityClient, p.DomainID)
 			if err != nil {
 				return nil, errors.Wrap(err, msgProjectNotFound)
 			}
@@ -67,7 +68,8 @@ func FindProject(identityClient *gophercloud.ServiceClient, domainNameOrID, proj
 	// do a Keystone project listing and try to find the project.
 	opts := identityprojects.ListOpts{Name: projectNameOrID}
 	if domainNameOrID != "" {
-		dID, err := FindDomainID(identityClient, domainNameOrID)
+		var dID string
+		dID, err = FindDomainID(identityClient, domainNameOrID)
 		if err != nil {
 			return nil, errors.Wrap(err, msgProjectNotFound)
 		}

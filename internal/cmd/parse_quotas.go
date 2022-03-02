@@ -183,7 +183,7 @@ func (e smallerThanDefaultUnitError) Error() string {
 
 // convertTo converts the given value from source to target unit and returns
 // the truncated result in limes.ValueWithUnit.
-// i.e: 22.65 TiB -> 23193 GiB (instead of 23193.6 GiB)
+// i.e: 22.65 TiB -> 23193 GiB (instead of 23193.6 GiB).
 func convertTo(valStr string, source, target limes.Unit) (limes.ValueWithUnit, error) {
 	v, err := strconv.ParseFloat(valStr, 64)
 	if err != nil {
