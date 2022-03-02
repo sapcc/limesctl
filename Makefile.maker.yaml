@@ -19,6 +19,7 @@ githubWorkflows:
     enabled: true
   spellCheck:
     enabled: true
+    ignoreWords: ["importas"] # importas is a valid linter name
     ignorePaths: [] # override global setting so that nothing is ignored
 
 verbatim: |
