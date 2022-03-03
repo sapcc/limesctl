@@ -5,33 +5,45 @@
 class Limesctl < Formula
   desc "Command-line interface for Limes"
   homepage "https://github.com/sapcc/limesctl"
-  version "2.0.1"
+  version "3.0.0"
   license "Apache-2.0"
 
   on_macos do
-    if Hardware::CPU.intel?
-      url "https://github.com/sapcc/limesctl/releases/download/v2.0.1/limesctl-2.0.1-darwin-amd64.tar.gz"
-      sha256 "9792804acf8c6db974d59d371ca7b8b27ed5a95eae17f804eefc7ada3b8bdf93"
-    end
     if Hardware::CPU.arm?
-      url "https://github.com/sapcc/limesctl/releases/download/v2.0.1/limesctl-2.0.1-darwin-arm64.tar.gz"
-      sha256 "dee0c4a314ef42bd2fe42c6276a2d027975e1956ff4776351d52ba52a747597c"
+      url "https://github.com/sapcc/limesctl/releases/download/v3.0.0/limesctl-3.0.0-darwin-arm64.tar.gz"
+      sha256 "f3e0fb9164e605d80618c1afe423ed3ff14e7a4a4819ee90ccf9a387cba411f3"
+
+      def install
+        bin.install "limesctl"
+      end
+    end
+    if Hardware::CPU.intel?
+      url "https://github.com/sapcc/limesctl/releases/download/v3.0.0/limesctl-3.0.0-darwin-amd64.tar.gz"
+      sha256 "0c5a69550790573954a497eca34f3ff3a5254ecb7d0e8aae8aa708510816125d"
+
+      def install
+        bin.install "limesctl"
+      end
     end
   end
 
   on_linux do
     if Hardware::CPU.intel?
-      url "https://github.com/sapcc/limesctl/releases/download/v2.0.1/limesctl-2.0.1-linux-amd64.tar.gz"
-      sha256 "69ae0e31f7558374d6bb17b944f503448d63e735bd26d13e958ff9aa55ba0313"
+      url "https://github.com/sapcc/limesctl/releases/download/v3.0.0/limesctl-3.0.0-linux-amd64.tar.gz"
+      sha256 "569f1f4228593ce4a50d0d81fb0ec17788ec7cdcf42b21bf187fbbbce6f403df"
+
+      def install
+        bin.install "limesctl"
+      end
     end
     if Hardware::CPU.arm? && Hardware::CPU.is_64_bit?
-      url "https://github.com/sapcc/limesctl/releases/download/v2.0.1/limesctl-2.0.1-linux-arm64.tar.gz"
-      sha256 "db04cb33f24213d47c86009da49a3586c9b33517be0192b33b9ce40b1986529f"
-    end
-  end
+      url "https://github.com/sapcc/limesctl/releases/download/v3.0.0/limesctl-3.0.0-linux-arm64.tar.gz"
+      sha256 "5441148827ba9c2f13562f9866931b374277f073d544f6d887f83e12ae1a5180"
 
-  def install
-    bin.install "limesctl"
+      def install
+        bin.install "limesctl"
+      end
+    end
   end
 
   test do
