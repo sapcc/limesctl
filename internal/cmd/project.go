@@ -37,21 +37,11 @@ type projectCmd struct {
 	Sync      projectSyncCmd      `cmd:"" help:"Schedule a sync job that pulls quota and usage data for a specific project from the backing services into Limes' local database. Requires a project-admin token."`
 }
 
-//nolint:lll
 type projectFlags struct {
-	ClusterID      string `short:"c" name:"cluster" help:"Cluster ID. When this option is used, the domain and project must be identified by ID (names won't work)."`
-	DomainNameOrID string `short:"d" name:"domain" help:"Name or ID of the domain. Required if using '--cluster' flag."`
+	DomainNameOrID string `short:"d" name:"domain" help:"Name or ID of the domain."`
 }
 
 func (pf *projectFlags) validateWithNameID(nameOrID string) error {
-	if pf.ClusterID != "" {
-		if pf.DomainNameOrID == "" {
-			return errors.New("Domain ID is required when using the '--cluster' flag")
-		}
-		if nameOrID == "" {
-			return errors.New("Project ID is required when using the '--cluster' flag")
-		}
-	}
 	if pf.DomainNameOrID != "" && nameOrID == "" {
 		return errors.New("Project name or ID is required when using the '--domain' flag")
 	}
@@ -67,25 +57,14 @@ type projectListCmd struct {
 	resourceOutputFmtFlags
 }
 
-// Validate implements the kong.Validatable interface.
-func (p *projectListCmd) Validate() error {
-	if p.ClusterID != "" && p.DomainNameOrID == "" {
-		return errors.New("Domain ID is required when using the '--cluster' flag")
-	}
-	return nil
-}
-
 func (p *projectListCmd) Run(clients *ServiceClients) error {
 	outputOpts, err := p.resourceOutputFmtFlags.validate()
 	if err != nil {
 		return err
 	}
 
-	domainID := p.DomainNameOrID
 	domainName := ""
-	if p.ClusterID == "" {
-		domainID, err = auth.FindDomainID(clients.identity, p.DomainNameOrID)
-	}
+	domainID, err := auth.FindDomainID(clients.identity, p.DomainNameOrID)
 	if err == nil {
 		domainName, err = auth.FindDomainName(clients.identity, domainID)
 	}
@@ -94,7 +73,6 @@ func (p *projectListCmd) Run(clients *ServiceClients) error {
 	}
 
 	res := projects.List(clients.limes, domainID, projects.ListOpts{
-		Cluster:   p.ClusterID,
 		Areas:     p.Areas,
 		Services:  p.Services,
 		Resources: p.Resources,
@@ -125,25 +103,14 @@ type projectListRatesCmd struct {
 	rateOutputFmtFlags
 }
 
-// Validate implements the kong.Validatable interface.
-func (p *projectListRatesCmd) Validate() error {
-	if p.ClusterID != "" && p.DomainNameOrID == "" {
-		return errors.New("Domain ID is required when using the '--cluster' flag")
-	}
-	return nil
-}
-
 func (p *projectListRatesCmd) Run(clients *ServiceClients) error {
 	outputOpts, err := p.rateOutputFmtFlags.validate()
 	if err != nil {
 		return err
 	}
 
-	domainID := p.DomainNameOrID
 	domainName := ""
-	if p.ClusterID == "" {
-		domainID, err = auth.FindDomainID(clients.identity, p.DomainNameOrID)
-	}
+	domainID, err := auth.FindDomainID(clients.identity, p.DomainNameOrID)
 	if err == nil {
 		domainName, err = auth.FindDomainName(clients.identity, domainID)
 	}
@@ -152,7 +119,6 @@ func (p *projectListRatesCmd) Run(clients *ServiceClients) error {
 	}
 
 	res := projects.List(clients.limes, domainID, projects.ListOpts{
-		Cluster:  p.ClusterID,
 		Services: p.Services,
 		Rates:    projects.OnlyRates,
 	})
@@ -181,15 +147,12 @@ type projectShowCmd struct {
 	resourceFilterFlags
 	resourceOutputFmtFlags
 
-	NameOrID string `arg:"" optional:"" help:"Name or ID of the project. Required if using '--cluster' or '--domain' flag."`
+	NameOrID string `arg:"" optional:"" help:"Name or ID of the project. Required if using '--domain' flag."`
 }
 
 // Validate implements the kong.Validatable interface.
 func (p *projectShowCmd) Validate() error {
-	if err := p.projectFlags.validateWithNameID(p.NameOrID); err != nil {
-		return err
-	}
-	return nil
+	return p.projectFlags.validateWithNameID(p.NameOrID)
 }
 
 func (p *projectShowCmd) Run(clients *ServiceClients) error {
@@ -198,13 +161,12 @@ func (p *projectShowCmd) Run(clients *ServiceClients) error {
 		return err
 	}
 
-	pInfo, err := getProjectInfo(clients, p.ClusterID, p.DomainNameOrID, p.NameOrID)
+	pInfo, err := auth.FindProject(clients.identity, p.DomainNameOrID, p.NameOrID)
 	if err != nil {
 		return err
 	}
 
 	res := projects.Get(clients.limes, pInfo.DomainID, pInfo.ID, projects.GetOpts{
-		Cluster:   p.ClusterID,
 		Areas:     p.Areas,
 		Services:  p.Services,
 		Resources: p.Resources,
@@ -237,15 +199,12 @@ type projectShowRatesCmd struct {
 	rateFilterFlags
 	rateOutputFmtFlags
 
-	NameOrID string `arg:"" optional:"" help:"Name or ID of the project. Required if using '--cluster' or '--domain' flag."`
+	NameOrID string `arg:"" optional:"" help:"Name or ID of the project. Required if using '--domain' flag."`
 }
 
 // Validate implements the kong.Validatable interface.
 func (p *projectShowRatesCmd) Validate() error {
-	if err := p.projectFlags.validateWithNameID(p.NameOrID); err != nil {
-		return err
-	}
-	return nil
+	return p.projectFlags.validateWithNameID(p.NameOrID)
 }
 
 func (p *projectShowRatesCmd) Run(clients *ServiceClients) error {
@@ -254,13 +213,12 @@ func (p *projectShowRatesCmd) Run(clients *ServiceClients) error {
 		return err
 	}
 
-	pInfo, err := getProjectInfo(clients, p.ClusterID, p.DomainNameOrID, p.NameOrID)
+	pInfo, err := auth.FindProject(clients.identity, p.DomainNameOrID, p.NameOrID)
 	if err != nil {
 		return err
 	}
 
 	res := projects.Get(clients.limes, pInfo.DomainID, pInfo.ID, projects.GetOpts{
-		Cluster:  p.ClusterID,
 		Services: p.Services,
 		Rates:    projects.OnlyRates,
 	})
@@ -293,7 +251,7 @@ type projectSetCmd struct {
 	projectFlags
 	Quotas []string `short:"q" sep:"," help:"New quotas values. For relative quota adjustment, use one of the following operators: [+=, -=, *=, /=]. Example: service/resource=120GiB."`
 
-	NameOrID string `arg:"" optional:"" help:"Name or ID of the project. Required if using '--cluster' or '--domain' flag."`
+	NameOrID string `arg:"" optional:"" help:"Name or ID of the project. Required if using '--domain' flag."`
 }
 
 // Validate implements the kong.Validatable interface.
@@ -302,12 +260,12 @@ func (p *projectSetCmd) Validate() error {
 }
 
 func (p *projectSetCmd) Run(clients *ServiceClients) error {
-	pInfo, err := getProjectInfo(clients, p.ClusterID, p.DomainNameOrID, p.NameOrID)
+	pInfo, err := auth.FindProject(clients.identity, p.DomainNameOrID, p.NameOrID)
 	if err != nil {
 		return err
 	}
 
-	resQuotas, err := getProjectResourceQuotas(clients.limes, p.ClusterID, pInfo)
+	resQuotas, err := getProjectResourceQuotas(clients.limes, pInfo)
 	if err != nil {
 		return errors.Wrap(err, "could not get default units")
 	}
@@ -317,7 +275,6 @@ func (p *projectSetCmd) Run(clients *ServiceClients) error {
 	}
 
 	warn, err := projects.Update(clients.limes, pInfo.DomainID, pInfo.ID, projects.UpdateOpts{
-		Cluster:  p.ClusterID,
 		Services: qc,
 	}).Extract()
 	if err != nil {
@@ -345,14 +302,12 @@ func (p *projectSyncCmd) Validate() error {
 }
 
 func (p *projectSyncCmd) Run(clients *ServiceClients) error {
-	pInfo, err := getProjectInfo(clients, p.ClusterID, p.DomainNameOrID, p.NameOrID)
+	pInfo, err := auth.FindProject(clients.identity, p.DomainNameOrID, p.NameOrID)
 	if err != nil {
 		return err
 	}
 
-	err = projects.Sync(clients.limes, pInfo.DomainID, pInfo.ID, projects.SyncOpts{
-		Cluster: p.ClusterID,
-	}).ExtractErr()
+	err = projects.Sync(clients.limes, pInfo.DomainID, pInfo.ID).ExtractErr()
 	if err != nil {
 		return errors.Wrap(err, "could not sync project")
 	}
@@ -363,28 +318,8 @@ func (p *projectSyncCmd) Run(clients *ServiceClients) error {
 ///////////////////////////////////////////////////////////////////////////////
 // Helper functions.
 
-func getProjectInfo(clients *ServiceClients, clusterID, domainNameOrID, projectNameOrID string) (*auth.ProjectInfo, error) {
-	if clusterID == "" {
-		return auth.FindProject(clients.identity, domainNameOrID, projectNameOrID)
-	}
-
-	pInfo := auth.ProjectInfo{
-		ID:       projectNameOrID,
-		DomainID: domainNameOrID,
-	}
-	var err error
-	pInfo.DomainName, err = auth.FindDomainName(clients.identity, domainNameOrID)
-	if err != nil {
-		return nil, err
-	}
-
-	return &pInfo, nil
-}
-
-func getProjectResourceQuotas(limesClient *gophercloud.ServiceClient, clusterID string, pInfo *auth.ProjectInfo) (resourceQuotas, error) {
-	rep, err := projects.Get(limesClient, pInfo.DomainID, pInfo.ID, projects.GetOpts{
-		Cluster: clusterID,
-	}).Extract()
+func getProjectResourceQuotas(limesClient *gophercloud.ServiceClient, pInfo *auth.ProjectInfo) (resourceQuotas, error) {
+	rep, err := projects.Get(limesClient, pInfo.DomainID, pInfo.ID, projects.GetOpts{}).Extract()
 	if err != nil {
 		return nil, err
 	}
