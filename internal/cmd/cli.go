@@ -31,7 +31,7 @@ import (
 type CLI struct {
 	globalFlags
 
-	Cluster clusterCmd `cmd:"" help:"Do some action on cluster(s)."`
+	Cluster clusterCmd `cmd:"" help:"Do some action on cluster."`
 	Domain  domainCmd  `cmd:"" help:"Do some action on domain(s)."`
 	Project projectCmd `cmd:"" help:"Do some action on project(s)."`
 }

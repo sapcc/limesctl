@@ -23,43 +23,7 @@ import (
 
 // clusterCmd contains the command-line structure for the cluster command.
 type clusterCmd struct {
-	List clusterListCmd `cmd:"" help:"Display resource usage data for all the clusters. Requires a cloud-admin token."`
-	Show clusterShowCmd `cmd:"" help:"Display resource usage data for a specific cluster. Requires a cloud-admin token."`
-}
-
-///////////////////////////////////////////////////////////////////////////////
-// Cluster list.
-
-type clusterListCmd struct {
-	resourceFilterFlags
-	resourceOutputFmtFlags
-}
-
-func (c *clusterListCmd) Run(clients *ServiceClients) error {
-	outputOpts, err := c.resourceOutputFmtFlags.validate()
-	if err != nil {
-		return err
-	}
-
-	res := clusters.List(clients.limes, clusters.ListOpts{
-		Areas:     c.Areas,
-		Services:  c.Services,
-		Resources: c.Resources,
-	})
-	if res.Err != nil {
-		return errors.Wrap(res.Err, "could not get cluster reports")
-	}
-
-	if c.Format == core.OutputFormatJSON {
-		return writeJSON(res.Body)
-	}
-
-	limesReps, err := res.ExtractClusters()
-	if err != nil {
-		return errors.Wrap(err, "could not extract cluster reports")
-	}
-
-	return writeReports(outputOpts, core.LimesClustersToReportRenderer(limesReps)...)
+	Show clusterShowCmd `cmd:"" help:"Display resource usage data for the cluster. Requires a cloud-admin token."`
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -81,7 +45,7 @@ func (c *clusterShowCmd) Run(clients *ServiceClients) error {
 	if c.ID == "" {
 		c.ID = "current"
 	}
-	res := clusters.Get(clients.limes, c.ID, clusters.GetOpts{
+	res := clusters.Get(clients.limes, clusters.GetOpts{
 		Areas:     c.Areas,
 		Services:  c.Services,
 		Resources: c.Resources,
