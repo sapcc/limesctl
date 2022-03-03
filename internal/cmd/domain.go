@@ -31,16 +31,10 @@ type domainCmd struct {
 	Set  domainSetCmd  `cmd:"" help:"Change resource quota values for a specific domain. Requires a cloud-admin token."`
 }
 
-//nolint:lll
-type domainClusterFlag struct {
-	ClusterID string `short:"c" name:"cluster" help:"Cluster ID. When this option is used, the domain must be identified by ID (name won't work)."`
-}
-
 ///////////////////////////////////////////////////////////////////////////////
 // Domain list.
 
 type domainListCmd struct {
-	domainClusterFlag
 	resourceFilterFlags
 	resourceOutputFmtFlags
 }
@@ -52,7 +46,6 @@ func (d *domainListCmd) Run(clients *ServiceClients) error {
 	}
 
 	res := domains.List(clients.limes, domains.ListOpts{
-		Cluster:   d.ClusterID,
 		Areas:     d.Areas,
 		Services:  d.Services,
 		Resources: d.Resources,
@@ -77,19 +70,10 @@ func (d *domainListCmd) Run(clients *ServiceClients) error {
 // Domain show.
 
 type domainShowCmd struct {
-	domainClusterFlag
 	resourceFilterFlags
 	resourceOutputFmtFlags
 
-	NameOrID string `arg:"" optional:"" help:"Name or ID of the domain. Required if using '--cluster' flag."`
-}
-
-// Validate implements the kong.Validatable interface.
-func (d *domainShowCmd) Validate() error {
-	if d.ClusterID != "" && d.NameOrID == "" {
-		return errors.New("Domain ID is required when using the '--cluster' flag")
-	}
-	return nil
+	NameOrID string `arg:"" optional:"" help:"Name or ID of the domain."`
 }
 
 func (d *domainShowCmd) Run(clients *ServiceClients) error {
@@ -98,16 +82,12 @@ func (d *domainShowCmd) Run(clients *ServiceClients) error {
 		return err
 	}
 
-	domainID := d.NameOrID
-	if d.ClusterID == "" {
-		domainID, err = auth.FindDomainID(clients.identity, d.NameOrID)
-		if err != nil {
-			return err
-		}
+	domainID, err := auth.FindDomainID(clients.identity, d.NameOrID)
+	if err != nil {
+		return err
 	}
 
 	res := domains.Get(clients.limes, domainID, domains.GetOpts{
-		Cluster:   d.ClusterID,
 		Areas:     d.Areas,
 		Services:  d.Services,
 		Resources: d.Resources,
@@ -133,31 +113,18 @@ func (d *domainShowCmd) Run(clients *ServiceClients) error {
 
 //nolint:lll
 type domainSetCmd struct {
-	domainClusterFlag
 	Quotas []string `short:"q" sep:"," help:"New quotas values. For relative quota adjustment, use one of the following operators: [+=, -=, *=, /=]. Example: service/resource=10GiB."`
 
-	NameOrID string `arg:"" optional:"" help:"Name or ID of the domain. Required if using '--cluster' flag."`
-}
-
-// Validate implements the kong.Validatable interface.
-func (d *domainSetCmd) Validate() error {
-	if d.ClusterID != "" && d.NameOrID == "" {
-		return errors.New("Domain ID is required when using the '--cluster' flag")
-	}
-	return nil
+	NameOrID string `arg:"" optional:"" help:"Name or ID of the domain."`
 }
 
 func (d *domainSetCmd) Run(clients *ServiceClients) error {
-	domainID := d.NameOrID
-	if d.ClusterID == "" {
-		var err error
-		domainID, err = auth.FindDomainID(clients.identity, d.NameOrID)
-		if err != nil {
-			return err
-		}
+	domainID, err := auth.FindDomainID(clients.identity, d.NameOrID)
+	if err != nil {
+		return err
 	}
 
-	resQuotas, err := getDomainResourceQuotas(clients.limes, d.ClusterID, domainID)
+	resQuotas, err := getDomainResourceQuotas(clients.limes, domainID)
 	if err != nil {
 		return errors.Wrap(err, "could not get default units")
 	}
@@ -167,7 +134,6 @@ func (d *domainSetCmd) Run(clients *ServiceClients) error {
 	}
 
 	err = domains.Update(clients.limes, domainID, domains.UpdateOpts{
-		Cluster:  d.ClusterID,
 		Services: qc,
 	}).ExtractErr()
 	if err != nil {
@@ -180,10 +146,8 @@ func (d *domainSetCmd) Run(clients *ServiceClients) error {
 ///////////////////////////////////////////////////////////////////////////////
 // Helper functions.
 
-func getDomainResourceQuotas(limesClient *gophercloud.ServiceClient, clusterID, domainID string) (resourceQuotas, error) {
-	rep, err := domains.Get(limesClient, domainID, domains.GetOpts{
-		Cluster: clusterID,
-	}).Extract()
+func getDomainResourceQuotas(limesClient *gophercloud.ServiceClient, domainID string) (resourceQuotas, error) {
+	rep, err := domains.Get(limesClient, domainID, domains.GetOpts{}).Extract()
 	if err != nil {
 		return nil, err
 	}
