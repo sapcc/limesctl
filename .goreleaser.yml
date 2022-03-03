@@ -1,5 +1,6 @@
-gomod:
-  proxy: true
+before:
+  hooks:
+    - go mod tidy
 
 builds:
   - env:
