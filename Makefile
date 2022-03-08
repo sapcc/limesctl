@@ -54,7 +54,7 @@ check: build-all static-check build/cover.html FORCE
 	@printf "\e[1;32m>> All checks successful.\e[0m\n"
 
 prepare-static-check: FORCE
-	@command -v golangci-lint >/dev/null 2>&1 || { echo >&2 "Error: golangci-lint is not installed. See: https://golangci-lint.run/usage/install/"; exit 1; }
+	@if ! hash golangci-lint 2>/dev/null; then printf "\e[1;36m>> Installing golangci-lint (this may take a while)...\e[0m\n"; go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest; fi
 
 static-check: prepare-static-check FORCE
 	@printf "\e[1;36m>> golangci-lint\e[0m\n"

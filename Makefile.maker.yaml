@@ -6,8 +6,10 @@ binaries:
 variables:
   GO_LDFLAGS: "-X main.version=$(VERSION) -X main.commit=$(COMMIT_HASH) -X main.date=$(BUILD_DATE)"
 
-staticCheck:
-  golangciLint: true
+golangciLint:
+  # This is default behavior, we define this option explicitly for documentation purposes.
+  # limesctl defines its own custom config for golangci-lint.
+  createConfig: false
 
 githubWorkflows:
   global:
