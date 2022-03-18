@@ -11,6 +11,9 @@ golangciLint:
   # limesctl defines its own custom config for golangci-lint.
   createConfig: false
 
+spellCheck:
+  ignoreWords: ["importas"] # importas is a valid linter name
+
 githubWorkflow:
   global:
     ignorePaths: [ "**.md" ] # all Markdown files
@@ -23,7 +26,6 @@ githubWorkflow:
     enabled: true
   spellCheck:
     enabled: true
-    ignoreWords: ["importas"] # importas is a valid linter name
     ignorePaths: [] # override global setting so that nothing is ignored
 
 verbatim: |
