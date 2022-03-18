@@ -11,12 +11,14 @@ golangciLint:
   # limesctl defines its own custom config for golangci-lint.
   createConfig: false
 
-githubWorkflows:
+githubWorkflow:
   global:
     ignorePaths: [ "**.md" ] # all Markdown files
   ci:
     enabled: true
     coveralls: true
+  codeQL:
+    enabled: true
   license:
     enabled: true
   spellCheck:
