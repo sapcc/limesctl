@@ -8,11 +8,15 @@
 
 ## Installation
 
-You can download pre-compiled binaries for the [latest release](https://github.com/sapcc/limesctl/releases/latest).
+We provide pre-compiled binaries for the [latest release](https://github.com/sapcc/limesctl/releases/latest).
 
-Alternatively, you can build with `make`, install with `make install`, or `go install`.
+Alternatively, you can build with `make` or install with `make install`. The latter
+understands the conventional environment variables for choosing install locations:
+`DESTDIR` and `PREFIX`.
 
-If you're a **Homebrew** user, then you can install it with a custom tap:
+### Homebrew
+
+You can install using our custom tap:
 
  ```
  $ brew tap sapcc/limesctl https://github.com/sapcc/limesctl.git
