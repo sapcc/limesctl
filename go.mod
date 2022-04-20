@@ -5,7 +5,7 @@ go 1.17
 require (
 	github.com/alecthomas/kong v0.5.0
 	github.com/gophercloud/gophercloud v0.24.0
-	github.com/gophercloud/utils v0.0.0-20210909165623-d7085207ff6d
+	github.com/gophercloud/utils v0.0.0-20220307143606-8e7800759d16
 	github.com/olekukonko/tablewriter v0.0.5
 	github.com/pkg/errors v0.9.1
 	github.com/sapcc/go-bits v0.0.0-20220223123017-b00971956813
