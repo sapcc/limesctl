@@ -8,8 +8,8 @@ github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSs
 github.com/gophercloud/gophercloud v0.20.0/go.mod h1:wRtmUelyIIv3CSSDI47aUwbs075O6i+LY+pXsKCBsb4=
 github.com/gophercloud/gophercloud v0.24.0 h1:jDsIMGJ1KZpAjYfQgGI2coNQj5Q83oPzuiGJRFWgMzw=
 github.com/gophercloud/gophercloud v0.24.0/go.mod h1:Q8fZtyi5zZxPS/j9aj3sSxtvj41AdQMDwyo1myduD5c=
-github.com/gophercloud/utils v0.0.0-20210909165623-d7085207ff6d h1:0Wsi5dvUuPF6dVn/CNfEA4xLxmaEtOt7tV2HD16xIf8=
-github.com/gophercloud/utils v0.0.0-20210909165623-d7085207ff6d/go.mod h1:qOGlfG6OIJ193/c3Xt/XjOfHataNZdQcVgiu93LxBUM=
+github.com/gophercloud/utils v0.0.0-20220307143606-8e7800759d16 h1:slt/exMiitZNY+5OrKJ6ZvSogqN+SyzeYzAtyI6db9A=
+github.com/gophercloud/utils v0.0.0-20220307143606-8e7800759d16/go.mod h1:qOGlfG6OIJ193/c3Xt/XjOfHataNZdQcVgiu93LxBUM=
 github.com/hashicorp/go-uuid v1.0.2/go.mod h1:6SBZvOh/SIDV7/2o3Jml5SYk/TvGqwFJ/bN7x4byOro=
 github.com/kr/pretty v0.1.0 h1:L/CwN0zerZDmRFUapSPitk6f+Q3+0za1rQkzVuMiMFI=
 github.com/kr/pretty v0.1.0/go.mod h1:dAy3ld7l9f0ibDNOQOHHMYYIIbhfbHSm3C4ZsoJORNo=
@@ -28,10 +28,10 @@ github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZb
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/sapcc/go-bits v0.0.0-20220223123017-b00971956813 h1:NYRwXCEQYYF7uOHusq3R7d8B2HSFeGxNqIbDXxKPMns=
 github.com/sapcc/go-bits v0.0.0-20220223123017-b00971956813/go.mod h1:v3z6vEhw5xtUJ3EO0ZjWKKIhtdCjnmMmhxHpb7Oioik=
-github.com/sapcc/gophercloud-sapcc v0.0.0-20220303132530-9b2bf0b9bb40 h1:QeYfn26JeflLiOhWlSZBnGyrI33HUdWtsiy+wHCE6v0=
-github.com/sapcc/gophercloud-sapcc v0.0.0-20220303132530-9b2bf0b9bb40/go.mod h1:2h6nwNOxi2hmcv5f9l0Ty+JlAu09HyPZgH6yCrpF+I4=
-github.com/sapcc/limes v0.0.0-20220302102216-c818d7b957b6 h1:xntX+dKKDfvwGM73ae3rAsBCFgNV0PvF3+1GTv0Azb0=
-github.com/sapcc/limes v0.0.0-20220302102216-c818d7b957b6/go.mod h1:s5/GEfxCkSOjbRAihKg2lZ0BJ5aoHG0yPgM1HhyVuas=
+github.com/sapcc/gophercloud-sapcc v0.0.0-20220420170244-95b22e190e3b h1:mhKB7Bafkg/O0SiKoI4MecSYS2h3Q4JK1HOCd623qBw=
+github.com/sapcc/gophercloud-sapcc v0.0.0-20220420170244-95b22e190e3b/go.mod h1:30YHiNTl6LB1ggC7pP02w0YzWD5V2BN3SBLItDZ5aJQ=
+github.com/sapcc/limes v0.0.0-20220420134608-60e551104a7c h1:+cLlYW5o84/g0NVdGQkQ7XawHPggp+xxFKcZy0l3+dU=
+github.com/sapcc/limes v0.0.0-20220420134608-60e551104a7c/go.mod h1:91GyEIzprjlfX0S795XBOuNRnwBsKdKjVonFhmnWTPQ=
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
 github.com/stretchr/testify v1.7.0 h1:nwc3DEeHmmLAfoZucVR881uASk0Mfjw8xYJ99tb5CcY=
 github.com/stretchr/testify v1.7.0/go.mod h1:6Fq8oRcR53rry900zMqJjRRixrwX3KX962/h/Wwjteg=
