@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           # Only a single commit is fetched by default, for the ref/SHA that
           # triggered the workflow. We need `fetch-depth: 0` to fetch all
