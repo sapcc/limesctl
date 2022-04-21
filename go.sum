@@ -30,8 +30,8 @@ github.com/sapcc/go-api-declarations v1.0.0 h1:csuVc9HDrF9JF65f8I3PR7t3rLWbuKXVi
 github.com/sapcc/go-api-declarations v1.0.0/go.mod h1:zS+2xqmbtAyQxQz1liJp0qxDgop78fb4Sfk/IB0PvH0=
 github.com/sapcc/go-bits v0.0.0-20220421001326-5fc35d483379 h1:L0+tCCnbgOCqIepWpzEZp6CcR086TogTwLuROxMtw/U=
 github.com/sapcc/go-bits v0.0.0-20220421001326-5fc35d483379/go.mod h1:cDXXlfA5JDB2K2wJ/Y3mgkBabmXRJPHUkPrx4Jt8XD0=
-github.com/sapcc/gophercloud-sapcc v0.0.0-20220421122031-2222e245d6c9 h1:W5Gooa0f3O0K/v1a6ZyTWMpOC07P6EW6w5ipv+Jh5Po=
-github.com/sapcc/gophercloud-sapcc v0.0.0-20220421122031-2222e245d6c9/go.mod h1:4GS9VQ7uwEhLYdzLUfsurKIeRgAqs5pSyMpzmdx6vCo=
+github.com/sapcc/gophercloud-sapcc v0.0.0-20220421132727-e6970b19f27e h1:ysyoVJ8X2ZXkIUT/0h3vUAkJKOWU7Pz5gNRS5rI5F40=
+github.com/sapcc/gophercloud-sapcc v0.0.0-20220421132727-e6970b19f27e/go.mod h1:4GS9VQ7uwEhLYdzLUfsurKIeRgAqs5pSyMpzmdx6vCo=
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
 github.com/stretchr/testify v1.7.0 h1:nwc3DEeHmmLAfoZucVR881uASk0Mfjw8xYJ99tb5CcY=
 github.com/stretchr/testify v1.7.0/go.mod h1:6Fq8oRcR53rry900zMqJjRRixrwX3KX962/h/Wwjteg=
