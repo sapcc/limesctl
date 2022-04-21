@@ -17,7 +17,7 @@ package core
 import (
 	"sort"
 
-	"github.com/sapcc/limes"
+	"github.com/sapcc/go-api-declarations/limes"
 )
 
 // DomainReport is a wrapper for limes.DomainReport.

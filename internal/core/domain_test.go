@@ -20,7 +20,7 @@ import (
 	"testing"
 
 	th "github.com/gophercloud/gophercloud/testhelper"
-	"github.com/sapcc/limes"
+	"github.com/sapcc/go-api-declarations/limes"
 )
 
 func TestDomainReportRender(t *testing.T) {

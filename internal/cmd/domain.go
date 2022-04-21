@@ -17,8 +17,8 @@ package cmd
 import (
 	"github.com/gophercloud/gophercloud"
 	"github.com/pkg/errors"
+	"github.com/sapcc/go-api-declarations/limes"
 	"github.com/sapcc/gophercloud-sapcc/resources/v1/domains"
-	"github.com/sapcc/limes"
 
 	"github.com/sapcc/limesctl/internal/auth"
 	"github.com/sapcc/limesctl/internal/core"

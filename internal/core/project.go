@@ -17,7 +17,7 @@ package core
 import (
 	"sort"
 
-	"github.com/sapcc/limes"
+	"github.com/sapcc/go-api-declarations/limes"
 )
 
 // ProjectReport is a wrapper for limes.ProjectReport.

@@ -26,8 +26,8 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/sapcc/go-api-declarations/limes"
 	"github.com/sapcc/go-bits/logg"
-	"github.com/sapcc/limes"
 
 	"github.com/sapcc/limesctl/internal/core"
 )

@@ -25,7 +25,7 @@ import (
 	"sort"
 	"strconv"
 
-	"github.com/sapcc/limes"
+	"github.com/sapcc/go-api-declarations/limes"
 )
 
 // suitableUnit takes a value and its current unit, and returns a suitable

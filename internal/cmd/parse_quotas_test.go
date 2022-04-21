@@ -23,7 +23,7 @@ import (
 	"testing"
 
 	th "github.com/gophercloud/gophercloud/testhelper"
-	"github.com/sapcc/limes"
+	"github.com/sapcc/go-api-declarations/limes"
 )
 
 // TestSplitQuotaRe tests the `splitQuotaRe` regular expression.

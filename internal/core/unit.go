@@ -14,7 +14,7 @@
 
 package core
 
-import "github.com/sapcc/limes"
+import "github.com/sapcc/go-api-declarations/limes"
 
 // LimesUnits is a slice of units that Limes understands.
 // Note: the units in this slice **must** be in ascending order.
