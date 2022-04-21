@@ -30,8 +30,8 @@ github.com/sapcc/go-bits v0.0.0-20220420164641-de8a04267267 h1:r4qHi4KEXtlRmHDhU
 github.com/sapcc/go-bits v0.0.0-20220420164641-de8a04267267/go.mod h1:dMmRruaiBr3+Y710I5ZldSo4QiVaq2bKmIN2jDbrVf0=
 github.com/sapcc/gophercloud-sapcc v0.0.0-20220420170244-95b22e190e3b h1:mhKB7Bafkg/O0SiKoI4MecSYS2h3Q4JK1HOCd623qBw=
 github.com/sapcc/gophercloud-sapcc v0.0.0-20220420170244-95b22e190e3b/go.mod h1:30YHiNTl6LB1ggC7pP02w0YzWD5V2BN3SBLItDZ5aJQ=
-github.com/sapcc/limes v0.0.0-20220420172036-732db96cb7d3 h1:NgVcaWJHM6T8n5rhBbAL9k+Nx38oDUmVew2TgxKOtVI=
-github.com/sapcc/limes v0.0.0-20220420172036-732db96cb7d3/go.mod h1:S0CY78EjAfHFnnNntZYuTU4yhkXNRask9Ne6xniu7Xw=
+github.com/sapcc/limes v0.0.0-20220420174925-1b3d2fd7fdbc h1:T1o6yH6rraYYE9Q4S20FZ6JkfTXuPKkM4MvpPI8b8pc=
+github.com/sapcc/limes v0.0.0-20220420174925-1b3d2fd7fdbc/go.mod h1:8XJ1nS1nIXOp42EzoVz+MBpGmdyGpHDIDbb0seQNMwA=
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
 github.com/stretchr/testify v1.7.0 h1:nwc3DEeHmmLAfoZucVR881uASk0Mfjw8xYJ99tb5CcY=
 github.com/stretchr/testify v1.7.0/go.mod h1:6Fq8oRcR53rry900zMqJjRRixrwX3KX962/h/Wwjteg=
