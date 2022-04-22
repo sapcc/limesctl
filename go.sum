@@ -28,8 +28,8 @@ github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZb
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/sapcc/go-api-declarations v1.0.0 h1:csuVc9HDrF9JF65f8I3PR7t3rLWbuKXVi7ZZkp8ZHRY=
 github.com/sapcc/go-api-declarations v1.0.0/go.mod h1:zS+2xqmbtAyQxQz1liJp0qxDgop78fb4Sfk/IB0PvH0=
-github.com/sapcc/go-bits v0.0.0-20220421001326-5fc35d483379 h1:L0+tCCnbgOCqIepWpzEZp6CcR086TogTwLuROxMtw/U=
-github.com/sapcc/go-bits v0.0.0-20220421001326-5fc35d483379/go.mod h1:cDXXlfA5JDB2K2wJ/Y3mgkBabmXRJPHUkPrx4Jt8XD0=
+github.com/sapcc/go-bits v0.0.0-20220421231541-1cfaba4ec6dc h1:w0vzgIld5OtmMdZ9a3B8wUlH4henQQIIs3XIgY11S5c=
+github.com/sapcc/go-bits v0.0.0-20220421231541-1cfaba4ec6dc/go.mod h1:JXZ0R3c5b/DUfw9YkuIdsT1PH4s70Z4DI7xetckPA8I=
 github.com/sapcc/gophercloud-sapcc v0.0.0-20220421132727-e6970b19f27e h1:ysyoVJ8X2ZXkIUT/0h3vUAkJKOWU7Pz5gNRS5rI5F40=
 github.com/sapcc/gophercloud-sapcc v0.0.0-20220421132727-e6970b19f27e/go.mod h1:4GS9VQ7uwEhLYdzLUfsurKIeRgAqs5pSyMpzmdx6vCo=
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
@@ -45,8 +45,8 @@ golang.org/x/sys v0.0.0-20191026070338-33540a1f6037/go.mod h1:h1NjWce9XRLGQEsW7w
 golang.org/x/sys v0.0.0-20201119102817-f84b799fce68/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
 golang.org/x/sys v0.0.0-20210423082822-04245dca01da/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
 golang.org/x/sys v0.0.0-20210615035016-665e8c7367d1/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
-golang.org/x/sys v0.0.0-20220209214540-3681064d5158 h1:rm+CHSpPEEW2IsXUib1ThaHIjuBVZjxNgSKmBLFfD4c=
-golang.org/x/sys v0.0.0-20220209214540-3681064d5158/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
+golang.org/x/sys v0.0.0-20220412211240-33da011f77ad h1:ntjMns5wyP/fN65tdBD4g8J5w8n015+iIIs9rtjXkY0=
+golang.org/x/sys v0.0.0-20220412211240-33da011f77ad/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
 golang.org/x/term v0.0.0-20201117132131-f5c789dd3221/go.mod h1:Nr5EML6q2oocZ2LXRh80K7BxOlk5/8JxuGnuhpl+muw=
 golang.org/x/term v0.0.0-20201126162022-7de9c90e9dd1/go.mod h1:bj7SfCRtBDWHUb9snDiAeCFNEtKQo2Wmx5Cou7ajbmo=
 golang.org/x/text v0.3.0/go.mod h1:NqM8EUOU14njkJ3fqMW+pc6Ldnwhi/IjpwHt7yyuwOQ=
