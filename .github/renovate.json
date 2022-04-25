@@ -6,6 +6,7 @@
     "regexManagers:dockerfileVersions"
   ],
   "assignees": [
+    "talal",
     "SuperSandro2000"
   ],
   "constraints": {

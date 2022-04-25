@@ -17,6 +17,7 @@ spellCheck:
 githubWorkflow:
   global:
     assignees:
+      - talal
       - SuperSandro2000
     ignorePaths: [ "**.md" ] # all Markdown files
   ci:
