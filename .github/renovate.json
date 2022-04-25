@@ -16,5 +16,11 @@
     "gomodTidy1.17",
     "gomodUpdateImportPaths"
   ],
+  "packageRules": [
+    {
+      "matchDepTypes": ["action"],
+      "enabled": false
+    }
+  ],
   "prHourlyLimit": 0
 }
