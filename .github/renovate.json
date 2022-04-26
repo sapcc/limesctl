@@ -18,8 +18,10 @@
   ],
   "packageRules": [
     {
-      "matchDepTypes": ["action"],
-      "enabled": false
+      "enabled": false,
+      "matchDepTypes": [
+        "action"
+      ]
     }
   ],
   "prHourlyLimit": 0
