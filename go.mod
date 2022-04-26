@@ -9,7 +9,7 @@ require (
 	github.com/olekukonko/tablewriter v0.0.5
 	github.com/pkg/errors v0.9.1
 	github.com/sapcc/go-api-declarations v1.1.0
-	github.com/sapcc/go-bits v0.0.0-20220422143146-28336182f358
+	github.com/sapcc/go-bits v0.0.0-20220426011237-e04e063832cc
 	github.com/sapcc/gophercloud-sapcc v0.0.0-20220425035941-c16268fdd54d
 )
 
