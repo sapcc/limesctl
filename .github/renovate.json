@@ -5,6 +5,9 @@
     "docker:enableMajor",
     "regexManagers:dockerfileVersions"
   ],
+  "github-actions": {
+    "enabled": false
+  },
   "assignees": [
     "talal",
     "SuperSandro2000"
@@ -19,9 +22,10 @@
   "packageRules": [
     {
       "enabled": false,
-      "matchDepTypes": [
-        "action"
-      ]
+      "matchPackagePrefixes": [
+        "k8s.io/"
+      ],
+      "allowedVersions": "<0.23"
     }
   ],
   "prHourlyLimit": 0
