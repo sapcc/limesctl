@@ -10,7 +10,7 @@ require (
 	github.com/pkg/errors v0.9.1
 	github.com/sapcc/go-api-declarations v1.1.0
 	github.com/sapcc/go-bits v0.0.0-20220530163628-4dafc5c6baa2
-	github.com/sapcc/gophercloud-sapcc v0.0.0-20220513163651-31b753538672
+	github.com/sapcc/gophercloud-sapcc v0.0.0-20220530164201-fa05b37efadb
 )
 
 require (
