@@ -22,6 +22,10 @@ githubWorkflow:
     ignorePaths: [ "**.md" ] # all Markdown files
   ci:
     enabled: true
+    runOn:
+      - macos-latest
+      - ubuntu-latest
+      - windows-latest
     coveralls: true
   license:
     enabled: true
