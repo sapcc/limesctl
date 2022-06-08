@@ -16,11 +16,17 @@ understands the conventional environment variables for choosing install location
 
 ### Homebrew
 
-You can install using our custom tap:
+The formula will also work with Homebrew on Linux.
 
- ```
- $ brew tap sapcc/limesctl https://github.com/sapcc/limesctl.git
- $ brew install sapcc/limesctl/limesctl
+```
+$ brew tap sapcc/limesctl https://github.com/sapcc/limesctl.git
+$ brew install sapcc/limesctl/limesctl
+```
+
+### Go
+
+```
+$ go install github.com/sapcc/limesctl@latest
 ```
 
 ## Usage

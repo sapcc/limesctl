@@ -22,8 +22,8 @@ import (
 	"github.com/sapcc/go-api-declarations/limes"
 	"github.com/sapcc/gophercloud-sapcc/resources/v1/projects"
 
-	"github.com/sapcc/limesctl/internal/auth"
-	"github.com/sapcc/limesctl/internal/core"
+	"github.com/sapcc/limesctl/v3/internal/auth"
+	"github.com/sapcc/limesctl/v3/internal/core"
 )
 
 //nolint:lll

@@ -17,7 +17,7 @@ package cmd
 import (
 	"errors"
 
-	"github.com/sapcc/limesctl/internal/core"
+	"github.com/sapcc/limesctl/v3/internal/core"
 )
 
 ///////////////////////////////////////////////////////////////////////////////

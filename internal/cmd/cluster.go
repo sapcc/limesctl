@@ -18,7 +18,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/sapcc/gophercloud-sapcc/resources/v1/clusters"
 
-	"github.com/sapcc/limesctl/internal/core"
+	"github.com/sapcc/limesctl/v3/internal/core"
 )
 
 // clusterCmd contains the command-line structure for the cluster command.

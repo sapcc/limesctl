@@ -1,4 +1,4 @@
-module github.com/sapcc/limesctl
+module github.com/sapcc/limesctl/v3
 
 go 1.17
 

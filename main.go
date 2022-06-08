@@ -24,8 +24,8 @@ import (
 
 	"github.com/alecthomas/kong"
 
-	"github.com/sapcc/limesctl/internal/cmd"
-	"github.com/sapcc/limesctl/internal/core"
+	"github.com/sapcc/limesctl/v3/internal/cmd"
+	"github.com/sapcc/limesctl/v3/internal/core"
 )
 
 // This info identifies a specific build of the app. It is set at compile time.

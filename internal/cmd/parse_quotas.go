@@ -29,7 +29,7 @@ import (
 	"github.com/sapcc/go-api-declarations/limes"
 	"github.com/sapcc/go-bits/logg"
 
-	"github.com/sapcc/limesctl/internal/core"
+	"github.com/sapcc/limesctl/v3/internal/core"
 )
 
 // resourceQuotas is a map of service name to resource name to the resource's
