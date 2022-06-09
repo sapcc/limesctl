@@ -28,8 +28,8 @@ github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZb
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/sapcc/go-api-declarations v1.2.0 h1:ypzrA7dc18VgtOLVaZnJ8vJ26T3ZFskr/2JLzgInd9s=
 github.com/sapcc/go-api-declarations v1.2.0/go.mod h1:zS+2xqmbtAyQxQz1liJp0qxDgop78fb4Sfk/IB0PvH0=
-github.com/sapcc/go-bits v0.0.0-20220608080142-64d2fde627f9 h1:G3EMQSaFuyech0CBgJOdJkhkX7vJXc61eKbYCSh8T7k=
-github.com/sapcc/go-bits v0.0.0-20220608080142-64d2fde627f9/go.mod h1:lEiOyZpHHcoPhHltf80TunCTjvpv2u7z++XTEmufPgc=
+github.com/sapcc/go-bits v0.0.0-20220609133230-ebdc392bcda3 h1:d/qMwd+T22KBXCLfWFx6OJUlDR7ShDRa7zDvyNI0xew=
+github.com/sapcc/go-bits v0.0.0-20220609133230-ebdc392bcda3/go.mod h1:lEiOyZpHHcoPhHltf80TunCTjvpv2u7z++XTEmufPgc=
 github.com/sapcc/gophercloud-sapcc v0.0.0-20220609133227-7782d10ec8cc h1:Snk8/xTGzacq0wV0EkXFCufBN4cL6tNwKF91jsPC1dU=
 github.com/sapcc/gophercloud-sapcc v0.0.0-20220609133227-7782d10ec8cc/go.mod h1:tM/aIwohLaPMcDaZb1LpNtZhiYiUFNGZtcuwui3naXI=
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
