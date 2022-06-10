@@ -22,12 +22,12 @@ package cmd
 import (
 	"fmt"
 	"math"
+	"os"
 	"regexp"
 	"strconv"
 	"strings"
 
 	"github.com/sapcc/go-api-declarations/limes"
-	"github.com/sapcc/go-bits/logg"
 
 	"github.com/sapcc/limesctl/v3/internal/core"
 )
@@ -118,7 +118,7 @@ func parseToQuotaRequest(resValues resourceQuotas, in []string) (limes.QuotaRequ
 		var newValWithUnit limes.ValueWithUnit
 		if isFloatVal || operation != "=" {
 			if isFloatVal {
-				logg.Info("Limes only accepts integer values, will attempt to convert %s %s to a suitable unit for %s/%s",
+				fmt.Fprintf(os.Stderr, "warning: Limes only accepts integer values, will attempt to convert %s %s to a suitable unit for %s/%s",
 					valStr, unit, service, resource)
 			}
 			var err error
@@ -127,7 +127,7 @@ func parseToQuotaRequest(resValues resourceQuotas, in []string) (limes.QuotaRequ
 				return nil, err
 			}
 			if isFloatVal {
-				logg.Info("%s %s -> %s", valStr, unit, newValWithUnit.String())
+				fmt.Fprintf(os.Stderr, "warning: converted %s %s -> %s", valStr, unit, newValWithUnit.String())
 			}
 		} else {
 			v, err := strconv.ParseUint(valStr, 10, 64)
