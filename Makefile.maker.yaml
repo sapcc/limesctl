@@ -18,6 +18,7 @@ githubWorkflow:
   global:
     assignees:
       - talal
+      - majewsky
       - SuperSandro2000
     ignorePaths: [ "**.md" ] # all Markdown files
   ci:
