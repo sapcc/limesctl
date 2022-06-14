@@ -16,7 +16,7 @@ understands the conventional environment variables for choosing install location
 
 ### Homebrew
 
-The formula will also work with Homebrew on Linux.
+In addition to macOS, the `brew` package will also work with Homebrew on Linux.
 
 ```
 $ brew tap sapcc/limesctl https://github.com/sapcc/limesctl.git
