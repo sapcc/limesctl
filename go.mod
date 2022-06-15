@@ -3,7 +3,7 @@ module github.com/sapcc/limesctl/v3
 go 1.18
 
 require (
-	github.com/alecthomas/kong v0.6.0
+	github.com/alecthomas/kong v0.6.1
 	github.com/gophercloud/gophercloud v0.25.0
 	github.com/gophercloud/utils v0.0.0-20220307143606-8e7800759d16
 	github.com/olekukonko/tablewriter v0.0.5
