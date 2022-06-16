@@ -13,8 +13,14 @@ builds:
       - amd64
       - arm64
     ldflags:
-      - -s -w -X github.com/sapcc/go-api-declarations/bininfo.binName=limesctl -X github.com/sapcc/go-api-declarations/bininfo.version={{ .Version }} -X github.com/sapcc/go-api-declarations/bininfo.commit={{ .FullCommit  }} -X github.com/sapcc/go-api-declarations/bininfo.buildDate={{ .CommitDate }}
-    mod_timestamp: "{{ .CommitTimestamp }}" # Ensure builds are reproducible
+      - -s -w
+      - -X github.com/sapcc/go-api-declarations/bininfo.binName=limesctl
+      - -X github.com/sapcc/go-api-declarations/bininfo.version={{ .Version }}
+      - -X github.com/sapcc/go-api-declarations/bininfo.commit={{ .FullCommit  }}
+      # Use CommitDate instead of Date for reproducibility.
+      - -X github.com/sapcc/go-api-declarations/bininfo.buildDate={{ .CommitDate }}
+    # Set the modified timestamp on the output binary to ensure that builds are reproducible.
+    mod_timestamp: "{{ .CommitTimestamp }}"
 
 snapshot:
   name_template: "{{ .Tag }}-next"
