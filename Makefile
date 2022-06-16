@@ -14,16 +14,12 @@ endif
 
 default: build-all
 
-VERSION     := $(shell git describe --tags --abbrev=7)
-COMMIT_HASH := $(shell git rev-parse --verify HEAD)
-BUILD_DATE  := $(shell date -u +"%Y-%m-%dT%H:%M:%S%Z")
-
 build/release-info: CHANGELOG.md | build
 	@if ! hash release-info 2>/dev/null; then printf "\e[1;36m>> Installing release-info...\e[0m\n"; go install github.com/sapcc/go-bits/tools/release-info@latest; fi
 	release-info $< $(shell git describe --tags --abbrev=0) > $@
 
 GO_BUILDFLAGS =
-GO_LDFLAGS = -X main.version=$(VERSION) -X main.commit=$(COMMIT_HASH) -X main.date=$(BUILD_DATE)
+GO_LDFLAGS =
 GO_TESTENV =
 
 # These definitions are overridable, e.g. to provide fixed version/commit values when

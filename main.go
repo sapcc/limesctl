@@ -23,19 +23,17 @@ import (
 	"strings"
 
 	"github.com/alecthomas/kong"
+	"github.com/sapcc/go-api-declarations/bininfo"
 
 	"github.com/sapcc/limesctl/v3/internal/cmd"
 	"github.com/sapcc/limesctl/v3/internal/core"
 )
 
-// This info identifies a specific build of the app. It is set at compile time.
-var (
-	version = "dev"
-	commit  = "unknown"
-	date    = "now"
-)
-
 func main() {
+	version := bininfo.VersionOr("dev")
+	commit := bininfo.CommitOr("unknown")
+	date := bininfo.BuildDateOr("now")
+
 	var cli cmd.CLI
 	ctx := kong.Parse(&cli,
 		kong.Name("limesctl"),
