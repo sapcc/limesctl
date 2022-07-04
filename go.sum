@@ -8,8 +8,8 @@ github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSs
 github.com/gophercloud/gophercloud v0.20.0/go.mod h1:wRtmUelyIIv3CSSDI47aUwbs075O6i+LY+pXsKCBsb4=
 github.com/gophercloud/gophercloud v0.25.0 h1:C3Oae7y0fUVQGSsBrb3zliAjdX+riCSEh4lNMejFNI4=
 github.com/gophercloud/gophercloud v0.25.0/go.mod h1:Q8fZtyi5zZxPS/j9aj3sSxtvj41AdQMDwyo1myduD5c=
-github.com/gophercloud/utils v0.0.0-20220627134740-f82c2a154887 h1:9r2BZkVVzq3ZkQ68b6S3AMibVvvb1jN8Is059v2INGc=
-github.com/gophercloud/utils v0.0.0-20220627134740-f82c2a154887/go.mod h1:qOGlfG6OIJ193/c3Xt/XjOfHataNZdQcVgiu93LxBUM=
+github.com/gophercloud/utils v0.0.0-20220704184730-55bdbbaec4ba h1:PTa/ilBNI0ZE2WjSnu4drZi7W81wkYjnHPk5AEEgOGk=
+github.com/gophercloud/utils v0.0.0-20220704184730-55bdbbaec4ba/go.mod h1:qOGlfG6OIJ193/c3Xt/XjOfHataNZdQcVgiu93LxBUM=
 github.com/hashicorp/go-uuid v1.0.2/go.mod h1:6SBZvOh/SIDV7/2o3Jml5SYk/TvGqwFJ/bN7x4byOro=
 github.com/kr/pretty v0.1.0 h1:L/CwN0zerZDmRFUapSPitk6f+Q3+0za1rQkzVuMiMFI=
 github.com/kr/pretty v0.1.0/go.mod h1:dAy3ld7l9f0ibDNOQOHHMYYIIbhfbHSm3C4ZsoJORNo=
