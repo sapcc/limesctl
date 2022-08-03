@@ -38,16 +38,18 @@ type resourceQuotas map[string]map[string]limes.ValueWithUnit
 
 // splitQuotaRe is used to split the user input around the equality sign.
 // Reference:
-//   The following user input: service/resource+=123.456Unit
-//   will result in:
-//     matchList == [<full-match>, "service/resource", "+=", "123.456Unit"]
+//
+//	The following user input: service/resource+=123.456Unit
+//	will result in:
+//	  matchList == [<full-match>, "service/resource", "+=", "123.456Unit"]
 var splitQuotaRe = regexp.MustCompile(`^(\S*?)([-+*/]?=)(\S*)$`)
 
 // quotaValueRe is used to extract quota value and unit.
 // Reference:
-//   The following user input: 123.456Unit
-//   will result in:
-//     matchList == [<full-match>, "123.456", "Unit"]
+//
+//	The following user input: 123.456Unit
+//	will result in:
+//	  matchList == [<full-match>, "123.456", "Unit"]
 var quotaValueRe = regexp.MustCompile(`^(\d*\.?\d+)([a-zA-Z]*)$`)
 
 // parseToQuotaRequest parses a slice of user input quota values, converts the
@@ -55,7 +57,9 @@ var quotaValueRe = regexp.MustCompile(`^(\d*\.?\d+)([a-zA-Z]*)$`)
 // limes.QuotaRequest for use with PUT requests on domains and projects.
 //
 // The input values are expected to be in the format:
-//   service/resource=123(Unit)
+//
+//	service/resource=123(Unit)
+//
 // where unit is optional.
 func parseToQuotaRequest(resValues resourceQuotas, in []string) (limes.QuotaRequest, error) {
 	out := make(limes.QuotaRequest)

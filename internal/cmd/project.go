@@ -26,8 +26,9 @@ import (
 	"github.com/sapcc/limesctl/v3/internal/core"
 )
 
-//nolint:lll
 // projectCmd contains the command-line structure for the project command.
+//
+//nolint:lll
 type projectCmd struct {
 	List      projectListCmd      `cmd:"" help:"Display resource usage data for all the projects in a domain. Requires a domain-admin token."`
 	ListRates projectListRatesCmd `cmd:"" help:"Display rate limits for all the projects in a domain. Requires a domain-admin token."`
