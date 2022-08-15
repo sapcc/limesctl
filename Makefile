@@ -41,7 +41,8 @@ else
 endif
 
 install: FORCE build/limesctl
-	install -D -m 0755 build/limesctl "$(DESTDIR)$(PREFIX)/bin/limesctl"
+	install -d -m 0755 "$(DESTDIR)$(PREFIX)/bin"
+	install -m 0755 build/limesctl "$(DESTDIR)$(PREFIX)/bin/limesctl"
 
 # which packages to test with "go test"
 GO_TESTPKGS := $(shell go list -f '{{if or .TestGoFiles .XTestGoFiles}}{{.ImportPath}}{{end}}' ./...)
