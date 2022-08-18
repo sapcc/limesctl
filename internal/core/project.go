@@ -37,6 +37,7 @@ func LimesProjectsToReportRenderer(
 	domainID, domainName string,
 	hasRatesOnly bool,
 ) []LimesReportRenderer {
+
 	out := make([]LimesReportRenderer, 0, len(in))
 	for _, rep := range in {
 		rep := rep

@@ -76,20 +76,20 @@ var defaultValToStrFunc valToStrFunc = func(v uint64) string { return fmt.Sprint
 
 // getValToStrFunc finds a human friendly unit for the given vals and returns a
 // function that can be used to convert resource values to this new unit.
-func getValToStrFunc(humanize bool, old limes.Unit, vals []uint64) (f valToStrFunc, new limes.Unit) {
+func getValToStrFunc(humanize bool, old limes.Unit, vals []uint64) (f valToStrFunc, newUnit limes.Unit) {
 	f = defaultValToStrFunc
-	new = old
+	newUnit = old
 	if humanize && old != limes.UnitNone {
 		// Find a new human friendly unit based on the smallest value.
 		if sml := smallestValue(vals); sml > 0 {
-			if new = suitableUnit(sml, old); new != old {
+			if newUnit = suitableUnit(sml, old); newUnit != old {
 				f = func(v uint64) string {
-					return convertValue(v, old, new)
+					return convertValue(v, old, newUnit)
 				}
 			}
 		}
 	}
-	return f, new
+	return f, newUnit
 }
 
 func smallestValue(vals []uint64) uint64 {

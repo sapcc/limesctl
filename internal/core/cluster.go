@@ -68,22 +68,22 @@ func (c ClusterReport) render(opts *OutputOpts) CSVRecords {
 			cSrv := c.Services[srv]
 			cSrvRes := c.Services[srv].Resources[res]
 
-			cap := cSrvRes.Capacity
+			capacity := cSrvRes.Capacity
 			physU := cSrvRes.PhysicalUsage
 			domsQ := cSrvRes.DomainsQuota
 
 			valToStr, unit := getValToStrFunc(opts.Humanize, cSrvRes.Unit, []uint64{
-				zeroIfNil(cap), zeroIfNil(physU), zeroIfNil(domsQ),
+				zeroIfNil(capacity), zeroIfNil(physU), zeroIfNil(domsQ),
 				cSrvRes.Usage, cSrvRes.BurstUsage,
 			})
 
 			if opts.CSVRecFmt == CSVRecordFormatLong {
-				r = append(r, c.ID, cSrv.Area, cSrv.Type, cSrvRes.Category, cSrvRes.Name, emptyStrIfNil(cap, valToStr),
+				r = append(r, c.ID, cSrv.Area, cSrv.Type, cSrvRes.Category, cSrvRes.Name, emptyStrIfNil(capacity, valToStr),
 					emptyStrIfNil(domsQ, valToStr), valToStr(cSrvRes.Usage), emptyStrIfNil(physU, valToStr),
 					valToStr(cSrvRes.BurstUsage), string(unit), timestampToString(cSrv.MinScrapedAt),
 				)
 			} else {
-				r = append(r, c.ID, cSrv.Type, cSrvRes.Name, emptyStrIfNil(cap, valToStr),
+				r = append(r, c.ID, cSrv.Type, cSrvRes.Name, emptyStrIfNil(capacity, valToStr),
 					emptyStrIfNil(domsQ, valToStr), valToStr(cSrvRes.Usage), string(unit),
 				)
 			}
