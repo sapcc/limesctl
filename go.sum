@@ -28,8 +28,8 @@ github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZb
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/sapcc/go-api-declarations v1.3.0 h1:4FMj0UR+Pydil1cpIewa068w/55mqvg3+/ILy3hGQ0g=
 github.com/sapcc/go-api-declarations v1.3.0/go.mod h1:EA4x5xxJGyG/3JTteUOYBg6cJLJgsBHrDj3ryfNU4dQ=
-github.com/sapcc/gophercloud-sapcc v0.0.0-20220824125306-acab8cdfa856 h1:RIR1FBArh1OggoKkVr1cPKsfyMWx14Z16knCyXFb7F4=
-github.com/sapcc/gophercloud-sapcc v0.0.0-20220824125306-acab8cdfa856/go.mod h1:6qxnuoS33BDmwZdSuJPWG0BWmu6TGyGs4yXxR5LszZk=
+github.com/sapcc/gophercloud-sapcc v0.0.0-20220829144010-36eac256b1f2 h1:PL3kt3jDk4ICFxxiSRkVNl3BAE7ErOF7ybUWOhAHqpQ=
+github.com/sapcc/gophercloud-sapcc v0.0.0-20220829144010-36eac256b1f2/go.mod h1:IEEgn7j0leii7a0cu6RESQT6EgjQvyISWpYUYZ6XjoY=
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
 github.com/stretchr/testify v1.7.2 h1:4jaiDzPyXQvSd7D0EjG45355tLlV3VOECpq10pLC+8s=
 github.com/stretchr/testify v1.7.2/go.mod h1:R6va5+xMeoiuVRoj+gSkQ7d3FALtqAAGI1FQKckRals=
