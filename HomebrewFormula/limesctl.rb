@@ -5,21 +5,21 @@
 class Limesctl < Formula
   desc "Command-line interface for Limes"
   homepage "https://github.com/sapcc/limesctl"
-  version "3.0.0"
+  version "3.0.2"
   license "Apache-2.0"
 
   on_macos do
     if Hardware::CPU.arm?
-      url "https://github.com/sapcc/limesctl/releases/download/v3.0.0/limesctl-3.0.0-darwin-arm64.tar.gz"
-      sha256 "f3e0fb9164e605d80618c1afe423ed3ff14e7a4a4819ee90ccf9a387cba411f3"
+      url "https://github.com/sapcc/limesctl/releases/download/v3.0.2/limesctl-3.0.2-darwin-arm64.tar.gz"
+      sha256 "f3e23134ff00920ce80349de076d83f28958919cd003049261745cbab1c9c13d"
 
       def install
         bin.install "limesctl"
       end
     end
     if Hardware::CPU.intel?
-      url "https://github.com/sapcc/limesctl/releases/download/v3.0.0/limesctl-3.0.0-darwin-amd64.tar.gz"
-      sha256 "0c5a69550790573954a497eca34f3ff3a5254ecb7d0e8aae8aa708510816125d"
+      url "https://github.com/sapcc/limesctl/releases/download/v3.0.2/limesctl-3.0.2-darwin-amd64.tar.gz"
+      sha256 "3163b63c39ff42f7717d9e73a777ddd5b6b7e642966d20fb7dc913a15bcb9547"
 
       def install
         bin.install "limesctl"
@@ -29,16 +29,16 @@ class Limesctl < Formula
 
   on_linux do
     if Hardware::CPU.intel?
-      url "https://github.com/sapcc/limesctl/releases/download/v3.0.0/limesctl-3.0.0-linux-amd64.tar.gz"
-      sha256 "569f1f4228593ce4a50d0d81fb0ec17788ec7cdcf42b21bf187fbbbce6f403df"
+      url "https://github.com/sapcc/limesctl/releases/download/v3.0.2/limesctl-3.0.2-linux-amd64.tar.gz"
+      sha256 "e686270686bd46786e6a9b566cafaad5d08c6e2b37d76d13184952efc82e44be"
 
       def install
         bin.install "limesctl"
       end
     end
     if Hardware::CPU.arm? && Hardware::CPU.is_64_bit?
-      url "https://github.com/sapcc/limesctl/releases/download/v3.0.0/limesctl-3.0.0-linux-arm64.tar.gz"
-      sha256 "5441148827ba9c2f13562f9866931b374277f073d544f6d887f83e12ae1a5180"
+      url "https://github.com/sapcc/limesctl/releases/download/v3.0.2/limesctl-3.0.2-linux-arm64.tar.gz"
+      sha256 "06953477198241c77901f0b4b9610c3c1c6ea11bd1eb0bfabc368474ff1ff492"
 
       def install
         bin.install "limesctl"
