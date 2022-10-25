@@ -8,15 +8,14 @@ require (
 	github.com/gophercloud/utils v0.0.0-20220927104426-4113af8d2663
 	github.com/olekukonko/tablewriter v0.0.5
 	github.com/pkg/errors v0.9.1
-	github.com/sapcc/go-api-declarations v1.3.0
-	github.com/sapcc/gophercloud-sapcc v0.0.0-20220930124009-dafae87b2f83
+	github.com/sapcc/go-api-declarations v1.4.0
+	github.com/sapcc/gophercloud-sapcc v0.0.0-20221012152522-fdec9b1cee08
 )
 
 require (
-	github.com/mattn/go-runewidth v0.0.13 // indirect
+	github.com/mattn/go-runewidth v0.0.9 // indirect
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
-	github.com/rivo/uniseg v0.3.4 // indirect
-	golang.org/x/sys v0.0.0-20220829200755-d48e67d00261 // indirect
-	golang.org/x/text v0.3.7 // indirect
+	golang.org/x/sys v0.0.0-20210615035016-665e8c7367d1 // indirect
+	golang.org/x/text v0.3.6 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 )
