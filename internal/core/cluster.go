@@ -17,12 +17,12 @@ package core
 import (
 	"sort"
 
-	"github.com/sapcc/go-api-declarations/limes"
+	limesresources "github.com/sapcc/go-api-declarations/limes/resources"
 )
 
-// ClusterReport is a wrapper for limes.ClusterReport.
+// ClusterReport is a wrapper for limesresources.ClusterReport.
 type ClusterReport struct {
-	*limes.ClusterReport
+	*limesresources.ClusterReport
 }
 
 var csvHeaderClusterLong = []string{

@@ -45,7 +45,7 @@ func (c *clusterShowCmd) Run(clients *ServiceClients) error {
 	if c.ID == "" {
 		c.ID = "current"
 	}
-	res := clusters.Get(clients.limes, clusters.GetOpts{
+	res := clusters.Get(clients.limesResources, clusters.GetOpts{
 		Areas:     c.Areas,
 		Services:  c.Services,
 		Resources: c.Resources,

@@ -24,6 +24,7 @@ import (
 
 	th "github.com/gophercloud/gophercloud/testhelper"
 	"github.com/sapcc/go-api-declarations/limes"
+	limesresources "github.com/sapcc/go-api-declarations/limes/resources"
 )
 
 // TestSplitQuotaRe tests the `splitQuotaRe` regular expression.
@@ -92,19 +93,15 @@ func TestQuotaValueRe(t *testing.T) {
 // TestParseToQuotaRequest tests if the resource quotas given at the
 // command-line are being correctly parsed.
 func TestParseToQuotaRequest(t *testing.T) {
-	expected := limes.QuotaRequest{
-		"shared": limes.ServiceQuotaRequest{
-			Resources: limes.ResourceQuotaRequest{
-				"capacity":  limes.ValueWithUnit{Value: 1597, Unit: limes.UnitMebibytes},
-				"capacity2": limes.ValueWithUnit{Value: 30, Unit: limes.UnitGibibytes},
-			},
+	expected := limesresources.QuotaRequest{
+		"shared": limesresources.ServiceQuotaRequest{
+			"capacity":  limesresources.ResourceQuotaRequest{Value: 1597, Unit: limes.UnitMebibytes},
+			"capacity2": limesresources.ResourceQuotaRequest{Value: 30, Unit: limes.UnitGibibytes},
 		},
-		"unshared": limes.ServiceQuotaRequest{
-			Resources: limes.ResourceQuotaRequest{
-				"things":  limes.ValueWithUnit{Value: 12, Unit: limes.UnitNone},
-				"things2": limes.ValueWithUnit{Value: 20, Unit: limes.UnitNone},
-				"things3": limes.ValueWithUnit{Value: 4, Unit: limes.UnitNone},
-			},
+		"unshared": limesresources.ServiceQuotaRequest{
+			"things":  limesresources.ResourceQuotaRequest{Value: 12, Unit: limes.UnitNone},
+			"things2": limesresources.ResourceQuotaRequest{Value: 20, Unit: limes.UnitNone},
+			"things3": limesresources.ResourceQuotaRequest{Value: 4, Unit: limes.UnitNone},
 		},
 	}
 

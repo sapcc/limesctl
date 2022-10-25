@@ -20,20 +20,21 @@ import (
 	"testing"
 
 	th "github.com/gophercloud/gophercloud/testhelper"
-	"github.com/sapcc/go-api-declarations/limes"
+	limesresources "github.com/sapcc/go-api-declarations/limes/resources"
 )
 
-func TestProjectReportRender(t *testing.T) {
+//nolint:dupl
+func TestProjectResourcesSingleReportRender(t *testing.T) {
 	mockJSONBytes, err := fixtureBytes("project-get-dresden.json")
 	th.AssertNoErr(t, err)
 	var data struct {
-		Project limes.ProjectReport `json:"project"`
+		Project limesresources.ProjectReport `json:"project"`
 	}
 	err = json.Unmarshal(mockJSONBytes, &data)
 	th.AssertNoErr(t, err)
 
 	var actual bytes.Buffer
-	rep := ProjectReport{
+	rep := ProjectResourcesReport{
 		ProjectReport: &data.Project,
 		DomainID:      "uuid-for-germany",
 		DomainName:    "germany",
@@ -48,35 +49,9 @@ func TestProjectReportRender(t *testing.T) {
 	assertEquals(t, "project-get-dresden.csv", actual.Bytes())
 }
 
-func TestProjectRatesReportRender(t *testing.T) {
-	mockJSONBytes, err := fixtureBytes("project-get-berlin-only-rates.json")
-	th.AssertNoErr(t, err)
-	var data struct {
-		Project limes.ProjectReport `json:"project"`
-	}
-	err = json.Unmarshal(mockJSONBytes, &data)
-	th.AssertNoErr(t, err)
-
-	var actual bytes.Buffer
-	rep := ProjectReport{
-		ProjectReport: &data.Project,
-		HasRatesOnly:  true,
-		DomainID:      "uuid-for-germany",
-		DomainName:    "germany",
-	}
-
-	opts := &OutputOpts{
-		CSVRecFmt: CSVRecordFormatLong,
-		Humanize:  false,
-	}
-	err = RenderReports(opts, rep).Write(&actual)
-	th.AssertNoErr(t, err)
-	assertEquals(t, "project-get-berlin-only-rates.csv", actual.Bytes())
-}
-
-func TestProjectReportsRender(t *testing.T) {
+func TestProjectResourcesMultipleReportsRender(t *testing.T) {
 	type listData struct {
-		Projects []limes.ProjectReport `json:"projects"`
+		Projects []limesresources.ProjectReport `json:"projects"`
 	}
 	domainID := "uuid-for-germany"
 	domainName := "germany"
@@ -93,7 +68,7 @@ func TestProjectReportsRender(t *testing.T) {
 		Humanize:  false,
 	}
 	var actual bytes.Buffer
-	reps := LimesProjectsToReportRenderer(data.Projects, domainID, domainName, false)
+	reps := LimesProjectResourcesToReportRenderer(data.Projects, domainID, domainName, false)
 	err = RenderReports(opts, reps...).Write(&actual)
 	th.AssertNoErr(t, err)
 	assertEquals(t, "project-list.csv", actual.Bytes())
@@ -108,7 +83,7 @@ func TestProjectReportsRender(t *testing.T) {
 	opts.CSVRecFmt = CSVRecordFormatLong
 	opts.Humanize = true
 	actual.Reset()
-	reps = LimesProjectsToReportRenderer(filteredData.Projects, domainID, domainName, false)
+	reps = LimesProjectResourcesToReportRenderer(filteredData.Projects, domainID, domainName, false)
 	err = RenderReports(opts, reps...).Write(&actual)
 	th.AssertNoErr(t, err)
 	assertEquals(t, "project-list-filtered.csv", actual.Bytes())

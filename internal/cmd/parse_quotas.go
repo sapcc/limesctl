@@ -28,6 +28,7 @@ import (
 	"strings"
 
 	"github.com/sapcc/go-api-declarations/limes"
+	limesresources "github.com/sapcc/go-api-declarations/limes/resources"
 
 	"github.com/sapcc/limesctl/v3/internal/core"
 )
@@ -61,8 +62,8 @@ var quotaValueRe = regexp.MustCompile(`^(\d*\.?\d+)([a-zA-Z]*)$`)
 //	service/resource=123(Unit)
 //
 // where unit is optional.
-func parseToQuotaRequest(resValues resourceQuotas, in []string) (limes.QuotaRequest, error) {
-	out := make(limes.QuotaRequest)
+func parseToQuotaRequest(resValues resourceQuotas, in []string) (limesresources.QuotaRequest, error) {
+	out := make(limesresources.QuotaRequest)
 	for _, inputStr := range in {
 		matchList := splitQuotaRe.FindStringSubmatch(inputStr)
 		if matchList == nil {
@@ -83,7 +84,7 @@ func parseToQuotaRequest(resValues resourceQuotas, in []string) (limes.QuotaRequ
 
 		// Check if the same resource was given multiple times.
 		if srv, ok := out[service]; ok {
-			if _, ok := srv.Resources[resource]; ok {
+			if _, ok := srv[resource]; ok {
 				return nil, fmt.Errorf(
 					"%s/%s was given multiple times, limesctl only supports a single change for a specific resource for a given request",
 					service, resource)
@@ -161,11 +162,9 @@ func parseToQuotaRequest(resValues resourceQuotas, in []string) (limes.QuotaRequ
 		}
 
 		if _, ok := out[service]; !ok {
-			out[service] = limes.ServiceQuotaRequest{
-				Resources: make(limes.ResourceQuotaRequest),
-			}
+			out[service] = make(limesresources.ServiceQuotaRequest)
 		}
-		out[service].Resources[resource] = newValWithUnit
+		out[service][resource] = limesresources.ResourceQuotaRequest(newValWithUnit)
 	}
 
 	return out, nil

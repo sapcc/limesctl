@@ -20,25 +20,31 @@ import (
 	"testing"
 
 	th "github.com/gophercloud/gophercloud/testhelper"
-	limesresources "github.com/sapcc/go-api-declarations/limes/resources"
+	limesrates "github.com/sapcc/go-api-declarations/limes/rates"
 )
 
-func TestClusterResourcesSingleReportRender(t *testing.T) {
-	mockJSONBytes, err := fixtureBytes("cluster-get-west.json")
+//nolint:dupl
+func TestProjectRatesSingleReportRender(t *testing.T) {
+	mockJSONBytes, err := fixtureBytes("project-get-berlin-only-rates.json")
 	th.AssertNoErr(t, err)
 	var data struct {
-		Cluster limesresources.ClusterReport `json:"cluster"`
+		Project limesrates.ProjectReport `json:"project"`
 	}
 	err = json.Unmarshal(mockJSONBytes, &data)
 	th.AssertNoErr(t, err)
 
+	var actual bytes.Buffer
+	rep := ProjectRatesReport{
+		ProjectReport: &data.Project,
+		DomainID:      "uuid-for-germany",
+		DomainName:    "germany",
+	}
+
 	opts := &OutputOpts{
-		CSVRecFmt: CSVRecordFormatDefault,
+		CSVRecFmt: CSVRecordFormatLong,
 		Humanize:  false,
 	}
-	var actual bytes.Buffer
-	rep := ClusterReport{&data.Cluster}
 	err = RenderReports(opts, rep).Write(&actual)
 	th.AssertNoErr(t, err)
-	assertEquals(t, "cluster-get-west.csv", actual.Bytes())
+	assertEquals(t, "project-get-berlin-only-rates.csv", actual.Bytes())
 }

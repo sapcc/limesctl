@@ -25,12 +25,12 @@ import (
 
 type commonFilterFlags struct {
 	Services []string `sep:"," help:"Service type(s)."`
+	Areas    []string `sep:"," help:"Service area(s)."`
 }
 
 // resourceFilterFlags define parameters for Limes API requests that concern
 // resources.
 type resourceFilterFlags struct {
-	Areas []string `sep:"," help:"Service area(s)."`
 	commonFilterFlags
 	Resources []string `sep:"," help:"Resource name(s)."`
 }

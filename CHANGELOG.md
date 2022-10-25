@@ -9,9 +9,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased](https://github.com/sapcc/limesctl/compare/v3.0.1...HEAD)
 
-## 3.0.2 - 2022-08-30
+## 3.0.3 - 2022-10-25
+
+### Changed
+
+- Updated all dependencies to their latest version.
 
 ### Fixed
+
+- Switched to new Limes client for project's rate reports.
+
+## 3.0.2 - 2022-08-30
+
+### Changed
 
 - Use Golang 1.19 in release workflow.
 

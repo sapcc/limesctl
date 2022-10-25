@@ -21,13 +21,14 @@ import (
 	"time"
 
 	th "github.com/gophercloud/gophercloud/testhelper"
+	"github.com/sapcc/go-api-declarations/limes"
 )
 
-func timestampToString(timestamp *int64) string {
+func timestampToString(timestamp *limes.UnixEncodedTime) string {
 	if timestamp == nil {
 		return ""
 	}
-	return time.Unix(*timestamp, 0).UTC().Format(time.RFC3339)
+	return timestamp.Format(time.RFC3339)
 }
 
 func zeroIfNil(ptr *uint64) uint64 {

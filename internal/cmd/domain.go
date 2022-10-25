@@ -45,7 +45,7 @@ func (d *domainListCmd) Run(clients *ServiceClients) error {
 		return err
 	}
 
-	res := domains.List(clients.limes, domains.ListOpts{
+	res := domains.List(clients.limesResources, domains.ListOpts{
 		Areas:     d.Areas,
 		Services:  d.Services,
 		Resources: d.Resources,
@@ -87,7 +87,7 @@ func (d *domainShowCmd) Run(clients *ServiceClients) error {
 		return err
 	}
 
-	res := domains.Get(clients.limes, domainID, domains.GetOpts{
+	res := domains.Get(clients.limesResources, domainID, domains.GetOpts{
 		Areas:     d.Areas,
 		Services:  d.Services,
 		Resources: d.Resources,
@@ -124,7 +124,7 @@ func (d *domainSetCmd) Run(clients *ServiceClients) error {
 		return err
 	}
 
-	resQuotas, err := getDomainResourceQuotas(clients.limes, domainID)
+	resQuotas, err := getDomainResourceQuotas(clients.limesResources, domainID)
 	if err != nil {
 		return errors.Wrap(err, "could not get default units")
 	}
@@ -133,7 +133,7 @@ func (d *domainSetCmd) Run(clients *ServiceClients) error {
 		return errors.Wrap(err, "could not parse quota values")
 	}
 
-	err = domains.Update(clients.limes, domainID, domains.UpdateOpts{
+	err = domains.Update(clients.limesResources, domainID, domains.UpdateOpts{
 		Services: qc,
 	}).ExtractErr()
 	if err != nil {

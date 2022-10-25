@@ -17,17 +17,17 @@ package core
 import (
 	"sort"
 
-	"github.com/sapcc/go-api-declarations/limes"
+	limesresources "github.com/sapcc/go-api-declarations/limes/resources"
 )
 
-// DomainReport is a wrapper for limes.DomainReport.
+// DomainReport is a wrapper for limesresources.DomainReport.
 type DomainReport struct {
-	*limes.DomainReport
+	*limesresources.DomainReport
 }
 
-// LimesDomainsToReportRenderer wraps the given limes.DomainReport in a
+// LimesDomainsToReportRenderer wraps the given limesresources.DomainReport in a
 // DomainReport and returns a []LimesReportRenderer.
-func LimesDomainsToReportRenderer(in []limes.DomainReport) []LimesReportRenderer {
+func LimesDomainsToReportRenderer(in []limesresources.DomainReport) []LimesReportRenderer {
 	out := make([]LimesReportRenderer, 0, len(in))
 	for _, rep := range in {
 		rep := rep

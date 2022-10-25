@@ -80,13 +80,14 @@ type openStackFlags struct {
 
 // ServiceClients holds the service clients for v3 identity service and Limes.
 type ServiceClients struct {
-	identity *gophercloud.ServiceClient
-	limes    *gophercloud.ServiceClient
+	identity       *gophercloud.ServiceClient
+	limesResources *gophercloud.ServiceClient
+	limesRates     *gophercloud.ServiceClient
 }
 
 // Authenticate authenticates against OpenStack and returns the necessary
 // service clients.
-func (cli *CLI) Authenticate() (*ServiceClients, error) {
+func (cli *CLI) Authenticate(ratesClient bool) (*ServiceClients, error) {
 	// Update OpenStack environment variables, if value provided as flag.
 	err := updateOpenStackEnvVars(&cli.openStackFlags)
 	if err != nil {
@@ -121,15 +122,22 @@ func (cli *CLI) Authenticate() (*ServiceClients, error) {
 		return nil, errors.Wrap(err, "could not initialize identity client")
 	}
 
-	limesClient, err := clients.NewLimesV1(provider, gophercloud.EndpointOpts{})
-	if err != nil {
-		return nil, errors.Wrap(err, "could not initialize Limes client")
+	result := &ServiceClients{identity: identityClient}
+	if ratesClient {
+		c, err := clients.NewLimesRatesV1(provider, gophercloud.EndpointOpts{})
+		if err != nil {
+			return nil, errors.Wrap(err, "could not initialize Limes rates client")
+		}
+		result.limesRates = c
+	} else {
+		c, err := clients.NewLimesV1(provider, gophercloud.EndpointOpts{})
+		if err != nil {
+			return nil, errors.Wrap(err, "could not initialize Limes resources client")
+		}
+		result.limesResources = c
 	}
 
-	return &ServiceClients{
-		identity: identityClient,
-		limes:    limesClient,
-	}, nil
+	return result, nil
 }
 
 func setenvIfVal(key, val string) error {

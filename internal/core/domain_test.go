@@ -20,14 +20,14 @@ import (
 	"testing"
 
 	th "github.com/gophercloud/gophercloud/testhelper"
-	"github.com/sapcc/go-api-declarations/limes"
+	limesresources "github.com/sapcc/go-api-declarations/limes/resources"
 )
 
-func TestDomainReportRender(t *testing.T) {
+func TestDomainResourcesSingleReportRender(t *testing.T) {
 	mockJSONBytes, err := fixtureBytes("domain-get-germany.json")
 	th.AssertNoErr(t, err)
 	var data struct {
-		Domain limes.DomainReport `json:"domain"`
+		Domain limesresources.DomainReport `json:"domain"`
 	}
 	err = json.Unmarshal(mockJSONBytes, &data)
 	th.AssertNoErr(t, err)
@@ -43,9 +43,9 @@ func TestDomainReportRender(t *testing.T) {
 	assertEquals(t, "domain-get-germany.csv", actual.Bytes())
 }
 
-func TestDomainReportsRender(t *testing.T) {
+func TestDomainResourcesMultipleReportsRender(t *testing.T) {
 	type listData struct {
-		Domains []limes.DomainReport `json:"domains"`
+		Domains []limesresources.DomainReport `json:"domains"`
 	}
 
 	// List

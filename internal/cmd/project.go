@@ -20,6 +20,7 @@ import (
 	"github.com/gophercloud/gophercloud"
 	"github.com/pkg/errors"
 	"github.com/sapcc/go-api-declarations/limes"
+	ratesProjects "github.com/sapcc/gophercloud-sapcc/rates/v1/projects"
 	"github.com/sapcc/gophercloud-sapcc/resources/v1/projects"
 
 	"github.com/sapcc/limesctl/v3/internal/auth"
@@ -73,7 +74,7 @@ func (p *projectListCmd) Run(clients *ServiceClients) error {
 		return err
 	}
 
-	res := projects.List(clients.limes, domainID, projects.ListOpts{
+	res := projects.List(clients.limesResources, domainID, projects.ListOpts{
 		Areas:     p.Areas,
 		Services:  p.Services,
 		Resources: p.Resources,
@@ -92,7 +93,7 @@ func (p *projectListCmd) Run(clients *ServiceClients) error {
 	}
 
 	return writeReports(outputOpts,
-		core.LimesProjectsToReportRenderer(limesReps, domainID, domainName, false)...)
+		core.LimesProjectResourcesToReportRenderer(limesReps, domainID, domainName, false)...)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -119,9 +120,9 @@ func (p *projectListRatesCmd) Run(clients *ServiceClients) error {
 		return err
 	}
 
-	res := projects.List(clients.limes, domainID, projects.ListOpts{
+	res := ratesProjects.List(clients.limesRates, domainID, ratesProjects.ReadOpts{
 		Services: p.Services,
-		Rates:    projects.OnlyRates,
+		Areas:    p.Areas,
 	})
 	if res.Err != nil {
 		return errors.Wrap(res.Err, "could not get project reports")
@@ -137,7 +138,7 @@ func (p *projectListRatesCmd) Run(clients *ServiceClients) error {
 	}
 
 	return writeReports(outputOpts,
-		core.LimesProjectsToReportRenderer(limesReps, domainID, domainName, true)...)
+		core.LimesProjectRatesToReportRenderer(limesReps, domainID, domainName, true)...)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -167,7 +168,7 @@ func (p *projectShowCmd) Run(clients *ServiceClients) error {
 		return err
 	}
 
-	res := projects.Get(clients.limes, pInfo.DomainID, pInfo.ID, projects.GetOpts{
+	res := projects.Get(clients.limesResources, pInfo.DomainID, pInfo.ID, projects.GetOpts{
 		Areas:     p.Areas,
 		Services:  p.Services,
 		Resources: p.Resources,
@@ -185,7 +186,7 @@ func (p *projectShowCmd) Run(clients *ServiceClients) error {
 		return errors.Wrap(err, "could not extract project report")
 	}
 
-	return writeReports(outputOpts, core.ProjectReport{
+	return writeReports(outputOpts, core.ProjectResourcesReport{
 		ProjectReport: limesRep,
 		DomainID:      pInfo.DomainID,
 		DomainName:    pInfo.DomainName,
@@ -219,9 +220,9 @@ func (p *projectShowRatesCmd) Run(clients *ServiceClients) error {
 		return err
 	}
 
-	res := projects.Get(clients.limes, pInfo.DomainID, pInfo.ID, projects.GetOpts{
+	res := ratesProjects.Get(clients.limesRates, pInfo.DomainID, pInfo.ID, ratesProjects.ReadOpts{
 		Services: p.Services,
-		Rates:    projects.OnlyRates,
+		Areas:    p.Areas,
 	})
 	if res.Err != nil {
 		return errors.Wrap(res.Err, "could not get project report")
@@ -236,9 +237,8 @@ func (p *projectShowRatesCmd) Run(clients *ServiceClients) error {
 		return errors.Wrap(err, "could not extract project report")
 	}
 
-	return writeReports(outputOpts, core.ProjectReport{
+	return writeReports(outputOpts, core.ProjectRatesReport{
 		ProjectReport: limesRep,
-		HasRatesOnly:  true,
 		DomainID:      pInfo.DomainID,
 		DomainName:    pInfo.DomainName,
 	})
@@ -266,7 +266,7 @@ func (p *projectSetCmd) Run(clients *ServiceClients) error {
 		return err
 	}
 
-	resQuotas, err := getProjectResourceQuotas(clients.limes, pInfo)
+	resQuotas, err := getProjectResourceQuotas(clients.limesResources, pInfo)
 	if err != nil {
 		return errors.Wrap(err, "could not get default units")
 	}
@@ -275,7 +275,7 @@ func (p *projectSetCmd) Run(clients *ServiceClients) error {
 		return errors.Wrap(err, "could not parse quota values")
 	}
 
-	warn, err := projects.Update(clients.limes, pInfo.DomainID, pInfo.ID, projects.UpdateOpts{
+	warn, err := projects.Update(clients.limesResources, pInfo.DomainID, pInfo.ID, projects.UpdateOpts{
 		Services: qc,
 	}).Extract()
 	if err != nil {
@@ -308,7 +308,7 @@ func (p *projectSyncCmd) Run(clients *ServiceClients) error {
 		return err
 	}
 
-	err = projects.Sync(clients.limes, pInfo.DomainID, pInfo.ID).ExtractErr()
+	err = projects.Sync(clients.limesResources, pInfo.DomainID, pInfo.ID).ExtractErr()
 	if err != nil {
 		return errors.Wrap(err, "could not sync project")
 	}

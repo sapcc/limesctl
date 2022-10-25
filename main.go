@@ -50,7 +50,9 @@ func main() {
 		kong.Vars{"outputFormats": outputFormats()},
 	)
 
-	clients, err := cli.Authenticate()
+	cmdStr := ctx.Command()
+	clients, err := cli.Authenticate(
+		strings.Contains(cmdStr, "show-rates") || strings.Contains(cmdStr, "list-rates"))
 	if err == nil {
 		err = ctx.Run(clients)
 	}
