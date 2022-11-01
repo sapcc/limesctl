@@ -106,7 +106,7 @@ func (p ProjectResourcesReport) render(opts *OutputOpts) CSVRecords {
 			var burstUsage uint64
 			if quota != nil && p.Bursting != nil && p.Bursting.Enabled {
 				q := *quota
-				bq := p.Bursting.Multiplier.ApplyTo(q)
+				bq := p.Bursting.Multiplier.ApplyTo(q, pSrvRes.QuotaDistributionModel)
 				burstQuota = &bq
 				if usage > q {
 					burstUsage = usage - q
