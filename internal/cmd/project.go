@@ -17,8 +17,9 @@ package cmd
 import (
 	"fmt"
 
+	"errors"
+
 	"github.com/gophercloud/gophercloud"
-	"github.com/pkg/errors"
 	"github.com/sapcc/go-api-declarations/limes"
 	ratesProjects "github.com/sapcc/gophercloud-sapcc/rates/v1/projects"
 	"github.com/sapcc/gophercloud-sapcc/resources/v1/projects"
