@@ -53,8 +53,10 @@ type domainListCmd struct {
 func newDomainListCmd() *domainListCmd {
 	domainList := &domainListCmd{}
 	cmd := &cobra.Command{
-		Use:     "list",
-		Short:   "Display resource usage data for all domains. Requires a cloud-admin token",
+		Use:   "list",
+		Short: "Display resource usage data for all domains",
+		Long: `Display resource usage data for all domains. This command requires a
+cloud-admin token.`,
 		Args:    cobra.NoArgs,
 		PreRunE: authWithLimesResources,
 		RunE:    domainList.Run,
@@ -109,8 +111,10 @@ type domainShowCmd struct {
 func newDomainShowCmd() *domainShowCmd {
 	domainShow := &domainShowCmd{}
 	cmd := &cobra.Command{
-		Use:     "show [name or ID]",
-		Short:   "Display resource usage data for a specific domain. Requires a domain-admin token",
+		Use:   "show [name or ID]",
+		Short: "Display resource usage data for a specific domain",
+		Long: `Display resource usage data for a specific domain. This command requires a
+domain-admin token.`,
 		Args:    cobra.MaximumNArgs(1),
 		PreRunE: authWithLimesResources,
 		RunE:    domainShow.Run,
@@ -173,8 +177,21 @@ type domainSetCmd struct {
 func newDomainSetCmd() *domainSetCmd {
 	domainSet := &domainSetCmd{}
 	cmd := &cobra.Command{
-		Use:     "set [name or ID]",
-		Short:   "Change resource quota values for a specific domain. Requires a cloud-admin token",
+		Use:   "set [name or ID]",
+		Short: "Change resource quota values for a specific domain",
+		Long: `Change resource quota values for a specific domain.
+
+For relative quota adjustment, use one of the following operators: [+=, -=, *=, /=].
+
+This command requires a cloud-admin token.`,
+		Example: makeExamplesString([]string{
+			`limesctl domain set --quotas="compute/cores=200,compute/ram=50GiB"`,
+			`limesctl domain set -q compute/cores=200 -q compute/ram=50GiB (you can give the flag multiple times)`,
+			`limesctl domain set -q compute/cores=200 -q compute/ram=50GiB (you can give the flag multiple times)`,
+			`limesctl domain set -q compute/cores*=2 -q compute/ram+=10GiB`,
+			`limesctl domain set -q object-store/capacity=1TiB (you can also use a unit other than the service's default, e.g. object-store uses 'B' by default but we use 'TiB' here)`,
+			`limesctl domain set -q object-store/capacity-=0.25TiB (fractional values are also possible)`,
+		}),
 		Args:    cobra.MaximumNArgs(1),
 		PreRunE: authWithLimesResources,
 		RunE:    domainSet.Run,

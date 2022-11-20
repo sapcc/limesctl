@@ -18,10 +18,15 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/sapcc/limesctl/v3/internal/core"
 	"github.com/sapcc/limesctl/v3/internal/util"
 )
+
+func makeExamplesString(list []string) string {
+	return "  " + strings.Join(list, "\n  ")
+}
 
 func writeJSON(d interface{}) error {
 	b, err := json.Marshal(d)

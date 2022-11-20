@@ -47,7 +47,8 @@ func newClusterShowCmd() *clusterShowCmd {
 	clusterShow := &clusterShowCmd{}
 	cmd := &cobra.Command{
 		Use:     "show",
-		Short:   "Display resource usage data for cluster. Requires a cloud-admin token",
+		Short:   "Display resource usage data for cluster",
+		Long:    "Display resource usage data for cluster. This command requires a cloud-admin token.",
 		Args:    cobra.NoArgs,
 		PreRunE: authWithLimesResources,
 		RunE:    clusterShow.Run,

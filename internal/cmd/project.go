@@ -77,8 +77,15 @@ type projectListCmd struct {
 func newProjectListCmd() *projectListCmd {
 	projectList := &projectListCmd{}
 	cmd := &cobra.Command{
-		Use:     "list",
-		Short:   "Display resource usage data for all the projects in a domain. Requires a domain-admin token",
+		Use:   "list",
+		Short: "Display resource usage data for all the projects in a domain",
+		Long: `Display resource usage data for all the projects in a domain.
+
+The project name/ID is optional by default and limesctl will get the project
+from current scope. However, if '--domain' flag is used then either project
+name or ID is required.
+
+This command requires a domain-admin token.`,
 		Args:    cobra.NoArgs,
 		PreRunE: authWithLimesResources,
 		RunE:    projectList.Run,
@@ -145,8 +152,15 @@ type projectListRatesCmd struct {
 func newProjectListRatesCmd() *projectListRatesCmd {
 	projectListRates := &projectListRatesCmd{}
 	cmd := &cobra.Command{
-		Use:     "list-rates",
-		Short:   "Display rate limits for all the projects in a domain. Requires a domain-admin token",
+		Use:   "list-rates",
+		Short: "Display rate limits for all the projects in a domain",
+		Long: `Display rate limits for all the projects in a domain.
+
+The project name/ID is optional by default and limesctl will get the project
+from current scope. However, if '--domain' flag is used then either project
+name or ID is required.
+
+This command requires a domain-admin token.`,
 		Args:    cobra.NoArgs,
 		PreRunE: authWithLimesRates,
 		RunE:    projectListRates.Run,
@@ -212,8 +226,15 @@ type projectShowCmd struct {
 func newProjectShowCmd() *projectShowCmd {
 	projectShow := &projectShowCmd{}
 	cmd := &cobra.Command{
-		Use:     "show [name or ID]",
-		Short:   "Display resource usage data for a specific project. Requires project member permissions",
+		Use:   "show [name or ID]",
+		Short: "Display resource usage data for a specific project",
+		Long: `Display resource usage data for a specific project
+
+The project name/ID is optional by default and limesctl will get the project
+from current scope. However, if '--domain' flag is used then either project
+name or ID is required.
+
+This command requires a project member permissions.`,
 		Args:    cobra.MaximumNArgs(1),
 		PreRunE: authWithLimesResources,
 		RunE:    projectShow.Run,
@@ -288,8 +309,15 @@ type projectShowRatesCmd struct {
 func newProjectShowRatesCmd() *projectShowRatesCmd {
 	projectShowRates := &projectShowRatesCmd{}
 	cmd := &cobra.Command{
-		Use:     "show-rates [name or ID]",
-		Short:   "Display rate limits for a specific project. Requires project member permissions",
+		Use:   "show-rates [name or ID]",
+		Short: "Display rate limits for a specific project",
+		Long: `Display rate limits for a specific project.
+
+The project name/ID is optional by default and limesctl will get the project
+from current scope. However, if '--domain' flag is used then either project
+name or ID is required.
+
+This command requires a project member permissions.`,
 		Args:    cobra.MaximumNArgs(1),
 		PreRunE: authWithLimesRates,
 		RunE:    projectShowRates.Run,
@@ -363,8 +391,25 @@ type projectSetCmd struct {
 func newProjectSetCmd() *projectSetCmd {
 	projectSet := &projectSetCmd{}
 	cmd := &cobra.Command{
-		Use:     "set [name or ID]",
-		Short:   "Change resource quota values for a specific project. Requires a domain-admin token",
+		Use:   "set [name or ID]",
+		Short: "Change resource quota values for a specific project",
+		Long: `Change resource quota values for a specific project.
+
+The project name/ID is optional by default and limesctl will get the project
+from current scope. However, if '--domain' flag is used then either project
+name or ID is required.
+
+For relative quota adjustment, use one of the following operators: [+=, -=, *=, /=].
+
+This command requires a domain-admin token.`,
+		Example: makeExamplesString([]string{
+			`limesctl project set --quotas="compute/cores=200,compute/ram=50GiB"`,
+			`limesctl project set -q compute/cores=200 -q compute/ram=50GiB (you can give the flag multiple times)`,
+			`limesctl project set -q compute/cores=200 -q compute/ram=50GiB (you can give the flag multiple times)`,
+			`limesctl project set -q compute/cores*=2 -q compute/ram+=10GiB`,
+			`limesctl project set -q object-store/capacity=1TiB (you can also use a unit other than the service's default, e.g. object-store uses 'B' by default but we use 'TiB' here)`,
+			`limesctl project set -q object-store/capacity-=0.25TiB (fractional values are also possible)`,
+		}),
 		Args:    cobra.MaximumNArgs(1),
 		PreRunE: authWithLimesResources,
 		RunE:    projectSet.Run,
@@ -430,9 +475,15 @@ func newProjectSyncCmd() *projectSyncCmd {
 	projectSync := &projectSyncCmd{}
 	cmd := &cobra.Command{
 		Use:   "sync [name or ID]",
-		Short: "Sync a specific project. Requires a project-admin token",
-		Long: `Schedule a sync job that pulls quota and usage data for a specific project
-from the backing services into Limes' local database.`,
+		Short: "Sync a specific project's resource data",
+		Long: `Schedule a sync job that pulls quota and usage data for a specific project from
+the backing services into Limes' local database.
+
+The project name/ID is optional by default and limesctl will get the project
+from current scope. However, if '--domain' flag is used then either project
+name or ID is required.
+
+This command requires a project-admin token.`,
 		Args:    cobra.MaximumNArgs(1),
 		PreRunE: authWithLimesResources,
 		RunE:    projectSync.Run,
