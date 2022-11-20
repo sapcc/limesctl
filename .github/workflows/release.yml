@@ -13,7 +13,7 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v3
         with:
-          # Only a single commit is fetched by default, for the ref/SHA that
+          # By default, only a single commit is fetched for the ref/SHA that
           # triggered the workflow. We need `fetch-depth: 0` to fetch all
           # history for all branches and tags.
           fetch-depth: 0
@@ -21,15 +21,8 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v3
         with:
-          go-version: 1.19
-
-      - name: Cache Go modules
-        uses: actions/cache@v3
-        with:
-          path: ~/go/pkg/mod
-          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
-          restore-keys: |
-            ${{ runner.os }}-go-
+          cache: true
+          go-version: "1.19"
 
       - name: Generate release info
         run: make build/release-info
