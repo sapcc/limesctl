@@ -7,11 +7,20 @@ The sections should follow the order `Added`, `Changed`, `Fixed`, `Removed`, and
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased](https://github.com/sapcc/limesctl/compare/v3.0.3...HEAD)
+## [Unreleased](https://github.com/sapcc/limesctl/compare/v3.1.0...HEAD)
+
+## 3.1.0 - 2022-11-20
+
+## Added
+
+- Add shell completions to Homebrew formula.
+- Added detailed examples for `project set` and `domain set` commands.
 
 ### Changed
 
+- Updated all dependencies to their latest version.
 - Use [Cobra](https://github.com/spf13/cobra) for command-line parsing.
+- Improved command descriptions.
 
 ## 3.0.3 - 2022-10-25
 
