@@ -58,7 +58,7 @@ func (pf *projectFlags) AddToCmd(cmd *cobra.Command) {
 
 func (pf *projectFlags) validateWithNameID(nameOrID string) error {
 	if pf.DomainNameOrID != "" && nameOrID == "" {
-		return errors.New("Project name or ID is required when using the '--domain' flag")
+		return errors.New("project name or ID is required when using the '--domain' flag")
 	}
 	return nil
 }
@@ -418,7 +418,7 @@ This command requires a domain-admin token.`,
 	// Flags
 	doNotSortFlags(cmd)
 	cmd.Flags().StringSliceVarP(&projectSet.quotas, "quotas", "q", nil, "new quota values (comma separated list)")
-	cmd.MarkFlagRequired("quotas")
+	cmd.MarkFlagRequired("quotas") //nolint: errcheck
 	projectSet.projectFlags.AddToCmd(cmd)
 
 	projectSet.Command = cmd

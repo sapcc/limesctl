@@ -200,7 +200,7 @@ This command requires a cloud-admin token.`,
 	// Flags
 	doNotSortFlags(cmd)
 	cmd.Flags().StringSliceVarP(&domainSet.quotas, "quotas", "q", nil, "new quota values (comma separated list)")
-	cmd.MarkFlagRequired("quotas")
+	cmd.MarkFlagRequired("quotas") //nolint: errcheck
 
 	domainSet.Command = cmd
 	return domainSet

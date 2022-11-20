@@ -15,13 +15,13 @@
 package auth
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 
-	"errors"
-
 	"github.com/gophercloud/gophercloud"
 	identitydomains "github.com/gophercloud/gophercloud/openstack/identity/v3/domains"
+
 	"github.com/sapcc/limesctl/v3/internal/util"
 )
 

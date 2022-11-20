@@ -28,10 +28,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func init() {
-	// cobra.OnInitialize(initConfig)
-}
-
 type VersionInfo struct {
 	Version       string
 	GitCommitHash string
@@ -99,14 +95,7 @@ var (
 	limesRatesClient     *gophercloud.ServiceClient
 )
 
-// serviceClients holds the service clients for v3 identity service and Limes.
-type serviceClients struct {
-	identity       *gophercloud.ServiceClient
-	limesResources *gophercloud.ServiceClient
-	limesRates     *gophercloud.ServiceClient
-}
-
-func authenty() (*gophercloud.ProviderClient, error) {
+func authenticate() (*gophercloud.ProviderClient, error) {
 	// Update OpenStack environment variables, if value(s) provided as flag.
 	updateOpenStackEnvVars()
 
@@ -142,7 +131,7 @@ func authenty() (*gophercloud.ProviderClient, error) {
 }
 
 func authWithLimesResources(_ *cobra.Command, _ []string) error {
-	provider, err := authenty()
+	provider, err := authenticate()
 	if err != nil {
 		return err
 	}
@@ -154,7 +143,7 @@ func authWithLimesResources(_ *cobra.Command, _ []string) error {
 }
 
 func authWithLimesRates(_ *cobra.Command, _ []string) error {
-	provider, err := authenty()
+	provider, err := authenticate()
 	if err != nil {
 		return err
 	}
@@ -163,37 +152,6 @@ func authWithLimesRates(_ *cobra.Command, _ []string) error {
 		return util.WrapError(err, "could not initialize Limes rates client")
 	}
 	return nil
-}
-
-// authenticate authenticates against OpenStack and returns the necessary
-// service clients.
-func authenticate(ratesClient bool) (*serviceClients, error) {
-	provider, err := authenty()
-	if err != nil {
-		return nil, err
-	}
-
-	identityClient, err := openstack.NewIdentityV3(provider, gophercloud.EndpointOpts{})
-	if err != nil {
-		return nil, util.WrapError(err, "could not initialize identity client")
-	}
-
-	result := &serviceClients{identity: identityClient}
-	if ratesClient {
-		c, err := clients.NewLimesRatesV1(provider, gophercloud.EndpointOpts{})
-		if err != nil {
-			return nil, util.WrapError(err, "could not initialize Limes rates client")
-		}
-		result.limesRates = c
-	} else {
-		c, err := clients.NewLimesV1(provider, gophercloud.EndpointOpts{})
-		if err != nil {
-			return nil, util.WrapError(err, "could not initialize Limes resources client")
-		}
-		result.limesResources = c
-	}
-
-	return result, nil
 }
 
 func setenvIfVal(key, val string) {
