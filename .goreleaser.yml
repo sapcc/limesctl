@@ -1,6 +1,7 @@
 before:
   hooks:
     - go mod tidy
+    - ./scripts/completions.sh
 
 builds:
   - env:
@@ -33,6 +34,11 @@ archives:
     format_overrides:
       - goos: windows
         format: zip
+    files:
+      - CHANGELOG.md
+      - LICENSE
+      - README.md
+      - completions/*
 
 brews:
   - tap:
@@ -42,8 +48,11 @@ brews:
     homepage: https://github.com/sapcc/limesctl
     description: Command-line interface for Limes
     license: Apache-2.0
-    install: |
+    install: |-
       bin.install "limesctl"
+      bash_completion.install "completions/limesctl.bash" => "limesctl"
+      zsh_completion.install "completions/limesctl.zsh" => "_limesctl"
+      fish_completion.install "completions/limesctl.fish"
     test: |
       system "#{bin}/limesctl --version"
     commit_msg_template: "Homebrew: update formula to {{ .Tag }}"

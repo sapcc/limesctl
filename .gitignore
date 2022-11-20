@@ -1,6 +1,7 @@
 # build artifacts
 build/
 dist/
+completions/
 
 # test artifacts
 *.actual
