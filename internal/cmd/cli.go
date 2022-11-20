@@ -24,8 +24,9 @@ import (
 	"github.com/gophercloud/utils/client"
 	"github.com/gophercloud/utils/openstack/clientconfig"
 	"github.com/sapcc/gophercloud-sapcc/clients"
-	"github.com/sapcc/limesctl/v3/internal/util"
 	"github.com/spf13/cobra"
+
+	"github.com/sapcc/limesctl/v3/internal/util"
 )
 
 type VersionInfo struct {

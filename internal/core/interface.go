@@ -26,6 +26,7 @@ import (
 	"os"
 
 	"github.com/olekukonko/tablewriter"
+
 	"github.com/sapcc/limesctl/v3/internal/util"
 )
 

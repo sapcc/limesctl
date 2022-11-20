@@ -17,8 +17,9 @@ package cmd
 import (
 	"errors"
 
-	"github.com/sapcc/limesctl/v3/internal/core"
 	"github.com/spf13/cobra"
+
+	"github.com/sapcc/limesctl/v3/internal/core"
 )
 
 func doNotSortFlags(cmd *cobra.Command) {
