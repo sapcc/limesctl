@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased](https://github.com/sapcc/limesctl/compare/v3.0.3...HEAD)
 
+### Changed
+
+- Use [Cobra](https://github.com/spf13/cobra) for command-line parsing.
+
 ## 3.0.3 - 2022-10-25
 
 ### Changed

@@ -16,51 +16,81 @@ package cmd
 
 import (
 	"github.com/gophercloud/gophercloud"
-	"github.com/pkg/errors"
 	"github.com/sapcc/go-api-declarations/limes"
 	"github.com/sapcc/gophercloud-sapcc/resources/v1/domains"
+	"github.com/spf13/cobra"
 
 	"github.com/sapcc/limesctl/v3/internal/auth"
 	"github.com/sapcc/limesctl/v3/internal/core"
+	"github.com/sapcc/limesctl/v3/internal/util"
 )
 
-// domainCmd contains the command-line structure for the domain command.
-type domainCmd struct {
-	List domainListCmd `cmd:"" help:"Display resource usage data for all the domains. Requires a cloud-admin token."`
-	Show domainShowCmd `cmd:"" help:"Display resource usage data for a specific domain. Requires a domain-admin token."`
-	Set  domainSetCmd  `cmd:"" help:"Change resource quota values for a specific domain. Requires a cloud-admin token."`
+func newDomainCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "domain",
+		Short: "Do some action at domain level",
+		Args:  cobra.NoArgs,
+	}
+	// Flags
+	doNotSortFlags(cmd)
+	// Subcommands
+	cmd.AddCommand(newDomainListCmd().Command)
+	cmd.AddCommand(newDomainShowCmd().Command)
+	cmd.AddCommand(newDomainSetCmd().Command)
+	return cmd
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 // Domain list.
 
 type domainListCmd struct {
+	*cobra.Command
+
 	resourceFilterFlags
 	resourceOutputFmtFlags
 }
 
-func (d *domainListCmd) Run(clients *ServiceClients) error {
+func newDomainListCmd() *domainListCmd {
+	domainList := &domainListCmd{}
+	cmd := &cobra.Command{
+		Use:     "list",
+		Short:   "Display resource usage data for all domains. Requires a cloud-admin token",
+		Args:    cobra.NoArgs,
+		PreRunE: authWithLimesResources,
+		RunE:    domainList.Run,
+	}
+
+	// Flags
+	doNotSortFlags(cmd)
+	domainList.resourceFilterFlags.AddToCmd(cmd)
+	domainList.resourceOutputFmtFlags.AddToCmd(cmd)
+
+	domainList.Command = cmd
+	return domainList
+}
+
+func (d *domainListCmd) Run(_ *cobra.Command, _ []string) error {
 	outputOpts, err := d.resourceOutputFmtFlags.validate()
 	if err != nil {
 		return err
 	}
 
-	res := domains.List(clients.limesResources, domains.ListOpts{
-		Areas:     d.Areas,
-		Services:  d.Services,
-		Resources: d.Resources,
+	res := domains.List(limesResourcesClient, domains.ListOpts{
+		Areas:     d.areas,
+		Services:  d.services,
+		Resources: d.resources,
 	})
 	if res.Err != nil {
-		return errors.Wrap(res.Err, "could not get domain reports")
+		return util.WrapError(res.Err, "could not get domain reports")
 	}
 
-	if d.Format == core.OutputFormatJSON {
+	if d.format == core.OutputFormatJSON {
 		return writeJSON(res.Body)
 	}
 
 	limesReps, err := res.ExtractDomains()
 	if err != nil {
-		return errors.Wrap(err, "could not extract domain reports")
+		return util.WrapError(err, "could not extract domain reports")
 	}
 
 	return writeReports(outputOpts, core.LimesDomainsToReportRenderer(limesReps)...)
@@ -70,39 +100,62 @@ func (d *domainListCmd) Run(clients *ServiceClients) error {
 // Domain show.
 
 type domainShowCmd struct {
+	*cobra.Command
+
 	resourceFilterFlags
 	resourceOutputFmtFlags
-
-	NameOrID string `arg:"" optional:"" help:"Name or ID of the domain."`
 }
 
-func (d *domainShowCmd) Run(clients *ServiceClients) error {
+func newDomainShowCmd() *domainShowCmd {
+	domainShow := &domainShowCmd{}
+	cmd := &cobra.Command{
+		Use:     "show [name or ID]",
+		Short:   "Display resource usage data for a specific domain. Requires a domain-admin token",
+		Args:    cobra.MaximumNArgs(1),
+		PreRunE: authWithLimesResources,
+		RunE:    domainShow.Run,
+	}
+
+	// Flags
+	doNotSortFlags(cmd)
+	domainShow.resourceFilterFlags.AddToCmd(cmd)
+	domainShow.resourceOutputFmtFlags.AddToCmd(cmd)
+
+	domainShow.Command = cmd
+	return domainShow
+}
+
+func (d *domainShowCmd) Run(_ *cobra.Command, args []string) error {
 	outputOpts, err := d.resourceOutputFmtFlags.validate()
 	if err != nil {
 		return err
 	}
 
-	domainID, err := auth.FindDomainID(clients.identity, d.NameOrID)
+	nameOrID := ""
+	if len(args) > 0 {
+		nameOrID = args[0]
+	}
+	domainID, err := auth.FindDomainID(identityClient, nameOrID)
 	if err != nil {
 		return err
 	}
 
-	res := domains.Get(clients.limesResources, domainID, domains.GetOpts{
-		Areas:     d.Areas,
-		Services:  d.Services,
-		Resources: d.Resources,
+	res := domains.Get(limesResourcesClient, domainID, domains.GetOpts{
+		Areas:     d.areas,
+		Services:  d.services,
+		Resources: d.resources,
 	})
 	if res.Err != nil {
-		return errors.Wrap(res.Err, "could not get domain report")
+		return util.WrapError(res.Err, "could not get domain report")
 	}
 
-	if d.Format == core.OutputFormatJSON {
+	if d.format == core.OutputFormatJSON {
 		return writeJSON(res.Body)
 	}
 
 	limesRep, err := res.Extract()
 	if err != nil {
-		return errors.Wrap(err, "could not extract domain report")
+		return util.WrapError(err, "could not extract domain report")
 	}
 
 	return writeReports(outputOpts, core.DomainReport{DomainReport: limesRep})
@@ -111,33 +164,55 @@ func (d *domainShowCmd) Run(clients *ServiceClients) error {
 ///////////////////////////////////////////////////////////////////////////////
 // Domain set.
 
-//nolint:lll
 type domainSetCmd struct {
-	Quotas []string `short:"q" sep:"," help:"New quotas values. For relative quota adjustment, use one of the following operators: [+=, -=, *=, /=]. Example: service/resource=10GiB."`
+	*cobra.Command
 
-	NameOrID string `arg:"" optional:"" help:"Name or ID of the domain."`
+	quotas []string
 }
 
-func (d *domainSetCmd) Run(clients *ServiceClients) error {
-	domainID, err := auth.FindDomainID(clients.identity, d.NameOrID)
+func newDomainSetCmd() *domainSetCmd {
+	domainSet := &domainSetCmd{}
+	cmd := &cobra.Command{
+		Use:     "set [name or ID]",
+		Short:   "Change resource quota values for a specific domain. Requires a cloud-admin token",
+		Args:    cobra.MaximumNArgs(1),
+		PreRunE: authWithLimesResources,
+		RunE:    domainSet.Run,
+	}
+
+	// Flags
+	doNotSortFlags(cmd)
+	cmd.Flags().StringSliceVarP(&domainSet.quotas, "quotas", "q", nil, "new quota values (comma separated list)")
+	cmd.MarkFlagRequired("quotas")
+
+	domainSet.Command = cmd
+	return domainSet
+}
+
+func (d *domainSetCmd) Run(_ *cobra.Command, args []string) error {
+	nameOrID := ""
+	if len(args) > 0 {
+		nameOrID = args[0]
+	}
+	domainID, err := auth.FindDomainID(identityClient, nameOrID)
 	if err != nil {
 		return err
 	}
 
-	resQuotas, err := getDomainResourceQuotas(clients.limesResources, domainID)
+	resQuotas, err := getDomainResourceQuotas(limesResourcesClient, domainID)
 	if err != nil {
-		return errors.Wrap(err, "could not get default units")
+		return util.WrapError(err, "could not get default units")
 	}
-	qc, err := parseToQuotaRequest(resQuotas, d.Quotas)
+	qc, err := parseToQuotaRequest(resQuotas, d.quotas)
 	if err != nil {
-		return errors.Wrap(err, "could not parse quota values")
+		return util.WrapError(err, "could not parse quota values")
 	}
 
-	err = domains.Update(clients.limesResources, domainID, domains.UpdateOpts{
+	err = domains.Update(limesResourcesClient, domainID, domains.UpdateOpts{
 		Services: qc,
 	}).ExtractErr()
 	if err != nil {
-		return errors.Wrap(err, "could not set new quotas for domain")
+		return util.WrapError(err, "could not set new quotas for domain")
 	}
 
 	return nil

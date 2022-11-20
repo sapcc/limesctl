@@ -21,11 +21,12 @@ package core
 
 import (
 	"encoding/csv"
+	"fmt"
 	"io"
 	"os"
 
 	"github.com/olekukonko/tablewriter"
-	"github.com/pkg/errors"
+	"github.com/sapcc/limesctl/v3/internal/util"
 )
 
 // OutputFormat that the app can print data in.
@@ -37,6 +38,28 @@ const (
 	OutputFormatCSV   OutputFormat = "csv"
 	OutputFormatJSON  OutputFormat = "json"
 )
+
+// String implements the pflag.Value interface.
+func (f *OutputFormat) String() string {
+	return string(*f)
+}
+
+// Set implements the pflag.Value interface.
+func (f *OutputFormat) Set(v string) error {
+	switch vf := OutputFormat(v); vf {
+	case OutputFormatTable, OutputFormatCSV, OutputFormatJSON:
+		*f = vf
+		return nil
+	default:
+		return fmt.Errorf("must be one of [%s, %s, %s], got %s",
+			OutputFormatTable, OutputFormatCSV, OutputFormatJSON, v)
+	}
+}
+
+// Type implements the pflag.Value interface.
+func (f *OutputFormat) Type() string {
+	return "string"
+}
 
 // CSVRecordFormat type defines the style of CSV records.
 type CSVRecordFormat int
@@ -58,7 +81,7 @@ func (d CSVRecords) Write(w io.Writer) error {
 	csvW := csv.NewWriter(w)
 	csvW.Comma = rune(';') // Use semicolon as delimiter
 	if err := csvW.WriteAll(d); err != nil {
-		return errors.Wrap(err, "could not write CSV data")
+		return util.WrapError(err, "could not write CSV data")
 	}
 	return nil
 }

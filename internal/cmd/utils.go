@@ -19,19 +19,18 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/pkg/errors"
-
 	"github.com/sapcc/limesctl/v3/internal/core"
+	"github.com/sapcc/limesctl/v3/internal/util"
 )
 
 func writeJSON(d interface{}) error {
 	b, err := json.Marshal(d)
 	if err != nil {
-		return errors.Wrap(err, "could not marshal JSON")
+		return util.WrapError(err, "could not marshal JSON")
 	}
 
 	if _, err = fmt.Fprintln(os.Stdout, string(b)); err != nil {
-		return errors.Wrap(err, "could not write JSON data")
+		return util.WrapError(err, "could not write JSON data")
 	}
 
 	return nil

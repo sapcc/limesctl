@@ -19,91 +19,107 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/alecthomas/kong"
 	"github.com/gophercloud/gophercloud"
 	"github.com/gophercloud/gophercloud/openstack"
 	"github.com/gophercloud/utils/client"
 	"github.com/gophercloud/utils/openstack/clientconfig"
-	"github.com/pkg/errors"
 	"github.com/sapcc/gophercloud-sapcc/clients"
+	"github.com/sapcc/limesctl/v3/internal/util"
+	"github.com/spf13/cobra"
 )
 
-type CLI struct {
-	globalFlags
-
-	Cluster clusterCmd `cmd:"" help:"Do some action on cluster."`
-	Domain  domainCmd  `cmd:"" help:"Do some action on domain(s)."`
-	Project projectCmd `cmd:"" help:"Do some action on project(s)."`
+func init() {
+	// cobra.OnInitialize(initConfig)
 }
 
-// globalFlags holds app level (global) flags.
-type globalFlags struct {
-	Debug   bool        `env:"LIMESCTL_DEBUG" help:"Enable debug mode (will print API requests and responses)."`
-	Version VersionFlag `help:"Print version information and quit."`
-	openStackFlags
-}
-
-// VersionFlag is a custom implementation of kong.VersionFlag.
-// It is used to display the version info.
-type VersionFlag struct {
+type VersionInfo struct {
 	Version       string
 	GitCommitHash string
 	BuildDate     string
 }
 
-// Decode implements the kong.MapperValue interface.
-func (v VersionFlag) Decode(ctx *kong.DecodeContext) error { return nil }
-
-// IsBool implements the kong.BoolMapper interface.
-func (v VersionFlag) IsBool() bool { return true }
-
-// BeforeApply writes the version info and terminates with a 0 exit status.
-func (v VersionFlag) BeforeApply(app *kong.Kong, version VersionFlag) error {
-	fmt.Printf("limesctl version %s built from Git commit %s on %s\n",
-		version.Version, version.GitCommitHash, version.BuildDate)
-	app.Exit(0)
-	return nil
+func Execute(v *VersionInfo) {
+	if err := newRootCmd(v).Execute(); err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
 }
 
-// openstackFlags holds the values for the required.
-type openStackFlags struct {
-	OSAuthURL           string `help:"Authentication URL."`
-	OSUsername          string `help:"Username."`
-	OSPassword          string `help:"User's Password."`
-	OSUserDomainID      string `help:"User's domain ID."`
-	OSUserDomainName    string `help:"User's domain name."`
-	OSProjectID         string `help:"Project ID to scope to."`
-	OSProjectName       string `help:"Project name to scope to."`
-	OSProjectDomainID   string `help:"Domain ID containing project to scope to."`
-	OSProjectDomainName string `help:"Domain name containing project to scope to."`
+// Global flags.
+var (
+	debug bool
+
+	osAuthURL           string
+	osUsername          string
+	osPassword          string
+	osUserDomainID      string
+	osUserDomainName    string
+	osProjectID         string
+	osProjectName       string
+	osProjectDomainID   string
+	osProjectDomainName string
+)
+
+func newRootCmd(v *VersionInfo) *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "limesctl",
+		Short: "Command-line client for Limes",
+		Args:  cobra.NoArgs,
+		Version: fmt.Sprintf("%s, Git commit %s, built at %s",
+			v.Version, v.GitCommitHash, v.BuildDate),
+		SilenceErrors: true,
+		SilenceUsage:  true,
+	}
+
+	// Flags
+	doNotSortFlags(cmd)
+	cmd.PersistentFlags().BoolVar(&debug, "debug", false, "enable debug mode (will print API requests and responses)")
+	cmd.PersistentFlags().StringVar(&osAuthURL, "os-auth-url", "", "authentication URL")
+	cmd.PersistentFlags().StringVar(&osUsername, "os-username", "", "username")
+	cmd.PersistentFlags().StringVar(&osPassword, "os-password", "", "user's Password")
+	cmd.PersistentFlags().StringVar(&osUserDomainID, "os-user-domain-id", "", "user's domain ID")
+	cmd.PersistentFlags().StringVar(&osUserDomainName, "os-user-domain-name", "", "user's domain name")
+	cmd.PersistentFlags().StringVar(&osProjectID, "os-project-id", "", "project ID to scope to")
+	cmd.PersistentFlags().StringVar(&osProjectName, "os-project-name", "", "project name to scope to")
+	cmd.PersistentFlags().StringVar(&osProjectDomainID, "os-project-domain-id", "", "domain ID containing project to scope to")
+	cmd.PersistentFlags().StringVar(&osProjectDomainName, "os-project-domain-name", "", "domain name containing project to scope to")
+
+	// Subcommands
+	cmd.AddCommand(newClusterCmd())
+	cmd.AddCommand(newDomainCmd())
+	cmd.AddCommand(newProjectCmd())
+
+	return cmd
 }
 
-// ServiceClients holds the service clients for v3 identity service and Limes.
-type ServiceClients struct {
+// Service clients that are used by different commands.
+var (
+	identityClient       *gophercloud.ServiceClient
+	limesResourcesClient *gophercloud.ServiceClient
+	limesRatesClient     *gophercloud.ServiceClient
+)
+
+// serviceClients holds the service clients for v3 identity service and Limes.
+type serviceClients struct {
 	identity       *gophercloud.ServiceClient
 	limesResources *gophercloud.ServiceClient
 	limesRates     *gophercloud.ServiceClient
 }
 
-// Authenticate authenticates against OpenStack and returns the necessary
-// service clients.
-func (cli *CLI) Authenticate(ratesClient bool) (*ServiceClients, error) {
-	// Update OpenStack environment variables, if value provided as flag.
-	err := updateOpenStackEnvVars(&cli.openStackFlags)
-	if err != nil {
-		return nil, err
-	}
+func authenty() (*gophercloud.ProviderClient, error) {
+	// Update OpenStack environment variables, if value(s) provided as flag.
+	updateOpenStackEnvVars()
 
 	ao, err := clientconfig.AuthOptions(nil)
 	if err != nil {
-		return nil, errors.Wrap(err, "could not get auth variables")
+		return nil, util.WrapError(err, "could not get auth variables")
 	}
 
 	provider, err := openstack.NewClient(ao.IdentityEndpoint)
 	if err != nil {
-		return nil, errors.Wrap(err, "cannot create an OpenStack client")
+		return nil, util.WrapError(err, "cannot create an OpenStack client")
 	}
-	if cli.Debug {
+	if debug {
 		provider.HTTPClient = http.Client{
 			Transport: &client.RoundTripper{
 				Rt:     &http.Transport{},
@@ -114,25 +130,65 @@ func (cli *CLI) Authenticate(ratesClient bool) (*ServiceClients, error) {
 
 	err = openstack.Authenticate(provider, *ao)
 	if err != nil {
-		return nil, errors.Wrap(err, "cannot connect to OpenStack")
+		return nil, util.WrapError(err, "cannot connect to OpenStack")
+	}
+
+	identityClient, err = openstack.NewIdentityV3(provider, gophercloud.EndpointOpts{})
+	if err != nil {
+		return nil, util.WrapError(err, "could not initialize identity client")
+	}
+
+	return provider, nil
+}
+
+func authWithLimesResources(_ *cobra.Command, _ []string) error {
+	provider, err := authenty()
+	if err != nil {
+		return err
+	}
+	limesResourcesClient, err = clients.NewLimesV1(provider, gophercloud.EndpointOpts{})
+	if err != nil {
+		return util.WrapError(err, "could not initialize Limes resources client")
+	}
+	return nil
+}
+
+func authWithLimesRates(_ *cobra.Command, _ []string) error {
+	provider, err := authenty()
+	if err != nil {
+		return err
+	}
+	limesRatesClient, err = clients.NewLimesRatesV1(provider, gophercloud.EndpointOpts{})
+	if err != nil {
+		return util.WrapError(err, "could not initialize Limes rates client")
+	}
+	return nil
+}
+
+// authenticate authenticates against OpenStack and returns the necessary
+// service clients.
+func authenticate(ratesClient bool) (*serviceClients, error) {
+	provider, err := authenty()
+	if err != nil {
+		return nil, err
 	}
 
 	identityClient, err := openstack.NewIdentityV3(provider, gophercloud.EndpointOpts{})
 	if err != nil {
-		return nil, errors.Wrap(err, "could not initialize identity client")
+		return nil, util.WrapError(err, "could not initialize identity client")
 	}
 
-	result := &ServiceClients{identity: identityClient}
+	result := &serviceClients{identity: identityClient}
 	if ratesClient {
 		c, err := clients.NewLimesRatesV1(provider, gophercloud.EndpointOpts{})
 		if err != nil {
-			return nil, errors.Wrap(err, "could not initialize Limes rates client")
+			return nil, util.WrapError(err, "could not initialize Limes rates client")
 		}
 		result.limesRates = c
 	} else {
 		c, err := clients.NewLimesV1(provider, gophercloud.EndpointOpts{})
 		if err != nil {
-			return nil, errors.Wrap(err, "could not initialize Limes resources client")
+			return nil, util.WrapError(err, "could not initialize Limes resources client")
 		}
 		result.limesResources = c
 	}
@@ -140,40 +196,24 @@ func (cli *CLI) Authenticate(ratesClient bool) (*ServiceClients, error) {
 	return result, nil
 }
 
-func setenvIfVal(key, val string) error {
+func setenvIfVal(key, val string) {
 	if val == "" {
-		return nil
+		return
 	}
-	return os.Setenv(key, val)
+	err := os.Setenv(key, val)
+	if err != nil {
+		cobra.CheckErr(err.Error())
+	}
 }
 
-func updateOpenStackEnvVars(v *openStackFlags) error {
-	if err := setenvIfVal("OS_AUTH_URL", v.OSAuthURL); err != nil {
-		return err
-	}
-	if err := setenvIfVal("OS_USERNAME", v.OSUsername); err != nil {
-		return err
-	}
-	if err := setenvIfVal("OS_PASSWORD", v.OSPassword); err != nil {
-		return err
-	}
-	if err := setenvIfVal("OS_USER_DOMAIN_ID", v.OSUserDomainID); err != nil {
-		return err
-	}
-	if err := setenvIfVal("OS_USER_DOMAIN_NAME", v.OSUserDomainName); err != nil {
-		return err
-	}
-	if err := setenvIfVal("OS_PROJECT_ID", v.OSProjectID); err != nil {
-		return err
-	}
-	if err := setenvIfVal("OS_PROJECT_NAME", v.OSProjectName); err != nil {
-		return err
-	}
-	if err := setenvIfVal("OS_PROJECT_DOMAIN_ID", v.OSProjectDomainID); err != nil {
-		return err
-	}
-	if err := setenvIfVal("OS_PROJECT_DOMAIN_NAME", v.OSProjectDomainName); err != nil {
-		return err
-	}
-	return nil
+func updateOpenStackEnvVars() {
+	setenvIfVal("OS_AUTH_URL", osAuthURL)
+	setenvIfVal("OS_USERNAME", osUsername)
+	setenvIfVal("OS_PASSWORD", osPassword)
+	setenvIfVal("OS_USER_DOMAIN_ID", osUserDomainID)
+	setenvIfVal("OS_USER_DOMAIN_NAME", osUserDomainName)
+	setenvIfVal("OS_PROJECT_ID", osProjectID)
+	setenvIfVal("OS_PROJECT_NAME", osProjectName)
+	setenvIfVal("OS_PROJECT_DOMAIN_ID", osProjectDomainID)
+	setenvIfVal("OS_PROJECT_DOMAIN_NAME", osProjectDomainName)
 }

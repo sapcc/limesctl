@@ -15,52 +15,75 @@
 package cmd
 
 import (
-	"github.com/pkg/errors"
 	"github.com/sapcc/gophercloud-sapcc/resources/v1/clusters"
+	"github.com/spf13/cobra"
 
 	"github.com/sapcc/limesctl/v3/internal/core"
+	"github.com/sapcc/limesctl/v3/internal/util"
 )
 
-// clusterCmd contains the command-line structure for the cluster command.
-type clusterCmd struct {
-	Show clusterShowCmd `cmd:"" help:"Display resource usage data for the cluster. Requires a cloud-admin token."`
+func newClusterCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "cluster",
+		Short: "Do some action at cluster level",
+		Args:  cobra.NoArgs,
+	}
+	doNotSortFlags(cmd)
+	cmd.AddCommand(newClusterShowCmd().Command)
+	return cmd
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 // Cluster show.
 
 type clusterShowCmd struct {
+	*cobra.Command
+
 	resourceFilterFlags
 	resourceOutputFmtFlags
-
-	ID string `arg:"" optional:"" help:"ID of the cluster (leave empty for current cluster)."`
 }
 
-func (c *clusterShowCmd) Run(clients *ServiceClients) error {
+func newClusterShowCmd() *clusterShowCmd {
+	clusterShow := &clusterShowCmd{}
+	cmd := &cobra.Command{
+		Use:     "show",
+		Short:   "Display resource usage data for cluster. Requires a cloud-admin token",
+		Args:    cobra.NoArgs,
+		PreRunE: authWithLimesResources,
+		RunE:    clusterShow.Run,
+	}
+
+	// Flags
+	doNotSortFlags(cmd)
+	clusterShow.resourceFilterFlags.AddToCmd(cmd)
+	clusterShow.resourceOutputFmtFlags.AddToCmd(cmd)
+
+	clusterShow.Command = cmd
+	return clusterShow
+}
+
+func (c *clusterShowCmd) Run(_ *cobra.Command, _ []string) error {
 	outputOpts, err := c.resourceOutputFmtFlags.validate()
 	if err != nil {
 		return err
 	}
 
-	if c.ID == "" {
-		c.ID = "current"
-	}
-	res := clusters.Get(clients.limesResources, clusters.GetOpts{
-		Areas:     c.Areas,
-		Services:  c.Services,
-		Resources: c.Resources,
+	res := clusters.Get(limesResourcesClient, clusters.GetOpts{
+		Areas:     c.areas,
+		Services:  c.services,
+		Resources: c.resources,
 	})
 	if res.Err != nil {
-		return errors.Wrap(res.Err, "could not get cluster report")
+		return util.WrapError(res.Err, "could not get cluster report")
 	}
 
-	if c.Format == core.OutputFormatJSON {
+	if c.format == core.OutputFormatJSON {
 		return writeJSON(res.Body)
 	}
 
 	limesRep, err := res.Extract()
 	if err != nil {
-		return errors.Wrap(err, "could not extract cluster report")
+		return util.WrapError(err, "could not extract cluster report")
 	}
 
 	return writeReports(outputOpts, core.ClusterReport{ClusterReport: limesRep})

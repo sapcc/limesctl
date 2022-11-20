@@ -22,25 +22,37 @@ import (
 	"github.com/sapcc/go-api-declarations/limes"
 	ratesProjects "github.com/sapcc/gophercloud-sapcc/rates/v1/projects"
 	"github.com/sapcc/gophercloud-sapcc/resources/v1/projects"
+	"github.com/spf13/cobra"
 
 	"github.com/sapcc/limesctl/v3/internal/auth"
 	"github.com/sapcc/limesctl/v3/internal/core"
+	"github.com/sapcc/limesctl/v3/internal/util"
 )
 
-// projectCmd contains the command-line structure for the project command.
-//
-//nolint:lll
-type projectCmd struct {
-	List      projectListCmd      `cmd:"" help:"Display resource usage data for all the projects in a domain. Requires a domain-admin token."`
-	ListRates projectListRatesCmd `cmd:"" help:"Display rate limits for all the projects in a domain. Requires a domain-admin token."`
-	Show      projectShowCmd      `cmd:"" help:"Display resource usage data for a specific project. Requires project member permissions."`
-	ShowRates projectShowRatesCmd `cmd:"" help:"Display rate limits for a specific project. Requires project member permissions."`
-	Set       projectSetCmd       `cmd:"" help:"Change resource quota values for a specific project. Requires a domain-admin token."`
-	Sync      projectSyncCmd      `cmd:"" help:"Schedule a sync job that pulls quota and usage data for a specific project from the backing services into Limes' local database. Requires a project-admin token."`
+func newProjectCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "project",
+		Short: "Do some action at project level",
+		Args:  cobra.NoArgs,
+	}
+	// Flags
+	doNotSortFlags(cmd)
+	// Subcommands
+	cmd.AddCommand(newProjectListCmd().Command)
+	cmd.AddCommand(newProjectListRatesCmd().Command)
+	cmd.AddCommand(newProjectShowCmd().Command)
+	cmd.AddCommand(newProjectShowRatesCmd().Command)
+	cmd.AddCommand(newProjectSetCmd().Command)
+	cmd.AddCommand(newProjectSyncCmd().Command)
+	return cmd
 }
 
 type projectFlags struct {
 	DomainNameOrID string `short:"d" name:"domain" help:"Name or ID of the domain."`
+}
+
+func (pf *projectFlags) AddToCmd(cmd *cobra.Command) {
+	cmd.Flags().StringVarP(&pf.DomainNameOrID, "domain", "d", "", "name or ID of the domain")
 }
 
 func (pf *projectFlags) validateWithNameID(nameOrID string) error {
@@ -54,42 +66,64 @@ func (pf *projectFlags) validateWithNameID(nameOrID string) error {
 // Project list.
 
 type projectListCmd struct {
+	*cobra.Command
+
 	projectFlags
 	resourceFilterFlags
 	resourceOutputFmtFlags
 }
 
-func (p *projectListCmd) Run(clients *ServiceClients) error {
+func newProjectListCmd() *projectListCmd {
+	projectList := &projectListCmd{}
+	cmd := &cobra.Command{
+		Use:     "list",
+		Short:   "Display resource usage data for all the projects in a domain. Requires a domain-admin token",
+		Args:    cobra.NoArgs,
+		PreRunE: authWithLimesResources,
+		RunE:    projectList.Run,
+	}
+
+	// Flags
+	doNotSortFlags(cmd)
+	projectList.projectFlags.AddToCmd(cmd)
+	projectList.resourceFilterFlags.AddToCmd(cmd)
+	projectList.resourceOutputFmtFlags.AddToCmd(cmd)
+
+	projectList.Command = cmd
+	return projectList
+}
+
+func (p *projectListCmd) Run(_ *cobra.Command, _ []string) error {
 	outputOpts, err := p.resourceOutputFmtFlags.validate()
 	if err != nil {
 		return err
 	}
 
 	domainName := ""
-	domainID, err := auth.FindDomainID(clients.identity, p.DomainNameOrID)
+	domainID, err := auth.FindDomainID(identityClient, p.DomainNameOrID)
 	if err == nil {
-		domainName, err = auth.FindDomainName(clients.identity, domainID)
+		domainName, err = auth.FindDomainName(identityClient, domainID)
 	}
 	if err != nil {
 		return err
 	}
 
-	res := projects.List(clients.limesResources, domainID, projects.ListOpts{
-		Areas:     p.Areas,
-		Services:  p.Services,
-		Resources: p.Resources,
+	res := projects.List(limesResourcesClient, domainID, projects.ListOpts{
+		Areas:     p.areas,
+		Services:  p.services,
+		Resources: p.resources,
 	})
 	if res.Err != nil {
-		return errors.Wrap(res.Err, "could not get project reports")
+		return util.WrapError(res.Err, "could not get project reports")
 	}
 
-	if p.Format == core.OutputFormatJSON {
+	if p.format == core.OutputFormatJSON {
 		return writeJSON(res.Body)
 	}
 
 	limesReps, err := res.ExtractProjects()
 	if err != nil {
-		return errors.Wrap(err, "could not extract project reports")
+		return util.WrapError(err, "could not extract project reports")
 	}
 
 	return writeReports(outputOpts,
@@ -100,41 +134,63 @@ func (p *projectListCmd) Run(clients *ServiceClients) error {
 // Project list rates.
 
 type projectListRatesCmd struct {
+	*cobra.Command
+
 	projectFlags
 	rateFilterFlags
 	rateOutputFmtFlags
 }
 
-func (p *projectListRatesCmd) Run(clients *ServiceClients) error {
+func newProjectListRatesCmd() *projectListRatesCmd {
+	projectListRates := &projectListRatesCmd{}
+	cmd := &cobra.Command{
+		Use:     "list-rates",
+		Short:   "Display rate limits for all the projects in a domain. Requires a domain-admin token",
+		Args:    cobra.NoArgs,
+		PreRunE: authWithLimesRates,
+		RunE:    projectListRates.Run,
+	}
+
+	// Flags
+	doNotSortFlags(cmd)
+	projectListRates.projectFlags.AddToCmd(cmd)
+	projectListRates.rateFilterFlags.AddToCmd(cmd)
+	projectListRates.rateOutputFmtFlags.AddToCmd(cmd)
+
+	projectListRates.Command = cmd
+	return projectListRates
+}
+
+func (p *projectListRatesCmd) Run(_ *cobra.Command, _ []string) error {
 	outputOpts, err := p.rateOutputFmtFlags.validate()
 	if err != nil {
 		return err
 	}
 
 	domainName := ""
-	domainID, err := auth.FindDomainID(clients.identity, p.DomainNameOrID)
+	domainID, err := auth.FindDomainID(identityClient, p.DomainNameOrID)
 	if err == nil {
-		domainName, err = auth.FindDomainName(clients.identity, domainID)
+		domainName, err = auth.FindDomainName(identityClient, domainID)
 	}
 	if err != nil {
 		return err
 	}
 
-	res := ratesProjects.List(clients.limesRates, domainID, ratesProjects.ReadOpts{
-		Services: p.Services,
-		Areas:    p.Areas,
+	res := ratesProjects.List(limesRatesClient, domainID, ratesProjects.ReadOpts{
+		Services: p.services,
+		Areas:    p.areas,
 	})
 	if res.Err != nil {
-		return errors.Wrap(res.Err, "could not get project reports")
+		return util.WrapError(res.Err, "could not get project reports")
 	}
 
-	if p.Format == core.OutputFormatJSON {
+	if p.format == core.OutputFormatJSON {
 		return writeJSON(res.Body)
 	}
 
 	limesReps, err := res.ExtractProjects()
 	if err != nil {
-		return errors.Wrap(err, "could not extract project reports")
+		return util.WrapError(err, "could not extract project reports")
 	}
 
 	return writeReports(outputOpts,
@@ -145,45 +201,69 @@ func (p *projectListRatesCmd) Run(clients *ServiceClients) error {
 // Project show.
 
 type projectShowCmd struct {
+	*cobra.Command
+
 	projectFlags
 	resourceFilterFlags
 	resourceOutputFmtFlags
-
-	NameOrID string `arg:"" optional:"" help:"Name or ID of the project. Required if using '--domain' flag."`
 }
 
-// Validate implements the kong.Validatable interface.
-func (p *projectShowCmd) Validate() error {
-	return p.projectFlags.validateWithNameID(p.NameOrID)
+func newProjectShowCmd() *projectShowCmd {
+	projectShow := &projectShowCmd{}
+	cmd := &cobra.Command{
+		Use:     "show [name or ID]",
+		Short:   "Display resource usage data for a specific project. Requires project member permissions",
+		Args:    cobra.MaximumNArgs(1),
+		PreRunE: authWithLimesResources,
+		RunE:    projectShow.Run,
+	}
+
+	// Flags
+	doNotSortFlags(cmd)
+	projectShow.projectFlags.AddToCmd(cmd)
+	projectShow.resourceFilterFlags.AddToCmd(cmd)
+	projectShow.resourceOutputFmtFlags.AddToCmd(cmd)
+
+	projectShow.Command = cmd
+	return projectShow
 }
 
-func (p *projectShowCmd) Run(clients *ServiceClients) error {
+func (p *projectShowCmd) Run(_ *cobra.Command, args []string) error {
+	nameOrID := ""
+	if len(args) > 0 {
+		nameOrID = args[0]
+	}
+	err := p.projectFlags.validateWithNameID(nameOrID)
+	if err != nil {
+		return err
+	}
+
 	outputOpts, err := p.resourceOutputFmtFlags.validate()
 	if err != nil {
 		return err
 	}
 
-	pInfo, err := auth.FindProject(clients.identity, p.DomainNameOrID, p.NameOrID)
+	pInfo, err := auth.FindProject(identityClient, p.DomainNameOrID, nameOrID)
 	if err != nil {
 		return err
 	}
 
-	res := projects.Get(clients.limesResources, pInfo.DomainID, pInfo.ID, projects.GetOpts{
-		Areas:     p.Areas,
-		Services:  p.Services,
-		Resources: p.Resources,
+	res := projects.Get(limesResourcesClient, pInfo.DomainID, pInfo.ID, projects.GetOpts{
+		Areas:     p.areas,
+		Services:  p.services,
+		Resources: p.resources,
 	})
 	if res.Err != nil {
-		return errors.Wrap(res.Err, "could not get project report")
+		return util.WrapError(res.Err, "could not get project report")
 	}
 
-	if p.Format == core.OutputFormatJSON {
+	if p.format == core.OutputFormatJSON {
 		return writeJSON(res.Body)
 	}
 
 	limesRep, err := res.Extract()
 	if err != nil {
-		return errors.Wrap(err, "could not extract project report")
+		return util.WrapError(err, "could not extract project report")
 	}
 
 	return writeReports(outputOpts, core.ProjectResourcesReport{
@@ -197,44 +277,68 @@ func (p *projectShowCmd) Run(clients *ServiceClients) error {
 // Project show rates.
 
 type projectShowRatesCmd struct {
+	*cobra.Command
+
 	projectFlags
 	rateFilterFlags
 	rateOutputFmtFlags
-
-	NameOrID string `arg:"" optional:"" help:"Name or ID of the project. Required if using '--domain' flag."`
 }
 
-// Validate implements the kong.Validatable interface.
-func (p *projectShowRatesCmd) Validate() error {
-	return p.projectFlags.validateWithNameID(p.NameOrID)
+func newProjectShowRatesCmd() *projectShowRatesCmd {
+	projectShowRates := &projectShowRatesCmd{}
+	cmd := &cobra.Command{
+		Use:     "show-rates [name or ID]",
+		Short:   "Display rate limits for a specific project. Requires project member permissions",
+		Args:    cobra.MaximumNArgs(1),
+		PreRunE: authWithLimesRates,
+		RunE:    projectShowRates.Run,
+	}
+
+	// Flags
+	doNotSortFlags(cmd)
+	projectShowRates.projectFlags.AddToCmd(cmd)
+	projectShowRates.rateFilterFlags.AddToCmd(cmd)
+	projectShowRates.rateOutputFmtFlags.AddToCmd(cmd)
+
+	projectShowRates.Command = cmd
+	return projectShowRates
 }
 
-func (p *projectShowRatesCmd) Run(clients *ServiceClients) error {
+func (p *projectShowRatesCmd) Run(_ *cobra.Command, args []string) error {
+	nameOrID := ""
+	if len(args) > 0 {
+		nameOrID = args[0]
+	}
+	err := p.projectFlags.validateWithNameID(nameOrID)
+	if err != nil {
+		return err
+	}
+
 	outputOpts, err := p.rateOutputFmtFlags.validate()
 	if err != nil {
 		return err
 	}
 
-	pInfo, err := auth.FindProject(clients.identity, p.DomainNameOrID, p.NameOrID)
+	pInfo, err := auth.FindProject(identityClient, p.DomainNameOrID, nameOrID)
 	if err != nil {
 		return err
 	}
 
-	res := ratesProjects.Get(clients.limesRates, pInfo.DomainID, pInfo.ID, ratesProjects.ReadOpts{
-		Services: p.Services,
-		Areas:    p.Areas,
+	res := ratesProjects.Get(limesRatesClient, pInfo.DomainID, pInfo.ID, ratesProjects.ReadOpts{
+		Services: p.services,
+		Areas:    p.areas,
 	})
 	if res.Err != nil {
-		return errors.Wrap(res.Err, "could not get project report")
+		return util.WrapError(res.Err, "could not get project report")
 	}
 
-	if p.Format == core.OutputFormatJSON {
+	if p.format == core.OutputFormatJSON {
 		return writeJSON(res.Body)
 	}
 
 	limesRep, err := res.Extract()
 	if err != nil {
-		return errors.Wrap(err, "could not extract project report")
+		return util.WrapError(err, "could not extract project report")
 	}
 
 	return writeReports(outputOpts, core.ProjectRatesReport{
@@ -249,37 +353,61 @@ func (p *projectShowRatesCmd) Run(clients *ServiceClients) error {
 
 //nolint:lll
 type projectSetCmd struct {
+	*cobra.Command
+
 	projectFlags
-	Quotas []string `short:"q" sep:"," help:"New quotas values. For relative quota adjustment, use one of the following operators: [+=, -=, *=, /=]. Example: service/resource=120GiB."`
-
-	NameOrID string `arg:"" optional:"" help:"Name or ID of the project. Required if using '--domain' flag."`
+	quotas []string
 }
 
-// Validate implements the kong.Validatable interface.
-func (p *projectSetCmd) Validate() error {
-	return p.projectFlags.validateWithNameID(p.NameOrID)
+func newProjectSetCmd() *projectSetCmd {
+	projectSet := &projectSetCmd{}
+	cmd := &cobra.Command{
+		Use:     "set [name or ID]",
+		Short:   "Change resource quota values for a specific project. Requires a domain-admin token",
+		Args:    cobra.MaximumNArgs(1),
+		PreRunE: authWithLimesResources,
+		RunE:    projectSet.Run,
+	}
+
+	// Flags
+	doNotSortFlags(cmd)
+	cmd.Flags().StringSliceVarP(&projectSet.quotas, "quotas", "q", nil, "new quota values (comma separated list)")
+	cmd.MarkFlagRequired("quotas")
+	projectSet.projectFlags.AddToCmd(cmd)
+
+	projectSet.Command = cmd
+	return projectSet
 }
 
-func (p *projectSetCmd) Run(clients *ServiceClients) error {
-	pInfo, err := auth.FindProject(clients.identity, p.DomainNameOrID, p.NameOrID)
+func (p *projectSetCmd) Run(_ *cobra.Command, args []string) error {
+	nameOrID := ""
+	if len(args) > 0 {
+		nameOrID = args[0]
+	}
+	err := p.projectFlags.validateWithNameID(nameOrID)
 	if err != nil {
 		return err
 	}
 
-	resQuotas, err := getProjectResourceQuotas(clients.limesResources, pInfo)
+	pInfo, err := auth.FindProject(identityClient, p.DomainNameOrID, nameOrID)
 	if err != nil {
-		return errors.Wrap(err, "could not get default units")
-	}
-	qc, err := parseToQuotaRequest(resQuotas, p.Quotas)
-	if err != nil {
-		return errors.Wrap(err, "could not parse quota values")
+		return err
 	}
 
-	warn, err := projects.Update(clients.limesResources, pInfo.DomainID, pInfo.ID, projects.UpdateOpts{
+	resQuotas, err := getProjectResourceQuotas(limesResourcesClient, pInfo)
+	if err != nil {
+		return util.WrapError(err, "could not get default units")
+	}
+	qc, err := parseToQuotaRequest(resQuotas, p.quotas)
+	if err != nil {
+		return util.WrapError(err, "could not parse quota values")
+	}
+
+	warn, err := projects.Update(limesResourcesClient, pInfo.DomainID, pInfo.ID, projects.UpdateOpts{
 		Services: qc,
 	}).Extract()
 	if err != nil {
-		return errors.Wrap(err, "could not set new quotas for project")
+		return util.WrapError(err, "could not set new quotas for project")
 	}
 
 	if warn != nil {
@@ -292,25 +420,49 @@ func (p *projectSetCmd) Run(clients *ServiceClients) error {
 // Project sync.
 
 type projectSyncCmd struct {
+	*cobra.Command
+
 	projectFlags
-
-	NameOrID string `arg:"" required:"" help:"Name or ID of the project."`
 }
 
-// Validate implements the kong.Validatable interface.
-func (p *projectSyncCmd) Validate() error {
-	return p.projectFlags.validateWithNameID(p.NameOrID)
+func newProjectSyncCmd() *projectSyncCmd {
+	projectSync := &projectSyncCmd{}
+	cmd := &cobra.Command{
+		Use:   "sync [name or ID]",
+		Short: "Sync a specific project. Requires a project-admin token",
+		Long: `Schedule a sync job that pulls quota and usage data for a specific project
+from the backing services into Limes' local database.`,
+		Args:    cobra.MaximumNArgs(1),
+		PreRunE: authWithLimesResources,
+		RunE:    projectSync.Run,
+	}
+
+	// Flags
+	doNotSortFlags(cmd)
+	projectSync.projectFlags.AddToCmd(cmd)
+
+	projectSync.Command = cmd
+	return projectSync
 }
 
-func (p *projectSyncCmd) Run(clients *ServiceClients) error {
-	pInfo, err := auth.FindProject(clients.identity, p.DomainNameOrID, p.NameOrID)
+func (p *projectSyncCmd) Run(_ *cobra.Command, args []string) error {
+	nameOrID := ""
+	if len(args) > 0 {
+		nameOrID = args[0]
+	}
+	err := p.projectFlags.validateWithNameID(nameOrID)
 	if err != nil {
 		return err
 	}
 
-	err = projects.Sync(clients.limesResources, pInfo.DomainID, pInfo.ID).ExtractErr()
+	pInfo, err := auth.FindProject(identityClient, p.DomainNameOrID, nameOrID)
 	if err != nil {
-		return errors.Wrap(err, "could not sync project")
+		return err
+	}
+
+	err = projects.Sync(limesResourcesClient, pInfo.DomainID, pInfo.ID).ExtractErr()
+	if err != nil {
+		return util.WrapError(err, "could not sync project")
 	}
 
 	return nil

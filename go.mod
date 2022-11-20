@@ -10,11 +10,14 @@ require (
 	github.com/pkg/errors v0.9.1
 	github.com/sapcc/go-api-declarations v1.4.2
 	github.com/sapcc/gophercloud-sapcc v0.0.0-20221118052740-b6d65c7512dc
+	github.com/spf13/cobra v1.6.1
 )
 
 require (
+	github.com/inconshreveable/mousetrap v1.0.1 // indirect
 	github.com/mattn/go-runewidth v0.0.9 // indirect
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
+	github.com/spf13/pflag v1.0.5 // indirect
 	golang.org/x/sys v0.0.0-20210615035016-665e8c7367d1 // indirect
 	golang.org/x/text v0.3.6 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect

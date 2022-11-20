@@ -20,52 +20,16 @@
 package main
 
 import (
-	"strings"
-
-	"github.com/alecthomas/kong"
 	"github.com/sapcc/go-api-declarations/bininfo"
 
 	"github.com/sapcc/limesctl/v3/internal/cmd"
-	"github.com/sapcc/limesctl/v3/internal/core"
 )
 
 func main() {
-	version := bininfo.VersionOr("dev")
-	commit := bininfo.CommitOr("unknown")
-	date := bininfo.BuildDateOr("now")
-
-	var cli cmd.CLI
-	ctx := kong.Parse(&cli,
-		kong.Name("limesctl"),
-		kong.Description("Command-line client for Limes."),
-		kong.UsageOnError(),
-		kong.ConfigureHelp(kong.HelpOptions{
-			Compact: true,
-		}),
-		kong.Bind(cmd.VersionFlag{
-			Version:       version,
-			GitCommitHash: commit,
-			BuildDate:     date,
-		}),
-		kong.Vars{"outputFormats": outputFormats()},
-	)
-
-	cmdStr := ctx.Command()
-	clients, err := cli.Authenticate(
-		strings.Contains(cmdStr, "show-rates") || strings.Contains(cmdStr, "list-rates"))
-	if err == nil {
-		err = ctx.Run(clients)
+	v := &cmd.VersionInfo{
+		Version:       bininfo.VersionOr("dev"),
+		GitCommitHash: bininfo.CommitOr("unknown"),
+		BuildDate:     bininfo.BuildDateOr("now"),
 	}
-	if err != nil {
-		ctx.FatalIfErrorf(err)
-	}
-}
-
-func outputFormats() string {
-	f := []string{
-		string(core.OutputFormatTable),
-		string(core.OutputFormatCSV),
-		string(core.OutputFormatJSON),
-	}
-	return strings.Join(f, ",")
+	cmd.Execute(v)
 }

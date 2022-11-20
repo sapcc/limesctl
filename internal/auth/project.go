@@ -20,6 +20,7 @@ import (
 	"github.com/gophercloud/gophercloud"
 	identityprojects "github.com/gophercloud/gophercloud/openstack/identity/v3/projects"
 	"github.com/pkg/errors"
+	"github.com/sapcc/limesctl/v3/internal/util"
 )
 
 const msgProjectNotFound = "project not found"
@@ -54,7 +55,7 @@ func FindProject(identityClient *gophercloud.ServiceClient, domainNameOrID, proj
 			var dName string
 			dName, err = FindDomainName(identityClient, p.DomainID)
 			if err != nil {
-				return nil, errors.Wrap(err, msgProjectNotFound)
+				return nil, util.WrapError(err, msgProjectNotFound)
 			}
 			return &ProjectInfo{
 				ID:         p.ID,
@@ -71,7 +72,7 @@ func FindProject(identityClient *gophercloud.ServiceClient, domainNameOrID, proj
 		var dID string
 		dID, err = FindDomainID(identityClient, domainNameOrID)
 		if err != nil {
-			return nil, errors.Wrap(err, msgProjectNotFound)
+			return nil, util.WrapError(err, msgProjectNotFound)
 		}
 		opts.DomainID = dID
 	}
@@ -81,7 +82,7 @@ func FindProject(identityClient *gophercloud.ServiceClient, domainNameOrID, proj
 		pList, err = identityprojects.ExtractProjects(page)
 	}
 	if err != nil {
-		return nil, errors.Wrap(err, msgProjectNotFound)
+		return nil, util.WrapError(err, msgProjectNotFound)
 	}
 	l := len(pList)
 	if l > 1 {
@@ -91,7 +92,7 @@ func FindProject(identityClient *gophercloud.ServiceClient, domainNameOrID, proj
 		if p := pList[0]; p.ID != "" {
 			dName, err := FindDomainName(identityClient, p.DomainID)
 			if err != nil {
-				return nil, errors.Wrap(err, msgProjectNotFound)
+				return nil, util.WrapError(err, msgProjectNotFound)
 			}
 			return &ProjectInfo{
 				ID:         p.ID,

@@ -21,6 +21,7 @@ import (
 	"github.com/gophercloud/gophercloud"
 	identitydomains "github.com/gophercloud/gophercloud/openstack/identity/v3/domains"
 	"github.com/pkg/errors"
+	"github.com/sapcc/limesctl/v3/internal/util"
 )
 
 const msgDomainNotFound = "domain not found"
@@ -39,7 +40,7 @@ func FindDomainName(identityClient *gophercloud.ServiceClient, id string) (strin
 		n := "domain-" + id
 		return n, nil
 	default:
-		return "", errors.Wrap(err, msgDomainNotFound)
+		return "", util.WrapError(err, msgDomainNotFound)
 	}
 }
 
@@ -69,7 +70,7 @@ func FindDomainID(identityClient *gophercloud.ServiceClient, nameOrID string) (s
 		dList, err = identitydomains.ExtractDomains(page)
 	}
 	if err != nil {
-		return "", errors.Wrap(err, msgDomainNotFound)
+		return "", util.WrapError(err, msgDomainNotFound)
 	}
 	l := len(dList)
 	if l > 1 {
