@@ -4,7 +4,7 @@ go 1.19
 
 require (
 	github.com/gophercloud/gophercloud v1.1.0
-	github.com/gophercloud/utils v0.0.0-20221124081324-7bac6f5cdf99
+	github.com/gophercloud/utils v0.0.0-20221128194715-5caf33c866da
 	github.com/olekukonko/tablewriter v0.0.5
 	github.com/sapcc/go-api-declarations v1.4.2
 	github.com/sapcc/gophercloud-sapcc v0.0.0-20221129160453-e10320edef22

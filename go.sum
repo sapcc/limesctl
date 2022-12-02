@@ -1,9 +1,8 @@
 github.com/cpuguy83/go-md2man/v2 v2.0.2/go.mod h1:tgQtvFlXSQOSOSIRvRPT7W67SCa46tRHOmNcaadrF8o=
-github.com/gophercloud/gophercloud v1.0.0/go.mod h1:Q8fZtyi5zZxPS/j9aj3sSxtvj41AdQMDwyo1myduD5c=
 github.com/gophercloud/gophercloud v1.1.0 h1:xlsBMeBi0KJ56RBW6GJ2laJJKbtlpObj5HwQzggYAsA=
 github.com/gophercloud/gophercloud v1.1.0/go.mod h1:aAVqcocTSXh2vYFZ1JTvx4EQmfgzxRcNupUfxZbBNDM=
-github.com/gophercloud/utils v0.0.0-20221124081324-7bac6f5cdf99 h1:fCv3q8eZ06quhZ5xXHET10R/wOyK8OSsH+tM/wnk63w=
-github.com/gophercloud/utils v0.0.0-20221124081324-7bac6f5cdf99/go.mod h1:RZub3bZJK1VLM2aMjSZxNYb1HvXtWoo9l1Yd3l2VFiA=
+github.com/gophercloud/utils v0.0.0-20221128194715-5caf33c866da h1:50QooRtRu+HVucCMrBO6RzmoxFClnQvFDTijBkIivwQ=
+github.com/gophercloud/utils v0.0.0-20221128194715-5caf33c866da/go.mod h1:gY7sdkpsI1IjTD9krr+XXywtsfhcrPx1Nu2DFLGZWWg=
 github.com/hashicorp/go-uuid v1.0.3/go.mod h1:6SBZvOh/SIDV7/2o3Jml5SYk/TvGqwFJ/bN7x4byOro=
 github.com/inconshreveable/mousetrap v1.0.1 h1:U3uMjPSQEBMNp1lFxmllqCPM6P5u/Xq7Pgzkat/bFNc=
 github.com/inconshreveable/mousetrap v1.0.1/go.mod h1:vpF70FUmC8bwa3OWnCshd2FqLfsEA9PFc4w1p2J65bw=
@@ -25,7 +24,6 @@ github.com/spf13/pflag v1.0.5/go.mod h1:McXfInJRrz4CZXVZOBLb0bTZqETkiAhM9Iw0y3An
 github.com/yuin/goldmark v1.4.13/go.mod h1:6yULJ656Px+3vBD8DxQVa3kxgyrAnzto9xy5taEt/CY=
 golang.org/x/crypto v0.0.0-20190308221718-c2843e01d9a2/go.mod h1:djNgcEr1/C05ACkg1iLfiJU5Ep61QUkGW8qpdssI0+w=
 golang.org/x/crypto v0.0.0-20210921155107-089bfa567519/go.mod h1:GvvjBRRGRdwPK5ydBHafDWAxML/pGHZbMvKqRZ5+Abc=
-golang.org/x/crypto v0.0.0-20211202192323-5770296d904e/go.mod h1:IxCIyHEi3zRg3s0A5j5BB6A9Jmi73HwBIUl50j+osU4=
 golang.org/x/crypto v0.0.0-20220829220503-c86fa9a7ed90/go.mod h1:IxCIyHEi3zRg3s0A5j5BB6A9Jmi73HwBIUl50j+osU4=
 golang.org/x/mod v0.6.0-dev.0.20220419223038-86c51ed26bb4/go.mod h1:jJ57K6gSWd91VN4djpZkiMVwK6gcyfeH4XE8wZrZaV4=
 golang.org/x/net v0.0.0-20190620200207-3b0461eec859/go.mod h1:z5CRVTTTmAJ677TzLLGU+0bjPO0LkuOLi4/5GtJWs/s=
