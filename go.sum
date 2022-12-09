@@ -1,8 +1,8 @@
 github.com/cpuguy83/go-md2man/v2 v2.0.2/go.mod h1:tgQtvFlXSQOSOSIRvRPT7W67SCa46tRHOmNcaadrF8o=
-github.com/gophercloud/gophercloud v1.1.0 h1:xlsBMeBi0KJ56RBW6GJ2laJJKbtlpObj5HwQzggYAsA=
-github.com/gophercloud/gophercloud v1.1.0/go.mod h1:aAVqcocTSXh2vYFZ1JTvx4EQmfgzxRcNupUfxZbBNDM=
-github.com/gophercloud/utils v0.0.0-20221128194715-5caf33c866da h1:50QooRtRu+HVucCMrBO6RzmoxFClnQvFDTijBkIivwQ=
-github.com/gophercloud/utils v0.0.0-20221128194715-5caf33c866da/go.mod h1:gY7sdkpsI1IjTD9krr+XXywtsfhcrPx1Nu2DFLGZWWg=
+github.com/gophercloud/gophercloud v1.1.1 h1:MuGyqbSxiuVBqkPZ3+Nhbytk1xZxhmfCB2Rg1cJWFWM=
+github.com/gophercloud/gophercloud v1.1.1/go.mod h1:aAVqcocTSXh2vYFZ1JTvx4EQmfgzxRcNupUfxZbBNDM=
+github.com/gophercloud/utils v0.0.0-20221207145018-e8fba78967ca h1:HZWyhvVXgS2rx5StixMKhrTjpfUg5vLSNhF/xHkcRNg=
+github.com/gophercloud/utils v0.0.0-20221207145018-e8fba78967ca/go.mod h1:z4Dey7xsTUXgcB1C8elMvGRKTjV1ez0eoYQlMrduG1g=
 github.com/hashicorp/go-uuid v1.0.3/go.mod h1:6SBZvOh/SIDV7/2o3Jml5SYk/TvGqwFJ/bN7x4byOro=
 github.com/inconshreveable/mousetrap v1.0.1 h1:U3uMjPSQEBMNp1lFxmllqCPM6P5u/Xq7Pgzkat/bFNc=
 github.com/inconshreveable/mousetrap v1.0.1/go.mod h1:vpF70FUmC8bwa3OWnCshd2FqLfsEA9PFc4w1p2J65bw=
@@ -15,8 +15,8 @@ github.com/olekukonko/tablewriter v0.0.5/go.mod h1:hPp6KlRPjbx+hW8ykQs1w3UBbZlj6
 github.com/russross/blackfriday/v2 v2.1.0/go.mod h1:+Rmxgy9KzJVeS9/2gXHxylqXiyQDYRxCVz55jmeOWTM=
 github.com/sapcc/go-api-declarations v1.4.2 h1:YlxBFe+gFjOwZHZLTSjVWVVgDJo+Xs3egTfYKBvydxY=
 github.com/sapcc/go-api-declarations v1.4.2/go.mod h1:EA4x5xxJGyG/3JTteUOYBg6cJLJgsBHrDj3ryfNU4dQ=
-github.com/sapcc/gophercloud-sapcc v0.0.0-20221202013434-a591fc02875e h1:B7qK6GjxT5mFf6hJN7fH1FxkqojxMIfOqNym/OOlc2E=
-github.com/sapcc/gophercloud-sapcc v0.0.0-20221202013434-a591fc02875e/go.mod h1:4oeOAAG4tH2hTsmV3NpkQfgt7GgTW6KcUQbDHAoV1Jo=
+github.com/sapcc/gophercloud-sapcc v0.0.0-20221208130052-8b23282c6119 h1:j64+IGw4Kqlo5Td+BxO1ewFFXbu7bFh6AqvLYegp7fg=
+github.com/sapcc/gophercloud-sapcc v0.0.0-20221208130052-8b23282c6119/go.mod h1:nnghnLPf3MsADYUUzIHeTrCkVtvH/IrBs0bZHz/CCQ8=
 github.com/spf13/cobra v1.6.1 h1:o94oiPyS4KD1mPy2fmcYYHHfCxLqYjJOhGsCHFZtEzA=
 github.com/spf13/cobra v1.6.1/go.mod h1:IOw/AERYS7UzyrGinqmz6HLUo219MORXGxhbaJUqzrY=
 github.com/spf13/pflag v1.0.5 h1:iy+VFUOCP1a+8yFto/drg2CJ5u0yRoB7fZw3DKv/JXA=
