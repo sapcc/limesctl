@@ -182,7 +182,7 @@ func setenvIfVal(key, val string) {
 	}
 	err := os.Setenv(key, val)
 	if err != nil {
-		cobra.CheckErr(err.Error())
+		cobra.CheckErr(err)
 	}
 }
 
