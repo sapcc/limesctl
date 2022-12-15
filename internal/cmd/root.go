@@ -15,6 +15,7 @@
 package cmd
 
 import (
+	"crypto/tls"
 	"fmt"
 	"net/http"
 	"os"
@@ -55,6 +56,8 @@ var (
 	osProjectName       string
 	osProjectDomainID   string
 	osProjectDomainName string
+	osCert              string
+	osKey               string
 )
 
 func newRootCmd(v *VersionInfo) *cobra.Command {
@@ -80,6 +83,8 @@ func newRootCmd(v *VersionInfo) *cobra.Command {
 	cmd.PersistentFlags().StringVar(&osProjectName, "os-project-name", "", "project name to scope to")
 	cmd.PersistentFlags().StringVar(&osProjectDomainID, "os-project-domain-id", "", "domain ID containing project to scope to")
 	cmd.PersistentFlags().StringVar(&osProjectDomainName, "os-project-domain-name", "", "domain name containing project to scope to")
+	cmd.PersistentFlags().StringVar(&osCert, "os-cert", "", "client certificate")
+	cmd.PersistentFlags().StringVar(&osKey, "os-key", "", "client certificate key")
 
 	// Subcommands
 	cmd.AddCommand(newClusterCmd())
@@ -109,10 +114,26 @@ func authenticate() (*gophercloud.ProviderClient, error) {
 	if err != nil {
 		return nil, util.WrapError(err, "cannot create an OpenStack client")
 	}
+
+	transport := &http.Transport{}
+	if os.Getenv("OS_CERT") != "" && os.Getenv("OS_KEY") != "" {
+		cert, err := tls.LoadX509KeyPair(os.Getenv("OS_CERT"), os.Getenv("OS_KEY"))
+		if err != nil {
+			return nil, util.WrapError(err, "failed to load x509 keypair")
+		}
+		transport.TLSClientConfig = &tls.Config{
+			Certificates: []tls.Certificate{cert},
+			MinVersion:   tls.VersionTLS12,
+		}
+		provider.HTTPClient = http.Client{
+			Transport: transport,
+		}
+	}
+
 	if debug {
 		provider.HTTPClient = http.Client{
 			Transport: &client.RoundTripper{
-				Rt:     &http.Transport{},
+				Rt:     transport,
 				Logger: &client.DefaultLogger{},
 			},
 		}
@@ -175,4 +196,6 @@ func updateOpenStackEnvVars() {
 	setenvIfVal("OS_PROJECT_NAME", osProjectName)
 	setenvIfVal("OS_PROJECT_DOMAIN_ID", osProjectDomainID)
 	setenvIfVal("OS_PROJECT_DOMAIN_NAME", osProjectDomainName)
+	setenvIfVal("OS_CERT", osCert)
+	setenvIfVal("OS_KEY", osKey)
 }
