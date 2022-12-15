@@ -119,7 +119,7 @@ func authenticate() (*gophercloud.ProviderClient, error) {
 	if os.Getenv("OS_CERT") != "" && os.Getenv("OS_KEY") != "" {
 		cert, err := tls.LoadX509KeyPair(os.Getenv("OS_CERT"), os.Getenv("OS_KEY"))
 		if err != nil {
-			return nil, util.WrapError(err, "failed to load x509 keypair")
+			return nil, util.WrapError(err, "failed to load x509 key pair")
 		}
 		transport.TLSClientConfig = &tls.Config{
 			Certificates: []tls.Certificate{cert},
