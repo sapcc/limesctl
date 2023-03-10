@@ -16,8 +16,8 @@ github.com/olekukonko/tablewriter v0.0.5/go.mod h1:hPp6KlRPjbx+hW8ykQs1w3UBbZlj6
 github.com/russross/blackfriday/v2 v2.1.0/go.mod h1:+Rmxgy9KzJVeS9/2gXHxylqXiyQDYRxCVz55jmeOWTM=
 github.com/sapcc/go-api-declarations v1.4.3 h1:RYJujw/NizuJepIU60E9da5JxGnWqn4FGSW/A6V7Uv8=
 github.com/sapcc/go-api-declarations v1.4.3/go.mod h1:EA4x5xxJGyG/3JTteUOYBg6cJLJgsBHrDj3ryfNU4dQ=
-github.com/sapcc/gophercloud-sapcc v0.0.0-20230209153730-4482e179c507 h1:wb8g59GK5quYuDtTLU+YY+Fox2N7IhjbRLx8yGtpHvM=
-github.com/sapcc/gophercloud-sapcc v0.0.0-20230209153730-4482e179c507/go.mod h1:VVkHxTL3jDlzU/QcqamDr2oYJV9UsBxAWmoDZAG8SPw=
+github.com/sapcc/gophercloud-sapcc v0.0.0-20230303130510-256bf2bc4fac h1:FvPYe8cFnOGkDkOWY7zH6RmRcx70WCfFK/wie7hTVkY=
+github.com/sapcc/gophercloud-sapcc v0.0.0-20230303130510-256bf2bc4fac/go.mod h1:Cbv506/ZragTVTrW5gt1yLAIRYOFpyDwPDklaaZFzdg=
 github.com/spf13/cobra v1.6.1 h1:o94oiPyS4KD1mPy2fmcYYHHfCxLqYjJOhGsCHFZtEzA=
 github.com/spf13/cobra v1.6.1/go.mod h1:IOw/AERYS7UzyrGinqmz6HLUo219MORXGxhbaJUqzrY=
 github.com/spf13/pflag v1.0.5 h1:iy+VFUOCP1a+8yFto/drg2CJ5u0yRoB7fZw3DKv/JXA=
