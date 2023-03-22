@@ -8,10 +8,6 @@ golangciLint:
 
 githubWorkflow:
   global:
-    assignees:
-      - talal
-      - majewsky
-      - SuperSandro2000
     ignorePaths: [ "**.md" ] # all Markdown files
   ci:
     enabled: true
@@ -26,6 +22,10 @@ githubWorkflow:
 
 renovate:
   enabled: true
+  assignees:
+    - talal
+    - majewsky
+    - SuperSandro2000
 
 verbatim: |
   build/release-info: CHANGELOG.md | build
