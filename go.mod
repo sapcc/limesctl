@@ -7,7 +7,7 @@ require (
 	github.com/gophercloud/utils v0.0.0-20230418172808-6eab72e966e1
 	github.com/olekukonko/tablewriter v0.0.5
 	github.com/sapcc/go-api-declarations v1.5.1
-	github.com/sapcc/gophercloud-sapcc v0.0.0-20230420084000-326e6b5e3351
+	github.com/sapcc/gophercloud-sapcc v0.0.0-20230426140328-8937b76696bc
 	github.com/spf13/cobra v1.7.0
 )
 
