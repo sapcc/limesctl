@@ -3,11 +3,11 @@ module github.com/sapcc/limesctl/v3
 go 1.20
 
 require (
-	github.com/gophercloud/gophercloud v1.3.0
-	github.com/gophercloud/utils v0.0.0-20230418172808-6eab72e966e1
+	github.com/gophercloud/gophercloud v1.4.0
+	github.com/gophercloud/utils v0.0.0-20230523080330-de873b9cf00d
 	github.com/olekukonko/tablewriter v0.0.5
 	github.com/sapcc/go-api-declarations v1.5.1
-	github.com/sapcc/gophercloud-sapcc v0.0.0-20230426140328-8937b76696bc
+	github.com/sapcc/gophercloud-sapcc v0.0.0-20230525104331-1eb9cdcb0295
 	github.com/spf13/cobra v1.7.0
 )
 
