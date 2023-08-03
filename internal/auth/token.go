@@ -43,7 +43,7 @@ func currentToken(identityClient *gophercloud.ServiceClient) (*token, error) {
 	var t token
 	err := identityClient.GetAuthResult().(tokens.CreateResult).ExtractInto(&t)
 	if err != nil {
-		return nil, fmt.Errorf("could not get current token: %v", err)
+		return nil, fmt.Errorf("could not get current token: %w", err)
 	}
 	return &t, nil
 }
