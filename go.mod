@@ -1,6 +1,6 @@
 module github.com/sapcc/limesctl/v3
 
-go 1.20
+go 1.21
 
 require (
 	github.com/gophercloud/gophercloud v1.5.0
