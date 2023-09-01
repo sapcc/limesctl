@@ -1,7 +1,11 @@
 before:
   hooks:
     - go mod tidy
-    - ./scripts/completions.sh
+    - rm -rf completions
+    - mkdir completions
+    - go run main.go completion bash >"completions/limesctl.bash"
+    - go run main.go completion fish >"completions/limesctl.fish"
+    - go run main.go completion zsh >"completions/limesctl.zsh"
 
 builds:
   - env:
@@ -51,8 +55,8 @@ brews:
     install: |-
       bin.install "limesctl"
       bash_completion.install "completions/limesctl.bash" => "limesctl"
-      zsh_completion.install "completions/limesctl.zsh" => "_limesctl"
       fish_completion.install "completions/limesctl.fish"
+      zsh_completion.install "completions/limesctl.zsh" => "_limesctl"
     test: |
       system "#{bin}/limesctl --version"
     commit_msg_template: "Homebrew: update formula to {{ .Tag }}"
