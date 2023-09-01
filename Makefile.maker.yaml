@@ -1,7 +1,16 @@
+# Configuration file for <https://github.com/sapcc/go-makefile-maker>
+
+metadata:
+  url: https://github.com/sapcc/limesctl
+
 binaries:
   - name: limesctl
     fromPackage: .
     installTo: bin/
+
+golang:
+  enableVendoring: true
+  setGoModVersion: true
 
 golangciLint:
   createConfig: true
