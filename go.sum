@@ -1,7 +1,7 @@
 github.com/cpuguy83/go-md2man/v2 v2.0.2/go.mod h1:tgQtvFlXSQOSOSIRvRPT7W67SCa46tRHOmNcaadrF8o=
 github.com/gophercloud/gophercloud v1.3.0/go.mod h1:aAVqcocTSXh2vYFZ1JTvx4EQmfgzxRcNupUfxZbBNDM=
-github.com/gophercloud/gophercloud v1.5.0 h1:cDN6XFCLKiiqvYpjQLq9AiM7RDRbIC9450WpPH+yvXo=
-github.com/gophercloud/gophercloud v1.5.0/go.mod h1:aAVqcocTSXh2vYFZ1JTvx4EQmfgzxRcNupUfxZbBNDM=
+github.com/gophercloud/gophercloud v1.6.0 h1:JwJN1bauRnWPba5ueWs9IluONHteXPWjjK+MvfM4krY=
+github.com/gophercloud/gophercloud v1.6.0/go.mod h1:aAVqcocTSXh2vYFZ1JTvx4EQmfgzxRcNupUfxZbBNDM=
 github.com/gophercloud/utils v0.0.0-20230523080330-de873b9cf00d h1:6Gvua77nKyAiZQpu0N3AsamGu1L6Mlnhp3tAtDcqwvc=
 github.com/gophercloud/utils v0.0.0-20230523080330-de873b9cf00d/go.mod h1:VSalo4adEk+3sNkmVJLnhHoOyOYYS8sTWLG4mv5BKto=
 github.com/hashicorp/go-uuid v1.0.3 h1:2gKiV6YVmrJ1i2CKKa9obLvRieoRGviZFL26PcT/Co8=
@@ -15,10 +15,10 @@ github.com/mitchellh/go-homedir v1.1.0/go.mod h1:SfyaCUpYCn1Vlf4IUYiD9fPX4A5wJrk
 github.com/olekukonko/tablewriter v0.0.5 h1:P2Ga83D34wi1o9J6Wh1mRuqd4mF/x/lgBS7N7AbDhec=
 github.com/olekukonko/tablewriter v0.0.5/go.mod h1:hPp6KlRPjbx+hW8ykQs1w3UBbZlj6HuIJcUGPhkA7kY=
 github.com/russross/blackfriday/v2 v2.1.0/go.mod h1:+Rmxgy9KzJVeS9/2gXHxylqXiyQDYRxCVz55jmeOWTM=
-github.com/sapcc/go-api-declarations v1.8.0 h1:jlomBUa0IMgcibtUT1GQ6VOT9RYa8LCk6LuP0DxURWo=
-github.com/sapcc/go-api-declarations v1.8.0/go.mod h1:83R3hTANhuRXt/pXDby37IJetw8l7DG41s33Tp9NXxI=
-github.com/sapcc/gophercloud-sapcc v0.0.0-20230824030507-b730bdde296f h1:gmxLF8mHjX4IwdvNSL9kDArDhFWuHuDF8W2A79GUzi0=
-github.com/sapcc/gophercloud-sapcc v0.0.0-20230824030507-b730bdde296f/go.mod h1:/uaLC/Xa+fHbB4gGvnMfDwOXkg5Nu6tqytWlgNTNUa4=
+github.com/sapcc/go-api-declarations v1.8.1 h1:cICFeK+YIZ9ozz01Q03OVjBYVNo33RuKep83Dw82KmY=
+github.com/sapcc/go-api-declarations v1.8.1/go.mod h1:83R3hTANhuRXt/pXDby37IJetw8l7DG41s33Tp9NXxI=
+github.com/sapcc/gophercloud-sapcc v0.0.0-20230831004640-11f565cf98ee h1:vW1S5EmVLxf30aBjdAZe2/CdFB1oA4HbO31kdIkx8lg=
+github.com/sapcc/gophercloud-sapcc v0.0.0-20230831004640-11f565cf98ee/go.mod h1:Lb29gNXHt8nmYt6wZX29XHNM9VyhmWxVe7G8ImKc5Hs=
 github.com/spf13/cobra v1.7.0 h1:hyqWnYt1ZQShIddO5kBpj3vu05/++x6tJ6dg8EC572I=
 github.com/spf13/cobra v1.7.0/go.mod h1:uLxZILRyS/50WlhOIKD7W6V5bgeIt+4sICxh6uRMrb0=
 github.com/spf13/pflag v1.0.5 h1:iy+VFUOCP1a+8yFto/drg2CJ5u0yRoB7fZw3DKv/JXA=
