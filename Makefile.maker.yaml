@@ -15,12 +15,17 @@ golang:
 golangciLint:
   createConfig: true
 
+goreleaser:
+  enabled: true
+
 githubWorkflow:
   ci:
     enabled: true
     coveralls: true
     ignorePaths: [ "**.md" ] # all Markdown files
   license:
+    enabled: true
+  release:
     enabled: true
   securityChecks:
     enabled: true
