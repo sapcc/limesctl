@@ -27,7 +27,7 @@ jobs:
       - name: Generate release info
         run: make build/release-info
       - name: Run GoReleaser
-        uses: goreleaser/goreleaser-action@v4
+        uses: goreleaser/goreleaser-action@v5
         with:
           args: release --rm-dist --release-notes=./build/release-info
           version: latest
