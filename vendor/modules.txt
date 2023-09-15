@@ -41,7 +41,7 @@ github.com/sapcc/go-api-declarations/internal/marshal
 github.com/sapcc/go-api-declarations/limes
 github.com/sapcc/go-api-declarations/limes/rates
 github.com/sapcc/go-api-declarations/limes/resources
-# github.com/sapcc/gophercloud-sapcc v0.0.0-20230907083958-7c3b338d88c6
+# github.com/sapcc/gophercloud-sapcc v0.0.0-20230914034222-2c07e1c4ab5c
 ## explicit; go 1.21
 github.com/sapcc/gophercloud-sapcc/clients
 github.com/sapcc/gophercloud-sapcc/rates/v1/clusters
