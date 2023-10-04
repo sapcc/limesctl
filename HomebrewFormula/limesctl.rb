@@ -5,55 +5,55 @@
 class Limesctl < Formula
   desc "Command-line interface for Limes"
   homepage "https://github.com/sapcc/limesctl"
-  version "3.2.1"
+  version "3.3.0"
   license "Apache-2.0"
 
   on_macos do
     if Hardware::CPU.arm?
-      url "https://github.com/sapcc/limesctl/releases/download/v3.2.1/limesctl-3.2.1-darwin-arm64.tar.gz"
-      sha256 "4967755b29d5ebe9f77bb10c2f1db6a5f8b59e2d5f41ac3a223d3d07c40b97dc"
+      url "https://github.com/sapcc/limesctl/releases/download/v3.3.0/limesctl-3.3.0-darwin-arm64.tar.gz"
+      sha256 "7fdc515863070b4bddf9b31b75465bb68ca60395e6531298b50d218aeb10a6fe"
 
       def install
         bin.install "limesctl"
         bash_completion.install "completions/limesctl.bash" => "limesctl"
-        zsh_completion.install "completions/limesctl.zsh" => "_limesctl"
         fish_completion.install "completions/limesctl.fish"
+        zsh_completion.install "completions/limesctl.zsh" => "_limesctl"
       end
     end
     if Hardware::CPU.intel?
-      url "https://github.com/sapcc/limesctl/releases/download/v3.2.1/limesctl-3.2.1-darwin-amd64.tar.gz"
-      sha256 "93e42d406e9e2b9dbc6cfc651732d40a684aba549d1ac5a936490520ef801929"
+      url "https://github.com/sapcc/limesctl/releases/download/v3.3.0/limesctl-3.3.0-darwin-amd64.tar.gz"
+      sha256 "c85def501bb74cd4a1700052adab90041b108393d766db79def7d7fbc3602916"
 
       def install
         bin.install "limesctl"
         bash_completion.install "completions/limesctl.bash" => "limesctl"
-        zsh_completion.install "completions/limesctl.zsh" => "_limesctl"
         fish_completion.install "completions/limesctl.fish"
+        zsh_completion.install "completions/limesctl.zsh" => "_limesctl"
       end
     end
   end
 
   on_linux do
-    if Hardware::CPU.intel?
-      url "https://github.com/sapcc/limesctl/releases/download/v3.2.1/limesctl-3.2.1-linux-amd64.tar.gz"
-      sha256 "4fa4ecd565082ec4b7265f085852ec501532cb8a9aee0720639ab895f7bf36f2"
+    if Hardware::CPU.arm? && Hardware::CPU.is_64_bit?
+      url "https://github.com/sapcc/limesctl/releases/download/v3.3.0/limesctl-3.3.0-linux-arm64.tar.gz"
+      sha256 "c338727c3e373f8a9cb6ba912053125e617b99b141eb5db56717fd65b4e6eddc"
 
       def install
         bin.install "limesctl"
         bash_completion.install "completions/limesctl.bash" => "limesctl"
-        zsh_completion.install "completions/limesctl.zsh" => "_limesctl"
         fish_completion.install "completions/limesctl.fish"
+        zsh_completion.install "completions/limesctl.zsh" => "_limesctl"
       end
     end
-    if Hardware::CPU.arm? && Hardware::CPU.is_64_bit?
-      url "https://github.com/sapcc/limesctl/releases/download/v3.2.1/limesctl-3.2.1-linux-arm64.tar.gz"
-      sha256 "b253384f07dfeefb5feb8f60a2b3fef5fdb212f3e177d20a7779a7099f54840b"
+    if Hardware::CPU.intel?
+      url "https://github.com/sapcc/limesctl/releases/download/v3.3.0/limesctl-3.3.0-linux-amd64.tar.gz"
+      sha256 "2df247d5abc0ca8b1f0584a08db7762bfb3586433820a863f8896267d78e00ea"
 
       def install
         bin.install "limesctl"
         bash_completion.install "completions/limesctl.bash" => "limesctl"
-        zsh_completion.install "completions/limesctl.zsh" => "_limesctl"
         fish_completion.install "completions/limesctl.fish"
+        zsh_completion.install "completions/limesctl.zsh" => "_limesctl"
       end
     end
   end
