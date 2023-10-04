@@ -19,6 +19,8 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"os/exec"
+	"strings"
 
 	"github.com/gophercloud/gophercloud"
 	"github.com/gophercloud/gophercloud/openstack"
@@ -50,6 +52,7 @@ var (
 	osAuthURL           string
 	osUsername          string
 	osPassword          string
+	osPwCmd             string
 	osUserDomainID      string
 	osUserDomainName    string
 	osProjectID         string
@@ -77,6 +80,7 @@ func newRootCmd(v *VersionInfo) *cobra.Command {
 	cmd.PersistentFlags().StringVar(&osAuthURL, "os-auth-url", "", "authentication URL")
 	cmd.PersistentFlags().StringVar(&osUsername, "os-username", "", "username")
 	cmd.PersistentFlags().StringVar(&osPassword, "os-password", "", "user's Password")
+	cmd.PersistentFlags().StringVar(&osPwCmd, "os-pw-cmd", "", "command from which to retrieve the user's password")
 	cmd.PersistentFlags().StringVar(&osUserDomainID, "os-user-domain-id", "", "user's domain ID")
 	cmd.PersistentFlags().StringVar(&osUserDomainName, "os-user-domain-name", "", "user's domain name")
 	cmd.PersistentFlags().StringVar(&osProjectID, "os-project-id", "", "project ID to scope to")
@@ -105,6 +109,15 @@ func authenticate() (*gophercloud.ProviderClient, error) {
 	// Update OpenStack environment variables, if value(s) provided as flag.
 	updateOpenStackEnvVars()
 
+	pwCmd := os.Getenv("OS_PW_CMD")
+	if pwCmd != "" && os.Getenv("OS_PASSWORD") == "" {
+		// Retrieve user's password from external command.
+		out, err := exec.Command("sh", "-c", pwCmd).Output()
+		if err != nil {
+			return nil, util.WrapError(err, fmt.Sprintf("could not retrieve user password using: %s", pwCmd))
+		}
+		setenvIfVal("OS_PASSWORD", strings.TrimSuffix(string(out), "\n"))
+	}
 	ao, err := clientconfig.AuthOptions(nil)
 	if err != nil {
 		return nil, util.WrapError(err, "could not get auth variables")
@@ -190,6 +203,7 @@ func updateOpenStackEnvVars() {
 	setenvIfVal("OS_AUTH_URL", osAuthURL)
 	setenvIfVal("OS_USERNAME", osUsername)
 	setenvIfVal("OS_PASSWORD", osPassword)
+	setenvIfVal("OS_PW_CMD", osPwCmd)
 	setenvIfVal("OS_USER_DOMAIN_ID", osUserDomainID)
 	setenvIfVal("OS_USER_DOMAIN_NAME", osUserDomainName)
 	setenvIfVal("OS_PROJECT_ID", osProjectID)
