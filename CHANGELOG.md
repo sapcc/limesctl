@@ -9,6 +9,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased](https://github.com/sapcc/limesctl/compare/v3.2.1...HEAD)
 
+## 3.3.0 - 2023-10-04
+
+### Added
+
+- Support for specifying shell command which will be used for retrieving user password
+  using `--os-pw-cmd` flag or `OS_PW_CMD` environment variable.
+
 ## 3.2.1 - 2023-09-01
 
 ### Changed

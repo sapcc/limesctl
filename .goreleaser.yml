@@ -45,7 +45,7 @@ archives:
       - completions/*
 
 brews:
-  - tap:
+  - repository:
       owner: sapcc
       name: limesctl
     folder: HomebrewFormula
