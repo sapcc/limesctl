@@ -14,10 +14,6 @@ endif
 
 default: build-all
 
-build/release-info: CHANGELOG.md | build
-	@if ! hash release-info 2>/dev/null; then printf "\e[1;36m>> Installing release-info...\e[0m\n"; go install github.com/sapcc/go-bits/tools/release-info@latest; fi
-	release-info $< $(shell git describe --tags --abbrev=0) > $@
-
 GO_BUILDFLAGS = -mod vendor
 GO_LDFLAGS =
 GO_TESTENV =
