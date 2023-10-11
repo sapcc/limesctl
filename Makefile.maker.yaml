@@ -15,8 +15,10 @@ golang:
 golangciLint:
   createConfig: true
 
-goreleaser:
-  enabled: true
+goReleaser:
+  # NOTE: this is default behavior but we define this option explicitly for documentation purposes.
+  # limesctl uses a custom config file which includes Homebrew tap definition.
+  createConfig: false
 
 githubWorkflow:
   ci:
@@ -38,8 +40,3 @@ renovate:
     - talal
     - majewsky
     - SuperSandro2000
-
-verbatim: |
-  build/release-info: CHANGELOG.md | build
-    @if ! hash release-info 2>/dev/null; then printf "\e[1;36m>> Installing release-info...\e[0m\n"; go install github.com/sapcc/go-bits/tools/release-info@latest; fi
-    release-info $< $(shell git describe --tags --abbrev=0) > $@

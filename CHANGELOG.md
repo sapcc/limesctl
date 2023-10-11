@@ -25,7 +25,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## 3.2.0 - 2023-03-03
 
-## Added
+### Added
 
 - Support for showing cluster global rate limits.
 
@@ -35,26 +35,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## 3.1.3 - 2022-12-15
 
-## Added
+### Added
 
 - Support for specifying TLS client certificate and key using flags (`--os-cert`/`--os-key`) or
   environment variables (`OS_CERT`/`OS_KEY`).
 
 ## 3.1.2 - 2022-11-24
 
-## Fixed
+### Fixed
 
 - Examples for `domain set` and `project set` commands.
 
 ## 3.1.1 - 2022-11-20
 
-## Fixed
+### Fixed
 
 - Removed dead code.
 
 ## 3.1.0 - 2022-11-20
 
-## Added
+### Added
 
 - Add shell completions to Homebrew formula.
 - Added detailed examples for `project set` and `domain set` commands.
