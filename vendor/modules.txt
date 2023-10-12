@@ -34,14 +34,14 @@ github.com/mitchellh/go-homedir
 # github.com/olekukonko/tablewriter v0.0.5
 ## explicit; go 1.12
 github.com/olekukonko/tablewriter
-# github.com/sapcc/go-api-declarations v1.8.3
+# github.com/sapcc/go-api-declarations v1.9.0
 ## explicit; go 1.21
 github.com/sapcc/go-api-declarations/bininfo
 github.com/sapcc/go-api-declarations/internal/marshal
 github.com/sapcc/go-api-declarations/limes
 github.com/sapcc/go-api-declarations/limes/rates
 github.com/sapcc/go-api-declarations/limes/resources
-# github.com/sapcc/gophercloud-sapcc v0.0.0-20231004083010-5b75b97bad76
+# github.com/sapcc/gophercloud-sapcc v0.0.0-20231012112418-5e87a157f2af
 ## explicit; go 1.21
 github.com/sapcc/gophercloud-sapcc/clients
 github.com/sapcc/gophercloud-sapcc/rates/v1/clusters
