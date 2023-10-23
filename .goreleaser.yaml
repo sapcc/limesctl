@@ -1,6 +1,5 @@
 before:
   hooks:
-    - go mod tidy
     - rm -rf completions
     - mkdir completions
     - sh -c "for sh in bash zsh fish; do go run main.go completion "$sh" >"completions/limesctl.$sh"; done"
