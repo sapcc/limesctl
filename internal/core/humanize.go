@@ -20,7 +20,6 @@
 package core
 
 import (
-	"fmt"
 	"math"
 	"sort"
 	"strconv"
@@ -72,7 +71,7 @@ func convertValue(v uint64, source, target limes.Unit) string {
 // string.
 type valToStrFunc func(v uint64) string
 
-var defaultValToStrFunc valToStrFunc = func(v uint64) string { return fmt.Sprintf("%d", v) }
+var defaultValToStrFunc valToStrFunc = func(v uint64) string { return strconv.FormatUint(v, 10) }
 
 // getValToStrFunc finds a human friendly unit for the given vals and returns a
 // function that can be used to convert resource values to this new unit.
