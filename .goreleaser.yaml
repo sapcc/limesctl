@@ -3,9 +3,7 @@ before:
     - go mod tidy
     - rm -rf completions
     - mkdir completions
-    - go run main.go completion bash >"completions/limesctl.bash"
-    - go run main.go completion fish >"completions/limesctl.fish"
-    - go run main.go completion zsh >"completions/limesctl.zsh"
+    - sh -c "for sh in bash zsh fish; do go run main.go completion "$sh" >"completions/limesctl.$sh"; done"
 
 builds:
   - env:
