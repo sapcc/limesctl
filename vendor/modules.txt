@@ -49,7 +49,7 @@ github.com/sapcc/gophercloud-sapcc/rates/v1/projects
 github.com/sapcc/gophercloud-sapcc/resources/v1/clusters
 github.com/sapcc/gophercloud-sapcc/resources/v1/domains
 github.com/sapcc/gophercloud-sapcc/resources/v1/projects
-# github.com/spf13/cobra v1.7.0
+# github.com/spf13/cobra v1.8.0
 ## explicit; go 1.15
 github.com/spf13/cobra
 # github.com/spf13/pflag v1.0.5
