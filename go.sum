@@ -15,10 +15,10 @@ github.com/mitchellh/go-homedir v1.1.0/go.mod h1:SfyaCUpYCn1Vlf4IUYiD9fPX4A5wJrk
 github.com/olekukonko/tablewriter v0.0.5 h1:P2Ga83D34wi1o9J6Wh1mRuqd4mF/x/lgBS7N7AbDhec=
 github.com/olekukonko/tablewriter v0.0.5/go.mod h1:hPp6KlRPjbx+hW8ykQs1w3UBbZlj6HuIJcUGPhkA7kY=
 github.com/russross/blackfriday/v2 v2.1.0/go.mod h1:+Rmxgy9KzJVeS9/2gXHxylqXiyQDYRxCVz55jmeOWTM=
-github.com/sapcc/go-api-declarations v1.10.4 h1:ZUq/2GjOMaKTVuWQrhY09Hu20Smk3SbDqItCJT0H9mg=
-github.com/sapcc/go-api-declarations v1.10.4/go.mod h1:83R3hTANhuRXt/pXDby37IJetw8l7DG41s33Tp9NXxI=
-github.com/sapcc/gophercloud-sapcc v0.0.0-20231207102321-ccb7578c58b1 h1:v3Fw4NzccL94uIjksUeae8TaR4cM/WpHthjQqwQ1EZo=
-github.com/sapcc/gophercloud-sapcc v0.0.0-20231207102321-ccb7578c58b1/go.mod h1:5xn8YcYXweyv3DriB2weiVI5PyEqb0ea1JugKHxN/J4=
+github.com/sapcc/go-api-declarations v1.10.5 h1:1jGXudH2kcS0JCfGqooHszhSIe7BCvqu7QYJdqfas0A=
+github.com/sapcc/go-api-declarations v1.10.5/go.mod h1:83R3hTANhuRXt/pXDby37IJetw8l7DG41s33Tp9NXxI=
+github.com/sapcc/gophercloud-sapcc v0.0.0-20231214091214-e4517ca1b6a4 h1:bPzqErdlvFN8KkZorXj0Js2bIMrSAt5oGdo65ncjnSM=
+github.com/sapcc/gophercloud-sapcc v0.0.0-20231214091214-e4517ca1b6a4/go.mod h1:W7BMHKOIhBMtBOqCDBT4APx7A48q7wt9i0jPB0PDXLs=
 github.com/spf13/cobra v1.8.0 h1:7aJaZx1B85qltLMc546zn58BxxfZdR/W22ej9CFoEf0=
 github.com/spf13/cobra v1.8.0/go.mod h1:WXLWApfZ71AjXPya3WOlMsY9yMs7YeiHhFVlvLyhcho=
 github.com/spf13/pflag v1.0.5 h1:iy+VFUOCP1a+8yFto/drg2CJ5u0yRoB7fZw3DKv/JXA=
