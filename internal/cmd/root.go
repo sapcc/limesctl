@@ -19,13 +19,12 @@ import (
 	"fmt"
 	"net/http"
 	"os"
-	"os/exec"
-	"strings"
 
 	"github.com/gophercloud/gophercloud"
 	"github.com/gophercloud/gophercloud/openstack"
 	"github.com/gophercloud/utils/client"
 	"github.com/gophercloud/utils/openstack/clientconfig"
+	"github.com/sapcc/go-bits/secrets"
 	"github.com/sapcc/gophercloud-sapcc/clients"
 	"github.com/spf13/cobra"
 
@@ -109,14 +108,8 @@ func authenticate() (*gophercloud.ProviderClient, error) {
 	// Update OpenStack environment variables, if value(s) provided as flag.
 	updateOpenStackEnvVars()
 
-	pwCmd := os.Getenv("OS_PW_CMD")
-	if pwCmd != "" && os.Getenv("OS_PASSWORD") == "" {
-		// Retrieve user's password from external command.
-		out, err := exec.Command("sh", "-c", pwCmd).Output()
-		if err != nil {
-			return nil, util.WrapError(err, fmt.Sprintf("could not retrieve user password using: %s", pwCmd))
-		}
-		setenvIfVal("OS_PASSWORD", strings.TrimSuffix(string(out), "\n"))
+	if err := secrets.GetPasswordFromCommandIfRequested(); err != nil {
+		return nil, err
 	}
 	ao, err := clientconfig.AuthOptions(nil)
 	if err != nil {
