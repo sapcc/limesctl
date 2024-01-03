@@ -7,7 +7,14 @@ The sections should follow the order `Added`, `Changed`, `Fixed`, `Removed`, and
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased](https://github.com/sapcc/limesctl/compare/v3.3.1...HEAD)
+## [Unreleased](https://github.com/sapcc/limesctl/compare/v3.3.2...HEAD)
+
+## 3.3.2 - 2024-01-03
+
+### Changed
+
+- `OS_PW_CMD` is now handled by go-bits which code is mostly adopted from limesctl.
+- Updated all dependencies to their latest version.
 
 ## 3.3.1 - 2023-10-23
 
