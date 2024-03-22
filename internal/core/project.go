@@ -38,9 +38,8 @@ func LimesProjectResourcesToReportRenderer(
 
 	out := make([]LimesReportRenderer, 0, len(in))
 	for _, rep := range in {
-		rep := rep
 		out = append(out, ProjectResourcesReport{
-			ProjectReport: &rep,
+			ProjectReport: &rep, //nolint:gosec // false positive in go 1.22
 			DomainID:      domainID,
 			DomainName:    domainName,
 		})
