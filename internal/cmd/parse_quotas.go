@@ -35,7 +35,7 @@ import (
 
 // resourceQuotas is a map of service name to resource name to the resource's
 // quota value and unit.
-type resourceQuotas map[string]map[string]limes.ValueWithUnit
+type resourceQuotas map[limes.ServiceType]map[limesresources.ResourceName]limes.ValueWithUnit
 
 // splitQuotaRe is used to split the user input around the equality sign.
 // Reference:
@@ -75,8 +75,8 @@ func parseToQuotaRequest(resValues resourceQuotas, in []string) (limesresources.
 		if len(serviceResource) > 2 {
 			return out, fmt.Errorf("expected a quota with service resource in the format: service/resource, got %q", matchList[1])
 		}
-		service := serviceResource[0]
-		resource := serviceResource[1]
+		service := limes.ServiceType(serviceResource[0])
+		resource := limesresources.ResourceName(serviceResource[1])
 		currentValWithUnit, ok := resValues[service][resource]
 		if !ok {
 			return nil, fmt.Errorf("invalid resource: %s/%s does not exist in Limes", service, resource)

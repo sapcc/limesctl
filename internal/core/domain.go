@@ -15,8 +15,9 @@
 package core
 
 import (
-	"sort"
+	"slices"
 
+	"github.com/sapcc/go-api-declarations/limes"
 	limesresources "github.com/sapcc/go-api-declarations/limes/resources"
 )
 
@@ -63,19 +64,19 @@ func (d DomainReport) render(opts *OutputOpts) CSVRecords {
 	var records CSVRecords
 
 	// Serialize service types with ordered keys
-	types := make([]string, 0, len(d.Services))
+	types := make([]limes.ServiceType, 0, len(d.Services))
 	for typeStr := range d.Services {
 		types = append(types, typeStr)
 	}
-	sort.Strings(types)
+	slices.Sort(types)
 
 	for _, srv := range types {
 		// Serialize resource names with ordered keys
-		names := make([]string, 0, len(d.Services[srv].Resources))
+		names := make([]limesresources.ResourceName, 0, len(d.Services[srv].Resources))
 		for nameStr := range d.Services[srv].Resources {
 			names = append(names, nameStr)
 		}
-		sort.Strings(names)
+		slices.Sort(names)
 
 		for _, res := range names {
 			var r []string
@@ -93,7 +94,7 @@ func (d DomainReport) render(opts *OutputOpts) CSVRecords {
 			})
 
 			if opts.CSVRecFmt == CSVRecordFormatLong {
-				r = append(r, d.UUID, d.Name, dSrv.Area, dSrv.Type, dSrvRes.Category, dSrvRes.Name,
+				r = append(r, d.UUID, d.Name, dSrv.Area, string(dSrv.Type), dSrvRes.Category, string(dSrvRes.Name),
 					emptyStrIfNil(domQ, valToStr), emptyStrIfNil(projectsQ, valToStr), valToStr(dSrvRes.Usage),
 					emptyStrIfNil(physU, valToStr), valToStr(dSrvRes.BurstUsage), string(unit), timestampToString(dSrv.MinScrapedAt),
 				)
@@ -102,7 +103,7 @@ func (d DomainReport) render(opts *OutputOpts) CSVRecords {
 				if opts.CSVRecFmt == CSVRecordFormatNames {
 					nameOrID = d.Name
 				}
-				r = append(r, nameOrID, dSrv.Type, dSrvRes.Name, emptyStrIfNil(domQ, valToStr),
+				r = append(r, nameOrID, string(dSrv.Type), string(dSrvRes.Name), emptyStrIfNil(domQ, valToStr),
 					emptyStrIfNil(projectsQ, valToStr), valToStr(dSrvRes.Usage), string(unit),
 				)
 			}

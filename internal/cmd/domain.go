@@ -17,6 +17,7 @@ package cmd
 import (
 	"github.com/gophercloud/gophercloud"
 	"github.com/sapcc/go-api-declarations/limes"
+	limesresources "github.com/sapcc/go-api-declarations/limes/resources"
 	"github.com/sapcc/gophercloud-sapcc/resources/v1/domains"
 	"github.com/spf13/cobra"
 
@@ -247,7 +248,7 @@ func getDomainResourceQuotas(limesClient *gophercloud.ServiceClient, domainID st
 	for srv, srvReport := range rep.Services {
 		for res, resReport := range srvReport.Resources {
 			if _, ok := result[srv]; !ok {
-				result[srv] = make(map[string]limes.ValueWithUnit)
+				result[srv] = make(map[limesresources.ResourceName]limes.ValueWithUnit)
 			}
 			var val uint64
 			if resReport.DomainQuota != nil {

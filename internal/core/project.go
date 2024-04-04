@@ -15,8 +15,9 @@
 package core
 
 import (
-	"sort"
+	"slices"
 
+	"github.com/sapcc/go-api-declarations/limes"
 	limesresources "github.com/sapcc/go-api-declarations/limes/resources"
 )
 
@@ -74,19 +75,19 @@ func (p ProjectResourcesReport) render(opts *OutputOpts) CSVRecords {
 	var records CSVRecords
 
 	// Serialize service types with ordered keys
-	types := make([]string, 0, len(p.Services))
+	types := make([]limes.ServiceType, 0, len(p.Services))
 	for typeStr := range p.Services {
 		types = append(types, typeStr)
 	}
-	sort.Strings(types)
+	slices.Sort(types)
 
 	for _, srv := range types {
 		// Serialize resource names with ordered keys
-		names := make([]string, 0, len(p.Services[srv].Resources))
+		names := make([]limesresources.ResourceName, 0, len(p.Services[srv].Resources))
 		for nameStr := range p.Services[srv].Resources {
 			names = append(names, nameStr)
 		}
-		sort.Strings(names)
+		slices.Sort(names)
 
 		for _, res := range names {
 			var r []string
@@ -117,8 +118,8 @@ func (p ProjectResourcesReport) render(opts *OutputOpts) CSVRecords {
 			})
 
 			if opts.CSVRecFmt == CSVRecordFormatLong {
-				r = append(r, p.DomainID, p.DomainName, p.UUID, p.Name, pSrv.Area, pSrv.Type, pSrvRes.Category,
-					pSrvRes.Name, emptyStrIfNil(quota, valToStr), emptyStrIfNil(burstQuota, valToStr), valToStr(usage),
+				r = append(r, p.DomainID, p.DomainName, p.UUID, p.Name, pSrv.Area, string(pSrv.Type), pSrvRes.Category,
+					string(pSrvRes.Name), emptyStrIfNil(quota, valToStr), emptyStrIfNil(burstQuota, valToStr), valToStr(usage),
 					emptyStrIfNil(physU, valToStr), valToStr(burstUsage), string(unit), timestampToString(pSrv.ScrapedAt),
 				)
 			} else {
@@ -128,7 +129,7 @@ func (p ProjectResourcesReport) render(opts *OutputOpts) CSVRecords {
 					projectNameOrID = p.Name
 					domainNameOrID = p.DomainName
 				}
-				r = append(r, domainNameOrID, projectNameOrID, pSrv.Type, pSrvRes.Name,
+				r = append(r, domainNameOrID, projectNameOrID, string(pSrv.Type), string(pSrvRes.Name),
 					emptyStrIfNil(quota, valToStr), valToStr(usage), string(unit),
 				)
 			}

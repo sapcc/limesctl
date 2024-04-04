@@ -21,6 +21,7 @@ import (
 
 	"github.com/gophercloud/gophercloud"
 	"github.com/sapcc/go-api-declarations/limes"
+	limesresources "github.com/sapcc/go-api-declarations/limes/resources"
 	ratesProjects "github.com/sapcc/gophercloud-sapcc/rates/v1/projects"
 	"github.com/sapcc/gophercloud-sapcc/resources/v1/projects"
 	"github.com/spf13/cobra"
@@ -532,7 +533,7 @@ func getProjectResourceQuotas(limesClient *gophercloud.ServiceClient, pInfo *aut
 	for srv, srvReport := range rep.Services {
 		for res, resReport := range srvReport.Resources {
 			if _, ok := result[srv]; !ok {
-				result[srv] = make(map[string]limes.ValueWithUnit)
+				result[srv] = make(map[limesresources.ResourceName]limes.ValueWithUnit)
 			}
 			var val uint64
 			if resReport.Quota != nil {

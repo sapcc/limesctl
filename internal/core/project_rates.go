@@ -15,8 +15,9 @@
 package core
 
 import (
-	"sort"
+	"slices"
 
+	"github.com/sapcc/go-api-declarations/limes"
 	limesrates "github.com/sapcc/go-api-declarations/limes/rates"
 )
 
@@ -72,19 +73,19 @@ func (p ProjectRatesReport) render(opts *OutputOpts) CSVRecords {
 	var records CSVRecords
 
 	// Serialize service types with ordered keys
-	types := make([]string, 0, len(p.Services))
+	types := make([]limes.ServiceType, 0, len(p.Services))
 	for typeStr := range p.Services {
 		types = append(types, typeStr)
 	}
-	sort.Strings(types)
+	slices.Sort(types)
 
 	for _, srv := range types {
 		// Serialize rate names with ordered keys
-		names := make([]string, 0, len(p.Services[srv].Rates))
+		names := make([]limesrates.RateName, 0, len(p.Services[srv].Rates))
 		for nameStr := range p.Services[srv].Rates {
 			names = append(names, nameStr)
 		}
-		sort.Strings(names)
+		slices.Sort(names)
 
 		for _, rate := range names {
 			var r []string
@@ -102,7 +103,7 @@ func (p ProjectRatesReport) render(opts *OutputOpts) CSVRecords {
 
 			valToStr := defaultValToStrFunc
 			if opts.CSVRecFmt == CSVRecordFormatLong {
-				r = append(r, p.DomainID, p.DomainName, p.UUID, p.Name, pSrv.Area, pSrv.Type, pSrvRate.Name,
+				r = append(r, p.DomainID, p.DomainName, p.UUID, p.Name, pSrv.Area, string(pSrv.Type), string(pSrvRate.Name),
 					valToStr(pSrvRate.Limit), valToStr(pSrvRate.DefaultLimit), window, defaultWindow,
 					pSrvRate.UsageAsBigint, string(pSrvRate.Unit), timestampToString(pSrv.ScrapedAt),
 				)
@@ -113,7 +114,7 @@ func (p ProjectRatesReport) render(opts *OutputOpts) CSVRecords {
 					projectNameOrID = p.Name
 					domainNameOrID = p.DomainName
 				}
-				r = append(r, domainNameOrID, projectNameOrID, pSrv.Type, pSrvRate.Name,
+				r = append(r, domainNameOrID, projectNameOrID, string(pSrv.Type), string(pSrvRate.Name),
 					valToStr(pSrvRate.Limit), window, pSrvRate.UsageAsBigint, string(pSrvRate.Unit),
 				)
 			}

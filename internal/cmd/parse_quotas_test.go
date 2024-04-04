@@ -106,11 +106,11 @@ func TestParseToQuotaRequest(t *testing.T) {
 	}
 
 	resQuotas := resourceQuotas{
-		"shared": map[string]limes.ValueWithUnit{
+		"shared": {
 			"capacity":  {Value: 1024, Unit: limes.UnitMebibytes},
 			"capacity2": {Value: 3, Unit: limes.UnitGibibytes},
 		},
-		"unshared": map[string]limes.ValueWithUnit{
+		"unshared": {
 			"things":  {Value: 10, Unit: limes.UnitNone},
 			"things2": {Value: 10, Unit: limes.UnitNone},
 			"things3": {Value: 44, Unit: limes.UnitNone},
