@@ -15,6 +15,8 @@
 package cmd
 
 import (
+	"github.com/sapcc/go-api-declarations/limes"
+	limesresources "github.com/sapcc/go-api-declarations/limes/resources"
 	ratesClusters "github.com/sapcc/gophercloud-sapcc/rates/v1/clusters"
 	"github.com/sapcc/gophercloud-sapcc/resources/v1/clusters"
 	"github.com/spf13/cobra"
@@ -73,8 +75,8 @@ func (c *clusterShowCmd) Run(_ *cobra.Command, _ []string) error {
 
 	res := clusters.Get(limesResourcesClient, clusters.GetOpts{
 		Areas:     c.areas,
-		Services:  c.services,
-		Resources: c.resources,
+		Services:  util.CastStringsTo[limes.ServiceType](c.services),
+		Resources: util.CastStringsTo[limesresources.ResourceName](c.resources),
 	})
 	if res.Err != nil {
 		return util.WrapError(res.Err, "could not get cluster report")
@@ -130,7 +132,7 @@ func (c *clusterShowRatesCmd) Run(_ *cobra.Command, args []string) error {
 
 	res := ratesClusters.Get(limesRatesClient, ratesClusters.GetOpts{
 		Areas:    c.areas,
-		Services: c.services,
+		Services: util.CastStringsTo[limes.ServiceType](c.services),
 	})
 	if res.Err != nil {
 		return util.WrapError(res.Err, "could not get cluster report")

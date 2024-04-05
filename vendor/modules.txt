@@ -41,12 +41,12 @@ github.com/sapcc/go-api-declarations/internal/marshal
 github.com/sapcc/go-api-declarations/limes
 github.com/sapcc/go-api-declarations/limes/rates
 github.com/sapcc/go-api-declarations/limes/resources
-# github.com/sapcc/go-bits v0.0.0-20240328092936-0e0b562825d4
-## explicit; go 1.21
+# github.com/sapcc/go-bits v0.0.0-20240404145041-8c313ab7cd29
+## explicit; go 1.22
 github.com/sapcc/go-bits/logg
 github.com/sapcc/go-bits/osext
 github.com/sapcc/go-bits/secrets
-# github.com/sapcc/gophercloud-sapcc v0.0.0-20240328042652-ea67c703afd6
+# github.com/sapcc/gophercloud-sapcc v0.0.0-20240405130115-591d5761ad21
 ## explicit; go 1.21
 github.com/sapcc/gophercloud-sapcc/clients
 github.com/sapcc/gophercloud-sapcc/rates/v1/clusters

@@ -80,8 +80,8 @@ func (d *domainListCmd) Run(_ *cobra.Command, _ []string) error {
 
 	res := domains.List(limesResourcesClient, domains.ListOpts{
 		Areas:     d.areas,
-		Services:  d.services,
-		Resources: d.resources,
+		Services:  util.CastStringsTo[limes.ServiceType](d.services),
+		Resources: util.CastStringsTo[limesresources.ResourceName](d.resources),
 	})
 	if res.Err != nil {
 		return util.WrapError(res.Err, "could not get domain reports")
@@ -147,8 +147,8 @@ func (d *domainShowCmd) Run(_ *cobra.Command, args []string) error {
 
 	res := domains.Get(limesResourcesClient, domainID, domains.GetOpts{
 		Areas:     d.areas,
-		Services:  d.services,
-		Resources: d.resources,
+		Services:  util.CastStringsTo[limes.ServiceType](d.services),
+		Resources: util.CastStringsTo[limesresources.ResourceName](d.resources),
 	})
 	if res.Err != nil {
 		return util.WrapError(res.Err, "could not get domain report")
