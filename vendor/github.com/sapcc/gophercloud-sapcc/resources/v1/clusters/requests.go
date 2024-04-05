@@ -17,6 +17,8 @@ package clusters
 
 import (
 	"github.com/gophercloud/gophercloud"
+	"github.com/sapcc/go-api-declarations/limes"
+	limesresources "github.com/sapcc/go-api-declarations/limes/resources"
 )
 
 // GetOptsBuilder allows extensions to add additional parameters to the Get request.
@@ -26,10 +28,10 @@ type GetOptsBuilder interface {
 
 // GetOpts contains parameters for filtering a Get request.
 type GetOpts struct {
-	Detail    bool     `q:"detail"`
-	Areas     []string `q:"area"`
-	Services  []string `q:"service"`
-	Resources []string `q:"resource"`
+	Detail    bool                          `q:"detail"`
+	Areas     []string                      `q:"area"`
+	Services  []limes.ServiceType           `q:"service"`
+	Resources []limesresources.ResourceName `q:"resource"`
 }
 
 // ToClusterGetQuery formats a GetOpts into a query string.

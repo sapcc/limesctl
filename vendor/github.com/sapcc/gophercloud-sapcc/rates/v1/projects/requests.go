@@ -14,7 +14,10 @@
 
 package projects
 
-import "github.com/gophercloud/gophercloud"
+import (
+	"github.com/gophercloud/gophercloud"
+	"github.com/sapcc/go-api-declarations/limes"
+)
 
 // ReadOptsBuilder allows extensions to add additional parameters to the Get/List requests.
 type ReadOptsBuilder interface {
@@ -23,8 +26,8 @@ type ReadOptsBuilder interface {
 
 // ReadOpts contains parameters for filtering a Get/List request.
 type ReadOpts struct {
-	Services []string `q:"service"`
-	Areas    []string `q:"area"`
+	Services []limes.ServiceType `q:"service"`
+	Areas    []string            `q:"area"`
 }
 
 // ToProjectReadParams formats a ReadOpts into a map of headers and a query string.

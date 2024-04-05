@@ -119,8 +119,8 @@ func (p *projectListCmd) Run(_ *cobra.Command, _ []string) error {
 
 	res := projects.List(limesResourcesClient, domainID, projects.ListOpts{
 		Areas:     p.areas,
-		Services:  p.services,
-		Resources: p.resources,
+		Services:  util.CastStringsTo[limes.ServiceType](p.services),
+		Resources: util.CastStringsTo[limesresources.ResourceName](p.resources),
 	})
 	if res.Err != nil {
 		return util.WrapError(res.Err, "could not get project reports")
@@ -193,8 +193,8 @@ func (p *projectListRatesCmd) Run(_ *cobra.Command, _ []string) error {
 	}
 
 	res := ratesProjects.List(limesRatesClient, domainID, ratesProjects.ReadOpts{
-		Services: p.services,
 		Areas:    p.areas,
+		Services: util.CastStringsTo[limes.ServiceType](p.services),
 	})
 	if res.Err != nil {
 		return util.WrapError(res.Err, "could not get project reports")
@@ -273,8 +273,8 @@ func (p *projectShowCmd) Run(_ *cobra.Command, args []string) error {
 
 	res := projects.Get(limesResourcesClient, pInfo.DomainID, pInfo.ID, projects.GetOpts{
 		Areas:     p.areas,
-		Services:  p.services,
-		Resources: p.resources,
+		Services:  util.CastStringsTo[limes.ServiceType](p.services),
+		Resources: util.CastStringsTo[limesresources.ResourceName](p.resources),
 	})
 	if res.Err != nil {
 		return util.WrapError(res.Err, "could not get project report")
@@ -355,8 +355,8 @@ func (p *projectShowRatesCmd) Run(_ *cobra.Command, args []string) error {
 	}
 
 	res := ratesProjects.Get(limesRatesClient, pInfo.DomainID, pInfo.ID, ratesProjects.ReadOpts{
-		Services: p.services,
 		Areas:    p.areas,
+		Services: util.CastStringsTo[limes.ServiceType](p.services),
 	})
 	if res.Err != nil {
 		return util.WrapError(res.Err, "could not get project report")

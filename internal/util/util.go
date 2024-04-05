@@ -19,3 +19,11 @@ import "fmt"
 func WrapError(err error, msg string) error {
 	return fmt.Errorf("%s: %w", msg, err)
 }
+
+func CastStringsTo[O ~string, I ~string](input []I) (output []O) {
+	output = make([]O, len(input))
+	for idx, val := range input {
+		output[idx] = O(val)
+	}
+	return
+}

@@ -19,6 +19,7 @@ import (
 	"net/http"
 
 	"github.com/gophercloud/gophercloud"
+	"github.com/sapcc/go-api-declarations/limes"
 	limesresources "github.com/sapcc/go-api-declarations/limes/resources"
 )
 
@@ -29,9 +30,9 @@ type ListOptsBuilder interface {
 
 // ListOpts contains parameters for filtering a List request.
 type ListOpts struct {
-	Areas     []string `q:"area"`
-	Services  []string `q:"service"`
-	Resources []string `q:"resource"`
+	Areas     []string                      `q:"area"`
+	Services  []limes.ServiceType           `q:"service"`
+	Resources []limesresources.ResourceName `q:"resource"`
 }
 
 // ToDomainListParams formats a ListOpts into a map of headers and a query string.
@@ -77,9 +78,9 @@ type GetOptsBuilder interface {
 
 // GetOpts contains parameters for filtering a Get request.
 type GetOpts struct {
-	Areas     []string `q:"area"`
-	Services  []string `q:"service"`
-	Resources []string `q:"resource"`
+	Areas     []string                      `q:"area"`
+	Services  []limes.ServiceType           `q:"service"`
+	Resources []limesresources.ResourceName `q:"resource"`
 }
 
 // ToDomainGetParams formats a GetOpts into a map of headers and a query string.
