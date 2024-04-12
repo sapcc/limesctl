@@ -23,7 +23,6 @@ import (
 	limesrates "github.com/sapcc/go-api-declarations/limes/rates"
 )
 
-//nolint:dupl
 func TestProjectRatesSingleReportRender(t *testing.T) {
 	mockJSONBytes, err := fixtureBytes("project-get-berlin-only-rates.json")
 	th.AssertNoErr(t, err)

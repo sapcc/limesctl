@@ -23,7 +23,6 @@ import (
 	limesresources "github.com/sapcc/go-api-declarations/limes/resources"
 )
 
-//nolint:dupl
 func TestProjectResourcesSingleReportRender(t *testing.T) {
 	mockJSONBytes, err := fixtureBytes("project-get-dresden.json")
 	th.AssertNoErr(t, err)
