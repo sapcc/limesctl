@@ -93,6 +93,7 @@ func newRootCmd(v *VersionInfo) *cobra.Command {
 	cmd.AddCommand(newClusterCmd())
 	cmd.AddCommand(newDomainCmd())
 	cmd.AddCommand(newProjectCmd())
+	cmd.AddCommand(newOpsCmd())
 
 	return cmd
 }
