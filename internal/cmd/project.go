@@ -15,11 +15,8 @@
 package cmd
 
 import (
-	"fmt"
-
 	"errors"
 
-	"github.com/gophercloud/gophercloud"
 	"github.com/sapcc/go-api-declarations/limes"
 	limesresources "github.com/sapcc/go-api-declarations/limes/resources"
 	ratesProjects "github.com/sapcc/gophercloud-sapcc/rates/v1/projects"
@@ -44,7 +41,6 @@ func newProjectCmd() *cobra.Command {
 	cmd.AddCommand(newProjectListRatesCmd().Command)
 	cmd.AddCommand(newProjectShowCmd().Command)
 	cmd.AddCommand(newProjectShowRatesCmd().Command)
-	cmd.AddCommand(newProjectSetCmd().Command)
 	cmd.AddCommand(newProjectSyncCmd().Command)
 	return cmd
 }
@@ -379,90 +375,6 @@ func (p *projectShowRatesCmd) Run(_ *cobra.Command, args []string) error {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// Project set.
-
-//nolint:lll
-type projectSetCmd struct {
-	*cobra.Command
-
-	projectFlags
-	quotas []string
-}
-
-func newProjectSetCmd() *projectSetCmd {
-	projectSet := &projectSetCmd{}
-	cmd := &cobra.Command{
-		Use:   "set [name or ID]",
-		Short: "Change resource quota values for a specific project",
-		Long: `Change resource quota values for a specific project.
-
-The project name/ID is optional by default and limesctl will get the project
-from current scope. However, if '--domain' flag is used then either project
-name or ID is required.
-
-For relative quota adjustment, use one of the following operators: [+=, -=, *=, /=].
-
-This command requires a domain-admin token.`,
-		Example: makeExamplesString([]string{
-			`limesctl project set --quotas="compute/cores=200,compute/ram=50GiB"`,
-			`limesctl project set -q compute/cores=200 -q compute/ram=50GiB (you can give the flag multiple times and use flag shorthand '-q')`,
-			`limesctl project set -q compute/cores*=2 -q compute/ram+=10GiB (relative quota update)`,
-			`limesctl project set -q object-store/capacity=1TiB (you can also use a unit other than the service's default, e.g. object-store uses 'B' by default but we use 'TiB' here)`,
-			`limesctl project set -q object-store/capacity-=0.25TiB (fractional values are also supported)`,
-		}),
-		Args:    cobra.MaximumNArgs(1),
-		PreRunE: authWithLimesResources,
-		RunE:    projectSet.Run,
-	}
-
-	// Flags
-	doNotSortFlags(cmd)
-	cmd.Flags().StringSliceVarP(&projectSet.quotas, "quotas", "q", nil, "new quota values (comma separated list)")
-	cmd.MarkFlagRequired("quotas") //nolint: errcheck
-	projectSet.projectFlags.AddToCmd(cmd)
-
-	projectSet.Command = cmd
-	return projectSet
-}
-
-func (p *projectSetCmd) Run(_ *cobra.Command, args []string) error {
-	nameOrID := ""
-	if len(args) > 0 {
-		nameOrID = args[0]
-	}
-	err := p.projectFlags.validateWithNameID(nameOrID)
-	if err != nil {
-		return err
-	}
-
-	pInfo, err := auth.FindProject(identityClient, p.DomainNameOrID, nameOrID)
-	if err != nil {
-		return err
-	}
-
-	resQuotas, err := getProjectResourceQuotas(limesResourcesClient, pInfo)
-	if err != nil {
-		return util.WrapError(err, "could not get default units")
-	}
-	qc, err := parseToQuotaRequest(resQuotas, p.quotas)
-	if err != nil {
-		return util.WrapError(err, "could not parse quota values")
-	}
-
-	warn, err := projects.Update(limesResourcesClient, pInfo.DomainID, pInfo.ID, projects.UpdateOpts{
-		Services: qc,
-	}).Extract()
-	if err != nil {
-		return util.WrapError(err, "could not set new quotas for project")
-	}
-
-	if warn != nil {
-		fmt.Println(string(warn))
-	}
-	return nil
-}
-
-///////////////////////////////////////////////////////////////////////////////
 // Project sync.
 
 type projectSyncCmd struct {
@@ -518,29 +430,4 @@ func (p *projectSyncCmd) Run(_ *cobra.Command, args []string) error {
 	}
 
 	return nil
-}
-
-///////////////////////////////////////////////////////////////////////////////
-// Helper functions.
-
-func getProjectResourceQuotas(limesClient *gophercloud.ServiceClient, pInfo *auth.ProjectInfo) (resourceQuotas, error) {
-	rep, err := projects.Get(limesClient, pInfo.DomainID, pInfo.ID, projects.GetOpts{}).Extract()
-	if err != nil {
-		return nil, err
-	}
-
-	result := make(resourceQuotas)
-	for srv, srvReport := range rep.Services {
-		for res, resReport := range srvReport.Resources {
-			if _, ok := result[srv]; !ok {
-				result[srv] = make(map[limesresources.ResourceName]limes.ValueWithUnit)
-			}
-			var val uint64
-			if resReport.Quota != nil {
-				val = *resReport.Quota
-			}
-			result[srv][res] = limes.ValueWithUnit{Value: val, Unit: resReport.ResourceInfo.Unit}
-		}
-	}
-	return result, nil
 }
