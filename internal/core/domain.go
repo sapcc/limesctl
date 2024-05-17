@@ -40,7 +40,7 @@ var csvHeaderDomainDefault = []string{"domain id", "service", "resource", "quota
 
 var csvHeaderDomainLong = []string{
 	"domain id", "domain name", "area", "service", "category", "resource",
-	"quota", "projects quota", "usage", "physical usage", "burst usage", "unit", "scraped at (UTC)",
+	"quota", "projects quota", "usage", "physical usage", "unit", "scraped at (UTC)",
 }
 
 const domainName = "domain name"
@@ -90,13 +90,13 @@ func (d DomainReport) render(opts *OutputOpts) CSVRecords {
 
 			valToStr, unit := getValToStrFunc(opts.Humanize, dSrvRes.Unit, []uint64{
 				zeroIfNil(physU), zeroIfNil(domQ), zeroIfNil(projectsQ),
-				dSrvRes.Usage, dSrvRes.BurstUsage,
+				dSrvRes.Usage,
 			})
 
 			if opts.CSVRecFmt == CSVRecordFormatLong {
 				r = append(r, d.UUID, d.Name, dSrv.Area, string(dSrv.Type), dSrvRes.Category, string(dSrvRes.Name),
 					emptyStrIfNil(domQ, valToStr), emptyStrIfNil(projectsQ, valToStr), valToStr(dSrvRes.Usage),
-					emptyStrIfNil(physU, valToStr), valToStr(dSrvRes.BurstUsage), string(unit), timestampToString(dSrv.MinScrapedAt),
+					emptyStrIfNil(physU, valToStr), string(unit), timestampToString(dSrv.MinScrapedAt),
 				)
 			} else {
 				nameOrID := d.UUID

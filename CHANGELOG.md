@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased](https://github.com/sapcc/limesctl/compare/v3.3.2...HEAD)
 
+### Removed
+
+- Removed everything related to Bursting
+
 ## 3.3.2 - 2024-01-03
 
 ### Changed
