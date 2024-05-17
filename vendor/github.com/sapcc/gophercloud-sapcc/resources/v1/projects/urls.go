@@ -24,10 +24,6 @@ func getURL(client *gophercloud.ServiceClient, domainID, projectID string) strin
 	return client.ServiceURL("domains", domainID, "projects", projectID)
 }
 
-func updateURL(client *gophercloud.ServiceClient, domainID, projectID string) string {
-	return client.ServiceURL("domains", domainID, "projects", projectID)
-}
-
 func syncURL(client *gophercloud.ServiceClient, domainID, projectID string) string {
 	return client.ServiceURL("domains", domainID, "projects", projectID, "sync")
 }

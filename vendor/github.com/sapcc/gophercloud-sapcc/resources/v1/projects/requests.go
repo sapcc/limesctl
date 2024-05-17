@@ -15,7 +15,6 @@
 package projects
 
 import (
-	"io"
 	"net/http"
 
 	"github.com/gophercloud/gophercloud"
@@ -118,54 +117,6 @@ func Get(c *gophercloud.ServiceClient, domainID, projectID string, opts GetOptsB
 		MoreHeaders: headers,
 	})
 	_, r.Header, r.Err = gophercloud.ParseResponse(resp, err)
-	return
-}
-
-// UpdateOptsBuilder allows extensions to add additional parameters to the Update request.
-type UpdateOptsBuilder interface {
-	ToProjectUpdateMap() (map[string]string, map[string]interface{}, error)
-}
-
-// UpdateOpts contains parameters to update a project.
-type UpdateOpts struct {
-	Services limesresources.QuotaRequest         `json:"services"`
-	Bursting *limesresources.ProjectBurstingInfo `json:"bursting,omitempty"`
-}
-
-// ToProjectUpdateMap formats a UpdateOpts into a map of headers and a request body.
-func (opts UpdateOpts) ToProjectUpdateMap() (headers map[string]string, requestBody map[string]interface{}, err error) {
-	h, err := gophercloud.BuildHeaders(opts)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	b, err := gophercloud.BuildRequestBody(opts, "project")
-	if err != nil {
-		return nil, nil, err
-	}
-
-	return h, b, nil
-}
-
-// Update modifies the attributes of a project and returns the response body which contains non-fatal error messages.
-func Update(c *gophercloud.ServiceClient, domainID, projectID string, opts UpdateOptsBuilder) (r UpdateResult) {
-	url := updateURL(c, domainID, projectID)
-	h, b, err := opts.ToProjectUpdateMap()
-	if err != nil {
-		r.Err = err
-		return
-	}
-	resp, err := c.Put(url, b, nil, &gophercloud.RequestOpts{
-		OkCodes:          []int{http.StatusAccepted},
-		MoreHeaders:      h,
-		KeepResponseBody: true,
-	})
-	_, r.Header, r.Err = gophercloud.ParseResponse(resp, err)
-	if r.Err != nil {
-		return
-	}
-	defer resp.Body.Close()
-	r.Body, r.Err = io.ReadAll(resp.Body)
 	return
 }
 

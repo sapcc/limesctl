@@ -16,8 +16,6 @@
 package domains
 
 import (
-	"net/http"
-
 	"github.com/gophercloud/gophercloud"
 	"github.com/sapcc/go-api-declarations/limes"
 	limesresources "github.com/sapcc/go-api-declarations/limes/resources"
@@ -64,7 +62,7 @@ func List(c *gophercloud.ServiceClient, opts ListOptsBuilder) (r CommonResult) {
 		url += q
 	}
 
-	resp, err := c.Get(url, &r.Body, &gophercloud.RequestOpts{ //nolint:bodyclose // already closed by gophercloud
+	resp, err := c.Get(url, &r.Body, &gophercloud.RequestOpts{
 		MoreHeaders: headers,
 	})
 	_, r.Header, r.Err = gophercloud.ParseResponse(resp, err)
@@ -112,49 +110,8 @@ func Get(c *gophercloud.ServiceClient, domainID string, opts GetOptsBuilder) (r 
 		url += q
 	}
 
-	resp, err := c.Get(url, &r.Body, &gophercloud.RequestOpts{ //nolint:bodyclose // already closed by gophercloud
+	resp, err := c.Get(url, &r.Body, &gophercloud.RequestOpts{
 		MoreHeaders: headers,
-	})
-	_, r.Header, r.Err = gophercloud.ParseResponse(resp, err)
-	return
-}
-
-// UpdateOptsBuilder allows extensions to add additional parameters to the Update request.
-type UpdateOptsBuilder interface {
-	ToDomainUpdateMap() (map[string]string, map[string]interface{}, error)
-}
-
-// UpdateOpts contains parameters to update a domain.
-type UpdateOpts struct {
-	Services limesresources.QuotaRequest `json:"services"`
-}
-
-// ToDomainUpdateMap formats a UpdateOpts into a map of headers and a request body.
-func (opts UpdateOpts) ToDomainUpdateMap() (headers map[string]string, requestBody map[string]interface{}, err error) {
-	h, err := gophercloud.BuildHeaders(opts)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	b, err := gophercloud.BuildRequestBody(opts, "domain")
-	if err != nil {
-		return nil, nil, err
-	}
-
-	return h, b, nil
-}
-
-// Update modifies the attributes of a domain.
-func Update(c *gophercloud.ServiceClient, domainID string, opts UpdateOptsBuilder) (r UpdateResult) {
-	url := updateURL(c, domainID)
-	h, b, err := opts.ToDomainUpdateMap()
-	if err != nil {
-		r.Err = err
-		return
-	}
-	resp, err := c.Put(url, b, nil, &gophercloud.RequestOpts{ //nolint:bodyclose // already closed by gophercloud
-		OkCodes:     []int{http.StatusAccepted},
-		MoreHeaders: h,
 	})
 	_, r.Header, r.Err = gophercloud.ParseResponse(resp, err)
 	return

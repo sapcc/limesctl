@@ -25,18 +25,6 @@ type CommonResult struct {
 	gophercloud.Result
 }
 
-// UpdateResult is the result of an Update operation. Call its appropriate
-// Extract method to extract the error and the warning body from the result.
-type UpdateResult struct {
-	gophercloud.Result
-	Body []byte
-}
-
-// Extract interprets a UpdateResult as an update warning body and error
-func (r UpdateResult) Extract() ([]byte, error) {
-	return r.Body, r.Err
-}
-
 // SyncResult is the result of an Sync operation. Call its appropriate
 // ExtractErr method to extract the error from the result.
 type SyncResult struct {
