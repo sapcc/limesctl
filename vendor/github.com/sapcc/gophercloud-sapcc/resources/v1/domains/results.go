@@ -25,12 +25,6 @@ type CommonResult struct {
 	gophercloud.Result
 }
 
-// UpdateResult is the result of an Update operation. Call its appropriate
-// ExtractErr method to extract the error from the result.
-type UpdateResult struct {
-	gophercloud.ErrResult
-}
-
 // ExtractDomains interprets a CommonResult as a slice of Domains.
 func (r CommonResult) ExtractDomains() ([]limesresources.DomainReport, error) {
 	var s struct {

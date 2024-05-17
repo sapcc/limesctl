@@ -28,7 +28,7 @@ type ClusterReport struct {
 
 var csvHeaderClusterLong = []string{
 	"cluster id", "area", "service", "category", "resource", "capacity",
-	"domains quota", "usage", "physical usage", "burst usage", "unit", "scraped at (UTC)",
+	"domains quota", "usage", "physical usage", "unit", "scraped at (UTC)",
 }
 
 var csvHeaderClusterDefault = []string{
@@ -75,13 +75,13 @@ func (c ClusterReport) render(opts *OutputOpts) CSVRecords {
 
 			valToStr, unit := getValToStrFunc(opts.Humanize, cSrvRes.Unit, []uint64{
 				zeroIfNil(capacity), zeroIfNil(physU), zeroIfNil(domsQ),
-				cSrvRes.Usage, cSrvRes.BurstUsage,
+				cSrvRes.Usage,
 			})
 
 			if opts.CSVRecFmt == CSVRecordFormatLong {
 				r = append(r, c.ID, cSrv.Area, string(cSrv.Type), cSrvRes.Category, string(cSrvRes.Name), emptyStrIfNil(capacity, valToStr),
 					emptyStrIfNil(domsQ, valToStr), valToStr(cSrvRes.Usage), emptyStrIfNil(physU, valToStr),
-					valToStr(cSrvRes.BurstUsage), string(unit), timestampToString(cSrv.MinScrapedAt),
+					string(unit), timestampToString(cSrv.MinScrapedAt),
 				)
 			} else {
 				r = append(r, c.ID, string(cSrv.Type), string(cSrvRes.Name), emptyStrIfNil(capacity, valToStr),

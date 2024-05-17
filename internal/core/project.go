@@ -52,7 +52,7 @@ var csvHeaderProjectDefault = []string{"domain id", "project id", "service", "re
 
 var csvHeaderProjectLong = []string{
 	"domain id", "domain name", "project id", "project name", "area", "service",
-	"category", "resource", "quota", "burst quota", "usage", "physical usage", "burst usage", "unit", "scraped at (UTC)",
+	"category", "resource", "quota", "usage", "physical usage", "unit", "scraped at (UTC)",
 }
 
 // GetHeaderRow implements the LimesReportRenderer interface.
@@ -99,28 +99,14 @@ func (p ProjectResourcesReport) render(opts *OutputOpts) CSVRecords {
 			quota := pSrvRes.Quota
 			usage := pSrvRes.Usage
 
-			// We use a *uint64 for burstQuota instead of an uint64 for
-			// consistency with Limes' API, i.e. if quota has a null value
-			// then burstQuota should also be null instead of zero.
-			var burstQuota *uint64
-			var burstUsage uint64
-			if quota != nil && p.Bursting != nil && p.Bursting.Enabled {
-				q := *quota
-				bq := p.Bursting.Multiplier.ApplyTo(q, pSrvRes.QuotaDistributionModel)
-				burstQuota = &bq
-				if usage > q {
-					burstUsage = usage - q
-				}
-			}
-
 			valToStr, unit := getValToStrFunc(opts.Humanize, pSrvRes.Unit, []uint64{
-				zeroIfNil(burstQuota), burstUsage, zeroIfNil(physU), zeroIfNil(quota), usage,
+				zeroIfNil(physU), zeroIfNil(quota), usage,
 			})
 
 			if opts.CSVRecFmt == CSVRecordFormatLong {
 				r = append(r, p.DomainID, p.DomainName, p.UUID, p.Name, pSrv.Area, string(pSrv.Type), pSrvRes.Category,
-					string(pSrvRes.Name), emptyStrIfNil(quota, valToStr), emptyStrIfNil(burstQuota, valToStr), valToStr(usage),
-					emptyStrIfNil(physU, valToStr), valToStr(burstUsage), string(unit), timestampToString(pSrv.ScrapedAt),
+					string(pSrvRes.Name), emptyStrIfNil(quota, valToStr), valToStr(usage),
+					emptyStrIfNil(physU, valToStr), string(unit), timestampToString(pSrv.ScrapedAt),
 				)
 			} else {
 				projectNameOrID := p.UUID
