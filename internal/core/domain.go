@@ -31,7 +31,7 @@ type DomainReport struct {
 func LimesDomainsToReportRenderer(in []limesresources.DomainReport) []LimesReportRenderer {
 	out := make([]LimesReportRenderer, 0, len(in))
 	for _, rep := range in {
-		out = append(out, DomainReport{DomainReport: &rep}) //nolint:gosec // false positive in go 1.22
+		out = append(out, DomainReport{DomainReport: &rep})
 	}
 	return out
 }
