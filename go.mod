@@ -9,7 +9,7 @@ require (
 	github.com/sapcc/go-api-declarations v1.11.2
 	github.com/sapcc/go-bits v0.0.0-20240606120701-d430ac9229ab
 	github.com/sapcc/gophercloud-sapcc v0.0.0-20240606103143-b09c014b629b
-	github.com/spf13/cobra v1.8.0
+	github.com/spf13/cobra v1.8.1
 )
 
 require (
