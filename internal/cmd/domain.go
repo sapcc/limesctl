@@ -17,7 +17,7 @@ package cmd
 import (
 	"github.com/sapcc/go-api-declarations/limes"
 	limesresources "github.com/sapcc/go-api-declarations/limes/resources"
-	"github.com/sapcc/gophercloud-sapcc/resources/v1/domains"
+	"github.com/sapcc/gophercloud-sapcc/v2/resources/v1/domains"
 	"github.com/spf13/cobra"
 
 	"github.com/sapcc/limesctl/v3/internal/auth"
@@ -70,13 +70,13 @@ cloud-admin token.`,
 	return domainList
 }
 
-func (d *domainListCmd) Run(_ *cobra.Command, _ []string) error {
+func (d *domainListCmd) Run(cmd *cobra.Command, _ []string) error {
 	outputOpts, err := d.resourceOutputFmtFlags.validate()
 	if err != nil {
 		return err
 	}
 
-	res := domains.List(limesResourcesClient, domains.ListOpts{
+	res := domains.List(cmd.Context(), limesResourcesClient, domains.ListOpts{
 		Areas:     d.areas,
 		Services:  util.CastStringsTo[limes.ServiceType](d.services),
 		Resources: util.CastStringsTo[limesresources.ResourceName](d.resources),
@@ -128,7 +128,7 @@ domain-admin token.`,
 	return domainShow
 }
 
-func (d *domainShowCmd) Run(_ *cobra.Command, args []string) error {
+func (d *domainShowCmd) Run(cmd *cobra.Command, args []string) error {
 	outputOpts, err := d.resourceOutputFmtFlags.validate()
 	if err != nil {
 		return err
@@ -138,12 +138,12 @@ func (d *domainShowCmd) Run(_ *cobra.Command, args []string) error {
 	if len(args) > 0 {
 		nameOrID = args[0]
 	}
-	domainID, err := auth.FindDomainID(identityClient, nameOrID)
+	domainID, err := auth.FindDomainID(cmd.Context(), identityClient, nameOrID)
 	if err != nil {
 		return err
 	}
 
-	res := domains.Get(limesResourcesClient, domainID, domains.GetOpts{
+	res := domains.Get(cmd.Context(), limesResourcesClient, domainID, domains.GetOpts{
 		Areas:     d.areas,
 		Services:  util.CastStringsTo[limes.ServiceType](d.services),
 		Resources: util.CastStringsTo[limesresources.ResourceName](d.resources),

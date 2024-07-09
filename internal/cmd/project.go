@@ -19,8 +19,8 @@ import (
 
 	"github.com/sapcc/go-api-declarations/limes"
 	limesresources "github.com/sapcc/go-api-declarations/limes/resources"
-	ratesProjects "github.com/sapcc/gophercloud-sapcc/rates/v1/projects"
-	"github.com/sapcc/gophercloud-sapcc/resources/v1/projects"
+	ratesProjects "github.com/sapcc/gophercloud-sapcc/v2/rates/v1/projects"
+	"github.com/sapcc/gophercloud-sapcc/v2/resources/v1/projects"
 	"github.com/spf13/cobra"
 
 	"github.com/sapcc/limesctl/v3/internal/auth"
@@ -98,22 +98,22 @@ This command requires a domain-admin token.`,
 	return projectList
 }
 
-func (p *projectListCmd) Run(_ *cobra.Command, _ []string) error {
+func (p *projectListCmd) Run(cmd *cobra.Command, _ []string) error {
 	outputOpts, err := p.resourceOutputFmtFlags.validate()
 	if err != nil {
 		return err
 	}
 
 	domainName := ""
-	domainID, err := auth.FindDomainID(identityClient, p.DomainNameOrID)
+	domainID, err := auth.FindDomainID(cmd.Context(), identityClient, p.DomainNameOrID)
 	if err == nil {
-		domainName, err = auth.FindDomainName(identityClient, domainID)
+		domainName, err = auth.FindDomainName(cmd.Context(), identityClient, domainID)
 	}
 	if err != nil {
 		return err
 	}
 
-	res := projects.List(limesResourcesClient, domainID, projects.ListOpts{
+	res := projects.List(cmd.Context(), limesResourcesClient, domainID, projects.ListOpts{
 		Areas:     p.areas,
 		Services:  util.CastStringsTo[limes.ServiceType](p.services),
 		Resources: util.CastStringsTo[limesresources.ResourceName](p.resources),
@@ -173,22 +173,22 @@ This command requires a domain-admin token.`,
 	return projectListRates
 }
 
-func (p *projectListRatesCmd) Run(_ *cobra.Command, _ []string) error {
+func (p *projectListRatesCmd) Run(cmd *cobra.Command, _ []string) error {
 	outputOpts, err := p.rateOutputFmtFlags.validate()
 	if err != nil {
 		return err
 	}
 
 	domainName := ""
-	domainID, err := auth.FindDomainID(identityClient, p.DomainNameOrID)
+	domainID, err := auth.FindDomainID(cmd.Context(), identityClient, p.DomainNameOrID)
 	if err == nil {
-		domainName, err = auth.FindDomainName(identityClient, domainID)
+		domainName, err = auth.FindDomainName(cmd.Context(), identityClient, domainID)
 	}
 	if err != nil {
 		return err
 	}
 
-	res := ratesProjects.List(limesRatesClient, domainID, ratesProjects.ReadOpts{
+	res := ratesProjects.List(cmd.Context(), limesRatesClient, domainID, ratesProjects.ReadOpts{
 		Areas:    p.areas,
 		Services: util.CastStringsTo[limes.ServiceType](p.services),
 	})
@@ -247,7 +247,7 @@ This command requires a project member permissions.`,
 	return projectShow
 }
 
-func (p *projectShowCmd) Run(_ *cobra.Command, args []string) error {
+func (p *projectShowCmd) Run(cmd *cobra.Command, args []string) error {
 	nameOrID := ""
 	if len(args) > 0 {
 		nameOrID = args[0]
@@ -262,12 +262,12 @@ func (p *projectShowCmd) Run(_ *cobra.Command, args []string) error {
 		return err
 	}
 
-	pInfo, err := auth.FindProject(identityClient, p.DomainNameOrID, nameOrID)
+	pInfo, err := auth.FindProject(cmd.Context(), identityClient, p.DomainNameOrID, nameOrID)
 	if err != nil {
 		return err
 	}
 
-	res := projects.Get(limesResourcesClient, pInfo.DomainID, pInfo.ID, projects.GetOpts{
+	res := projects.Get(cmd.Context(), limesResourcesClient, pInfo.DomainID, pInfo.ID, projects.GetOpts{
 		Areas:     p.areas,
 		Services:  util.CastStringsTo[limes.ServiceType](p.services),
 		Resources: util.CastStringsTo[limesresources.ResourceName](p.resources),
@@ -330,7 +330,7 @@ This command requires a project member permissions.`,
 	return projectShowRates
 }
 
-func (p *projectShowRatesCmd) Run(_ *cobra.Command, args []string) error {
+func (p *projectShowRatesCmd) Run(cmd *cobra.Command, args []string) error {
 	nameOrID := ""
 	if len(args) > 0 {
 		nameOrID = args[0]
@@ -345,12 +345,12 @@ func (p *projectShowRatesCmd) Run(_ *cobra.Command, args []string) error {
 		return err
 	}
 
-	pInfo, err := auth.FindProject(identityClient, p.DomainNameOrID, nameOrID)
+	pInfo, err := auth.FindProject(cmd.Context(), identityClient, p.DomainNameOrID, nameOrID)
 	if err != nil {
 		return err
 	}
 
-	res := ratesProjects.Get(limesRatesClient, pInfo.DomainID, pInfo.ID, ratesProjects.ReadOpts{
+	res := ratesProjects.Get(cmd.Context(), limesRatesClient, pInfo.DomainID, pInfo.ID, ratesProjects.ReadOpts{
 		Areas:    p.areas,
 		Services: util.CastStringsTo[limes.ServiceType](p.services),
 	})
@@ -409,7 +409,7 @@ This command requires a project-admin token.`,
 	return projectSync
 }
 
-func (p *projectSyncCmd) Run(_ *cobra.Command, args []string) error {
+func (p *projectSyncCmd) Run(cmd *cobra.Command, args []string) error {
 	nameOrID := ""
 	if len(args) > 0 {
 		nameOrID = args[0]
@@ -419,12 +419,12 @@ func (p *projectSyncCmd) Run(_ *cobra.Command, args []string) error {
 		return err
 	}
 
-	pInfo, err := auth.FindProject(identityClient, p.DomainNameOrID, nameOrID)
+	pInfo, err := auth.FindProject(cmd.Context(), identityClient, p.DomainNameOrID, nameOrID)
 	if err != nil {
 		return err
 	}
 
-	err = projects.Sync(limesResourcesClient, pInfo.DomainID, pInfo.ID).ExtractErr()
+	err = projects.Sync(cmd.Context(), limesResourcesClient, pInfo.DomainID, pInfo.ID).ExtractErr()
 	if err != nil {
 		return util.WrapError(err, "could not sync project")
 	}

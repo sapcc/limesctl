@@ -26,7 +26,7 @@ import (
 
 	"github.com/sapcc/go-api-declarations/limes"
 	limesresources "github.com/sapcc/go-api-declarations/limes/resources"
-	"github.com/sapcc/gophercloud-sapcc/resources/v1/projects"
+	"github.com/sapcc/gophercloud-sapcc/v2/resources/v1/projects"
 	"github.com/spf13/cobra"
 
 	"github.com/sapcc/limesctl/v3/internal/auth"
@@ -66,11 +66,11 @@ func runValidateQuotaOverrides(cmd *cobra.Command, args []string) error {
 	}
 
 	// get resource report for the project from the current token scope
-	pInfo, err := auth.FindProject(identityClient, "", "")
+	pInfo, err := auth.FindProject(cmd.Context(), identityClient, "", "")
 	if err != nil {
 		return err
 	}
-	report, err := projects.Get(limesResourcesClient, pInfo.DomainID, pInfo.ID, projects.GetOpts{}).Extract()
+	report, err := projects.Get(cmd.Context(), limesResourcesClient, pInfo.DomainID, pInfo.ID, projects.GetOpts{}).Extract()
 	if err != nil {
 		return util.WrapError(err, "could not get project report")
 	}

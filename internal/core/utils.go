@@ -20,7 +20,7 @@ import (
 	"testing"
 	"time"
 
-	th "github.com/gophercloud/gophercloud/testhelper"
+	th "github.com/gophercloud/gophercloud/v2/testhelper"
 	"github.com/sapcc/go-api-declarations/limes"
 )
 

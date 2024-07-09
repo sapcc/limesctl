@@ -15,11 +15,12 @@
 package auth
 
 import (
+	"context"
 	"errors"
 	"fmt"
 
-	"github.com/gophercloud/gophercloud"
-	identityprojects "github.com/gophercloud/gophercloud/openstack/identity/v3/projects"
+	"github.com/gophercloud/gophercloud/v2"
+	identityprojects "github.com/gophercloud/gophercloud/v2/openstack/identity/v3/projects"
 
 	"github.com/sapcc/limesctl/v3/internal/util"
 )
@@ -34,7 +35,7 @@ type ProjectInfo struct {
 }
 
 // FindProject tries to find a project using the provided name/ID(s).
-func FindProject(identityClient *gophercloud.ServiceClient, domainNameOrID, projectNameOrID string) (*ProjectInfo, error) {
+func FindProject(ctx context.Context, identityClient *gophercloud.ServiceClient, domainNameOrID, projectNameOrID string) (*ProjectInfo, error) {
 	// Strategy 1: find project in current token.
 	pInfo := findProjectInCurrentToken(identityClient, domainNameOrID, projectNameOrID)
 	if pInfo != nil {
@@ -47,14 +48,14 @@ func FindProject(identityClient *gophercloud.ServiceClient, domainNameOrID, proj
 
 	// Strategy 2: assume that projectNameOrID is an ID and try to find in
 	// Keystone.
-	p, err := identityprojects.Get(identityClient, projectNameOrID).Extract()
+	p, err := identityprojects.Get(ctx, identityClient, projectNameOrID).Extract()
 	if err == nil {
 		if p.IsDomain {
 			return nil, errors.New("the given ID belongs to a domain, usage instructions: limectl domain --help")
 		}
 		if p.ID != "" {
 			var dName string
-			dName, err = FindDomainName(identityClient, p.DomainID)
+			dName, err = FindDomainName(ctx, identityClient, p.DomainID)
 			if err != nil {
 				return nil, util.WrapError(err, msgProjectNotFound)
 			}
@@ -71,14 +72,14 @@ func FindProject(identityClient *gophercloud.ServiceClient, domainNameOrID, proj
 	opts := identityprojects.ListOpts{Name: projectNameOrID}
 	if domainNameOrID != "" {
 		var dID string
-		dID, err = FindDomainID(identityClient, domainNameOrID)
+		dID, err = FindDomainID(ctx, identityClient, domainNameOrID)
 		if err != nil {
 			return nil, util.WrapError(err, msgProjectNotFound)
 		}
 		opts.DomainID = dID
 	}
 	var pList []identityprojects.Project
-	page, err := identityprojects.List(identityClient, opts).AllPages()
+	page, err := identityprojects.List(identityClient, opts).AllPages(ctx)
 	if err == nil {
 		pList, err = identityprojects.ExtractProjects(page)
 	}
@@ -91,7 +92,7 @@ func FindProject(identityClient *gophercloud.ServiceClient, domainNameOrID, proj
 	}
 	if l == 1 {
 		if p := pList[0]; p.ID != "" {
-			dName, err := FindDomainName(identityClient, p.DomainID)
+			dName, err := FindDomainName(ctx, identityClient, p.DomainID)
 			if err != nil {
 				return nil, util.WrapError(err, msgProjectNotFound)
 			}
