@@ -15,12 +15,13 @@
 package auth
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"strings"
 
-	"github.com/gophercloud/gophercloud"
-	identitydomains "github.com/gophercloud/gophercloud/openstack/identity/v3/domains"
+	"github.com/gophercloud/gophercloud/v2"
+	identitydomains "github.com/gophercloud/gophercloud/v2/openstack/identity/v3/domains"
 
 	"github.com/sapcc/limesctl/v3/internal/util"
 )
@@ -28,8 +29,8 @@ import (
 const msgDomainNotFound = "domain not found"
 
 // FindDomainName returns the name of a domain.
-func FindDomainName(identityClient *gophercloud.ServiceClient, id string) (string, error) {
-	d, err := identitydomains.Get(identityClient, id).Extract()
+func FindDomainName(ctx context.Context, identityClient *gophercloud.ServiceClient, id string) (string, error) {
+	d, err := identitydomains.Get(ctx, identityClient, id).Extract()
 	switch {
 	case err == nil:
 		return d.Name, nil
@@ -46,7 +47,7 @@ func FindDomainName(identityClient *gophercloud.ServiceClient, id string) (strin
 }
 
 // FindDomainID tries to find a domain id using the provided nameOrID.
-func FindDomainID(identityClient *gophercloud.ServiceClient, nameOrID string) (string, error) {
+func FindDomainID(ctx context.Context, identityClient *gophercloud.ServiceClient, nameOrID string) (string, error) {
 	// Strategy 1: get domain id from current token scope.
 	id := getDomainIDFromCurrentToken(identityClient, nameOrID)
 	if id != "" {
@@ -58,7 +59,7 @@ func FindDomainID(identityClient *gophercloud.ServiceClient, nameOrID string) (s
 	}
 
 	// Strategy 2: assume that nameOrID is an ID and try to find in Keystone.
-	d, err := identitydomains.Get(identityClient, nameOrID).Extract()
+	d, err := identitydomains.Get(ctx, identityClient, nameOrID).Extract()
 	if err == nil && d.ID != "" {
 		return d.ID, nil
 	}
@@ -66,7 +67,7 @@ func FindDomainID(identityClient *gophercloud.ServiceClient, nameOrID string) (s
 	// Strategy 3: at this point we know that nameOrID is a name so we do a
 	// Keystone domain listing and try to find the domain.
 	var dList []identitydomains.Domain
-	page, err := identitydomains.List(identityClient, identitydomains.ListOpts{Name: nameOrID}).AllPages()
+	page, err := identitydomains.List(identityClient, identitydomains.ListOpts{Name: nameOrID}).AllPages(ctx)
 	if err == nil {
 		dList, err = identitydomains.ExtractDomains(page)
 	}

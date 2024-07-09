@@ -19,7 +19,7 @@ import (
 	"encoding/json"
 	"testing"
 
-	th "github.com/gophercloud/gophercloud/testhelper"
+	th "github.com/gophercloud/gophercloud/v2/testhelper"
 	limesrates "github.com/sapcc/go-api-declarations/limes/rates"
 )
 

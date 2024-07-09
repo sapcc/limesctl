@@ -15,17 +15,18 @@
 package cmd
 
 import (
+	"context"
 	"crypto/tls"
 	"fmt"
 	"net/http"
 	"os"
 
-	"github.com/gophercloud/gophercloud"
-	"github.com/gophercloud/gophercloud/openstack"
-	"github.com/gophercloud/utils/client"
-	"github.com/gophercloud/utils/openstack/clientconfig"
+	"github.com/gophercloud/gophercloud/v2"
+	"github.com/gophercloud/gophercloud/v2/openstack"
+	"github.com/gophercloud/utils/v2/client"
+	"github.com/gophercloud/utils/v2/openstack/clientconfig"
 	"github.com/sapcc/go-bits/secrets"
-	"github.com/sapcc/gophercloud-sapcc/clients"
+	"github.com/sapcc/gophercloud-sapcc/v2/clients"
 	"github.com/spf13/cobra"
 
 	"github.com/sapcc/limesctl/v3/internal/util"
@@ -37,8 +38,8 @@ type VersionInfo struct {
 	BuildDate     string
 }
 
-func Execute(v *VersionInfo) {
-	if err := newRootCmd(v).Execute(); err != nil {
+func Execute(ctx context.Context, v *VersionInfo) {
+	if err := newRootCmd(v).ExecuteContext(ctx); err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}
@@ -105,7 +106,7 @@ var (
 	limesRatesClient     *gophercloud.ServiceClient
 )
 
-func authenticate() (*gophercloud.ProviderClient, error) {
+func authenticate(ctx context.Context) (*gophercloud.ProviderClient, error) {
 	// Update OpenStack environment variables, if value(s) provided as flag.
 	updateOpenStackEnvVars()
 
@@ -146,7 +147,7 @@ func authenticate() (*gophercloud.ProviderClient, error) {
 		}
 	}
 
-	err = openstack.Authenticate(provider, *ao)
+	err = openstack.Authenticate(ctx, provider, *ao)
 	if err != nil {
 		return nil, util.WrapError(err, "cannot connect to OpenStack")
 	}
@@ -159,8 +160,8 @@ func authenticate() (*gophercloud.ProviderClient, error) {
 	return provider, nil
 }
 
-func authWithLimesResources(_ *cobra.Command, _ []string) error {
-	provider, err := authenticate()
+func authWithLimesResources(cmd *cobra.Command, _ []string) error {
+	provider, err := authenticate(cmd.Context())
 	if err != nil {
 		return err
 	}
@@ -171,8 +172,8 @@ func authWithLimesResources(_ *cobra.Command, _ []string) error {
 	return nil
 }
 
-func authWithLimesRates(_ *cobra.Command, _ []string) error {
-	provider, err := authenticate()
+func authWithLimesRates(cmd *cobra.Command, _ []string) error {
+	provider, err := authenticate(cmd.Context())
 	if err != nil {
 		return err
 	}

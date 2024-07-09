@@ -17,8 +17,8 @@ package cmd
 import (
 	"github.com/sapcc/go-api-declarations/limes"
 	limesresources "github.com/sapcc/go-api-declarations/limes/resources"
-	ratesClusters "github.com/sapcc/gophercloud-sapcc/rates/v1/clusters"
-	"github.com/sapcc/gophercloud-sapcc/resources/v1/clusters"
+	ratesClusters "github.com/sapcc/gophercloud-sapcc/v2/rates/v1/clusters"
+	"github.com/sapcc/gophercloud-sapcc/v2/resources/v1/clusters"
 	"github.com/spf13/cobra"
 
 	"github.com/sapcc/limesctl/v3/internal/core"
@@ -67,13 +67,13 @@ func newClusterShowCmd() *clusterShowCmd {
 	return clusterShow
 }
 
-func (c *clusterShowCmd) Run(_ *cobra.Command, _ []string) error {
+func (c *clusterShowCmd) Run(cmd *cobra.Command, _ []string) error {
 	outputOpts, err := c.resourceOutputFmtFlags.validate()
 	if err != nil {
 		return err
 	}
 
-	res := clusters.Get(limesResourcesClient, clusters.GetOpts{
+	res := clusters.Get(cmd.Context(), limesResourcesClient, clusters.GetOpts{
 		Areas:     c.areas,
 		Services:  util.CastStringsTo[limes.ServiceType](c.services),
 		Resources: util.CastStringsTo[limesresources.ResourceName](c.resources),
@@ -124,13 +124,13 @@ func newClusterShowRatesCmd() *clusterShowRatesCmd {
 	return clusterShowRates
 }
 
-func (c *clusterShowRatesCmd) Run(_ *cobra.Command, args []string) error {
+func (c *clusterShowRatesCmd) Run(cmd *cobra.Command, args []string) error {
 	outputOpts, err := c.rateOutputFmtFlags.validate()
 	if err != nil {
 		return err
 	}
 
-	res := ratesClusters.Get(limesRatesClient, ratesClusters.GetOpts{
+	res := ratesClusters.Get(cmd.Context(), limesRatesClient, ratesClusters.GetOpts{
 		Areas:    c.areas,
 		Services: util.CastStringsTo[limes.ServiceType](c.services),
 	})
