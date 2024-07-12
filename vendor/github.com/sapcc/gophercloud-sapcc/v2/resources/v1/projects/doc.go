@@ -26,8 +26,8 @@
 //	  "github.com/gophercloud/gophercloud/v2/openstack/identity/v3/tokens"
 //	  "github.com/gophercloud/utils/v2/openstack/clientconfig"
 //
-//	  "github.com/sapcc/gophercloud-sapcc/clients"
-//	  "github.com/sapcc/gophercloud-sapcc/resources/v1/projects"
+//	  "github.com/sapcc/gophercloud-sapcc/v2/clients"
+//	  "github.com/sapcc/gophercloud-sapcc/v2/resources/v1/projects"
 //	)
 //
 //	func main() {
