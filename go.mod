@@ -4,7 +4,7 @@ go 1.22
 
 require (
 	github.com/gophercloud/gophercloud/v2 v2.1.0
-	github.com/gophercloud/utils/v2 v2.0.0-20240705071316-780b64d153e3
+	github.com/gophercloud/utils/v2 v2.0.0-20240725072607-4241c98875fa
 	github.com/olekukonko/tablewriter v0.0.5
 	github.com/sapcc/go-api-declarations v1.12.0
 	github.com/sapcc/go-bits v0.0.0-20240725082021-261f0bf53c79
