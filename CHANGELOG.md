@@ -7,11 +7,25 @@ The sections should follow the order `Added`, `Changed`, `Fixed`, `Removed`, and
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased](https://github.com/sapcc/limesctl/compare/v3.3.2...HEAD)
+## [Unreleased](https://github.com/sapcc/limesctl/compare/v3.3.3...HEAD)
+
+## 3.4.0 - 2024-08-29
+
+### Added
+
+- Added `ops validate-quota-overrides` subcommand
+  This is to automatically validate a quota-overrides.json file before deploying it into a Limes installation.
+
+### Changed
+
+- Use Golang 1.23 for prebuilt binaries.
+- Updated all dependencies to their latest version including Gophercloud to version 2.0
 
 ### Removed
 
 - Removed everything related to Bursting
+- Removed `domain set` and `project set` subcommands
+  Support for writing quotas manually has been removed in Limes.
 
 ## 3.3.2 - 2024-01-03
 
