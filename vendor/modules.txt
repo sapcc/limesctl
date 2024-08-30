@@ -42,7 +42,7 @@ github.com/sapcc/go-api-declarations/limes
 github.com/sapcc/go-api-declarations/limes/rates
 github.com/sapcc/go-api-declarations/limes/resources
 github.com/sapcc/go-api-declarations/liquid
-# github.com/sapcc/go-bits v0.0.0-20240822124354-41dc601581db
+# github.com/sapcc/go-bits v0.0.0-20240829073103-7495f31d66ad
 ## explicit; go 1.22
 github.com/sapcc/go-bits/httpext
 github.com/sapcc/go-bits/logg
