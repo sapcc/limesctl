@@ -1,7 +1,7 @@
 # github.com/gofrs/uuid/v5 v5.3.0
 ## explicit; go 1.19
 github.com/gofrs/uuid/v5
-# github.com/gophercloud/gophercloud/v2 v2.1.1
+# github.com/gophercloud/gophercloud/v2 v2.2.0
 ## explicit; go 1.22
 github.com/gophercloud/gophercloud/v2
 github.com/gophercloud/gophercloud/v2/openstack
@@ -15,7 +15,7 @@ github.com/gophercloud/gophercloud/v2/openstack/identity/v3/tokens
 github.com/gophercloud/gophercloud/v2/openstack/utils
 github.com/gophercloud/gophercloud/v2/pagination
 github.com/gophercloud/gophercloud/v2/testhelper
-# github.com/gophercloud/utils/v2 v2.0.0-20241008104625-7cbb8fd76bb7
+# github.com/gophercloud/utils/v2 v2.0.0-20241021065553-b46d0737ee98
 ## explicit; go 1.22
 github.com/gophercloud/utils/v2/client
 github.com/gophercloud/utils/v2/env
@@ -42,7 +42,7 @@ github.com/sapcc/go-api-declarations/limes
 github.com/sapcc/go-api-declarations/limes/rates
 github.com/sapcc/go-api-declarations/limes/resources
 github.com/sapcc/go-api-declarations/liquid
-# github.com/sapcc/go-bits v0.0.0-20241017174154-c7f8644a3ec1
+# github.com/sapcc/go-bits v0.0.0-20241024075658-61a12e76dcad
 ## explicit; go 1.23
 github.com/sapcc/go-bits/httpext
 github.com/sapcc/go-bits/logg
