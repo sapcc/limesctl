@@ -95,6 +95,7 @@ func newRootCmd(v *VersionInfo) *cobra.Command {
 	cmd.AddCommand(newDomainCmd())
 	cmd.AddCommand(newProjectCmd())
 	cmd.AddCommand(newOpsCmd())
+	cmd.AddCommand(newLiquidCmd())
 
 	return cmd
 }
@@ -104,6 +105,7 @@ var (
 	identityClient       *gophercloud.ServiceClient
 	limesResourcesClient *gophercloud.ServiceClient
 	limesRatesClient     *gophercloud.ServiceClient
+	limesAdminClient     *gophercloud.ServiceClient
 )
 
 func authenticate(ctx context.Context) (*gophercloud.ProviderClient, error) {
@@ -180,6 +182,25 @@ func authWithLimesRates(cmd *cobra.Command, _ []string) error {
 	limesRatesClient, err = clients.NewLimesRatesV1(provider, gophercloud.EndpointOpts{})
 	if err != nil {
 		return util.WrapError(err, "could not initialize Limes rates client")
+	}
+	return nil
+}
+
+func authWithLimesAdmin(cmd *cobra.Command, _ []string) error {
+	provider, err := authenticate(cmd.Context())
+	if err != nil {
+		return err
+	}
+	endpointOpts := gophercloud.EndpointOpts{}
+	endpointOpts.ApplyDefaults("resources")
+	endpoint, err := provider.EndpointLocator(endpointOpts)
+	if err != nil {
+		return util.WrapError(err, "could not initialize Limes admin client")
+	}
+	endpoint += "admin/"
+	limesAdminClient = &gophercloud.ServiceClient{
+		ProviderClient: provider,
+		Endpoint:       endpoint,
 	}
 	return nil
 }

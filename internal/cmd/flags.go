@@ -132,3 +132,25 @@ func (o *rateOutputFmtFlags) AddToCmd(cmd *cobra.Command) {
 func (o rateOutputFmtFlags) validate() (*core.OutputOpts, error) {
 	return o.commonOutputFmtFlags.validate()
 }
+
+// liquidOperationFlags
+type liquidOperationFlags struct {
+	endpoint string
+	compare  bool
+}
+
+func (l *liquidOperationFlags) AddToCmd(cmd *cobra.Command) {
+	cmd.Flags().StringVarP(&l.endpoint, "endpoint", "e", "", "query a liquid running locally")
+	cmd.Flags().BoolVarP(&l.compare, "compare", "c", false, "query both the liquid in the cluster and the liquid running locally. Renders the diff of both responses. Requires --endpoint to be set.")
+}
+
+// liquidQuotaOperationFlags
+type liquidQuotaOperationFlags struct {
+	endpoint    string
+	quotaValues []string
+}
+
+func (l *liquidQuotaOperationFlags) AddToCmd(cmd *cobra.Command) {
+	cmd.Flags().StringVarP(&l.endpoint, "endpoint", "e", "", "query a liquid running locally")
+	cmd.Flags().StringSliceVarP(&l.quotaValues, "quota_values", "q", nil, "quota values $RESURCE=$VALUE (comma separated list)")
+}
