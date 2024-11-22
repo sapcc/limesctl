@@ -152,5 +152,5 @@ type liquidQuotaOperationFlags struct {
 
 func (l *liquidQuotaOperationFlags) AddToCmd(cmd *cobra.Command) {
 	cmd.Flags().StringVarP(&l.endpoint, "endpoint", "e", "", "query a liquid running locally")
-	cmd.Flags().StringSliceVarP(&l.quotaValues, "quota_values", "q", nil, "quota values $RESURCE=$VALUE (comma separated list)")
+	cmd.Flags().StringSliceVarP(&l.quotaValues, "quota-values", "q", nil, "quota values $RESOURCE=$VALUE (comma-separated list)")
 }

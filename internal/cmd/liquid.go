@@ -384,7 +384,7 @@ func (c *liquidSetQuotaCmd) Run(cmd *cobra.Command, args []string) error {
 	endpoint := c.liquidQuotaOperationFlags.endpoint
 
 	if len(c.liquidQuotaOperationFlags.quotaValues) == 0 {
-		return errors.New("flag --quota_values is required")
+		return errors.New("flag --quota-values is required")
 	}
 	var serviceQuotaRequest liquid.ServiceQuotaRequest
 	serviceQuotaRequest.Resources = make(map[liquid.ResourceName]liquid.ResourceQuotaRequest)
@@ -392,7 +392,7 @@ func (c *liquidSetQuotaCmd) Run(cmd *cobra.Command, args []string) error {
 	for _, resourceQuotaString := range resourceQuotaStrings {
 		parts := strings.Split(resourceQuotaString, "=")
 		if len(parts) != 2 {
-			return errors.New("quota values should be formatted $RESOURCE1=$VALUE1,$RESOURCE2=$VALUE2")
+			return errors.New("quota values should be formatted like $RESOURCE1=$VALUE1,$RESOURCE2=$VALUE2")
 		}
 		quota, err := strconv.ParseUint(parts[1], 10, 64)
 		if err != nil {
