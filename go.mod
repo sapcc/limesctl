@@ -5,7 +5,7 @@ go 1.23
 require (
 	github.com/google/go-cmp v0.6.0
 	github.com/gophercloud/gophercloud/v2 v2.3.0
-	github.com/gophercloud/utils/v2 v2.0.0-20241205095159-af98389672f6
+	github.com/gophercloud/utils/v2 v2.0.0-20241209100706-e3a3b7c07d26
 	github.com/olekukonko/tablewriter v0.0.5
 	github.com/sapcc/go-api-declarations v1.13.1
 	github.com/sapcc/go-bits v0.0.0-20241212142854-05ca4ed3590b
