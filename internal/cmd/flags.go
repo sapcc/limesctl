@@ -137,11 +137,13 @@ func (o rateOutputFmtFlags) validate() (*core.OutputOpts, error) {
 type liquidOperationFlags struct {
 	endpoint string
 	compare  bool
+	body     string
 }
 
 func (l *liquidOperationFlags) AddToCmd(cmd *cobra.Command) {
 	cmd.Flags().StringVarP(&l.endpoint, "endpoint", "e", "", "query a liquid running locally")
 	cmd.Flags().BoolVarP(&l.compare, "compare", "c", false, "query both the liquid in the cluster and the liquid running locally. Renders the diff of both responses. Requires --endpoint to be set.")
+	cmd.Flags().StringVarP(&l.body, "body", "b", "", "use a custom request body generated from provided json structure")
 }
 
 // liquidQuotaOperationFlags
