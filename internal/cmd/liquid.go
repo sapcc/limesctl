@@ -107,6 +107,10 @@ func (c *liquidServiceInfoCmd) Run(cmd *cobra.Command, args []string) error {
 	if compare && (endpoint == "" || serviceType == "") {
 		return errors.New("argument $SERVICE_TYPE and flag --endpoint are both required for comparison mode")
 	}
+	body := c.liquidOperationFlags.body
+	if body != "" {
+		return errors.New("custom request body is not needed when retrieving service info")
+	}
 
 	provider, err := authenticate(cmd.Context())
 	if err != nil {
@@ -197,18 +201,29 @@ func (c *liquidReportCapacityCmd) Run(cmd *cobra.Command, args []string) error {
 	if compare && (endpoint == "" || serviceType == "") {
 		return errors.New("argument $SERVICE_TYPE and flag --endpoint are both required for comparison mode")
 	}
-
-	var res gophercloud.Result
-	resp, err := limesAdminClient.Get(cmd.Context(), limesAdminClient.ServiceURL("liquid/service-capacity-request?service_type=liquid-"+serviceType), &res.Body, nil) //nolint:bodyclose
-	_, res.Header, res.Err = gophercloud.ParseResponse(resp, err)
-	if err != nil {
-		return util.WrapError(err, "could not fetch service capacity request body from limes")
-	}
+	body := c.liquidOperationFlags.body
 
 	var serviceCapacityRequest *liquid.ServiceCapacityRequest
-	err = res.ExtractInto(&serviceCapacityRequest)
-	if err != nil {
-		return util.WrapError(err, "could not parse service capacity request body response from limes")
+	if body == "" {
+		var res gophercloud.Result
+		resp, err := limesAdminClient.Get(cmd.Context(), limesAdminClient.ServiceURL("liquid/service-capacity-request?service_type=liquid-"+serviceType), &res.Body, nil) //nolint:bodyclose
+		_, res.Header, res.Err = gophercloud.ParseResponse(resp, err)
+		if err != nil {
+			return util.WrapError(err, "could not fetch service capacity request body from limes")
+		}
+
+		err = res.ExtractInto(&serviceCapacityRequest)
+		if err != nil {
+			return util.WrapError(err, "could not parse service capacity request body response from limes")
+		}
+	} else {
+		decoder := json.NewDecoder(strings.NewReader(body))
+		decoder.DisallowUnknownFields()
+
+		err := decoder.Decode(&serviceCapacityRequest)
+		if err != nil {
+			return util.WrapError(err, "could not parse custom body parameters into service capacity request")
+		}
 	}
 
 	provider, err := authenticate(cmd.Context())
@@ -301,18 +316,29 @@ func (c *liquidReportUsageCmd) Run(cmd *cobra.Command, args []string) error {
 	if compare && (endpoint == "" || serviceType == "") {
 		return errors.New("argument $SERVICE_TYPE and flag --endpoint are both required for comparison mode")
 	}
-
-	var r gophercloud.Result
-	resp, err := limesAdminClient.Get(cmd.Context(), limesAdminClient.ServiceURL(fmt.Sprintf("liquid/service-usage-request?service_type=%s&project_id=%s", serviceType, projectID)), &r.Body, nil) //nolint:bodyclose
-	_, r.Header, r.Err = gophercloud.ParseResponse(resp, err)
-	if err != nil {
-		return util.WrapError(err, "could not fetch service usage request body from limes")
-	}
+	body := c.liquidOperationFlags.body
 
 	var serviceUsageRequest *liquid.ServiceUsageRequest
-	err = r.ExtractInto(&serviceUsageRequest)
-	if err != nil {
-		return util.WrapError(err, "could not parse service usage request body response from limes")
+	if body == "" {
+		var r gophercloud.Result
+		resp, err := limesAdminClient.Get(cmd.Context(), limesAdminClient.ServiceURL(fmt.Sprintf("liquid/service-usage-request?service_type=%s&project_id=%s", serviceType, projectID)), &r.Body, nil) //nolint:bodyclose
+		_, r.Header, r.Err = gophercloud.ParseResponse(resp, err)
+		if err != nil {
+			return util.WrapError(err, "could not fetch service usage request body from limes")
+		}
+
+		err = r.ExtractInto(&serviceUsageRequest)
+		if err != nil {
+			return util.WrapError(err, "could not parse service usage request body response from limes")
+		}
+	} else {
+		decoder := json.NewDecoder(strings.NewReader(body))
+		decoder.DisallowUnknownFields()
+
+		err := decoder.Decode(&serviceUsageRequest)
+		if err != nil {
+			return util.WrapError(err, "could not parse custom body parameters into service usage request")
+		}
 	}
 
 	provider, err := authenticate(cmd.Context())
