@@ -4,8 +4,8 @@ go 1.23
 
 require (
 	github.com/google/go-cmp v0.6.0
-	github.com/gophercloud/gophercloud/v2 v2.3.0
-	github.com/gophercloud/utils/v2 v2.0.0-20241209100706-e3a3b7c07d26
+	github.com/gophercloud/gophercloud/v2 v2.4.0
+	github.com/gophercloud/utils/v2 v2.0.0-20241220104409-2e0af06694a1
 	github.com/olekukonko/tablewriter v0.0.5
 	github.com/sapcc/go-api-declarations v1.13.2
 	github.com/sapcc/go-bits v0.0.0-20250101161453-7169321dc311
@@ -24,7 +24,6 @@ require (
 	github.com/klauspost/compress v1.17.9 // indirect
 	github.com/kr/text v0.2.0 // indirect
 	github.com/mattn/go-runewidth v0.0.9 // indirect
-	github.com/mitchellh/go-homedir v1.1.0 // indirect
 	github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 // indirect
 	github.com/prometheus/client_golang v1.20.5 // indirect
 	github.com/prometheus/client_model v0.6.1 // indirect
