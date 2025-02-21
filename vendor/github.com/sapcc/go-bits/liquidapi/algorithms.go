@@ -36,18 +36,18 @@ import (
 // <https://en.wikipedia.org/wiki/Largest_remainder_method>.
 func DistributeFairly[K comparable](total uint64, requested map[K]uint64) map[K]uint64 {
 	// easy case: all requests can be granted
-	sumOfRequests := uint64(0)
+	sumOfRequests := 0.0
 	for _, request := range requested {
-		sumOfRequests += request
+		sumOfRequests += float64(request)
 	}
-	if sumOfRequests <= total {
+	if sumOfRequests <= float64(total) {
 		return requested
 	}
 
 	// a completely fair distribution would require using these floating-point values...
 	exact := make(map[K]float64, len(requested))
 	for key, request := range requested {
-		exact[key] = float64(total) * float64(request) / float64(sumOfRequests)
+		exact[key] = float64(total) * float64(request) / sumOfRequests
 	}
 
 	// ...but we have to round to uint64
@@ -84,6 +84,12 @@ func DistributeFairly[K comparable](total uint64, requested map[K]uint64) map[K]
 			return 0
 		}
 	})
+	if missing > uint64(len(keys)) {
+		// the algorithm ought to guarantee that the number of `missing`
+		// allocations is smaller than the number of keys, but we had this fail in the past,
+		// so this crash message is here to generate test cases as necessary
+		logg.Fatal("too many missing allocations in DistributeFairly for input: total = %d, requested = %#v", total, requested)
+	}
 	for _, key := range keys[len(keys)-int(missing):] { //nolint:gosec // algorithm ensures that no overflow happens on uint64 -> int cast
 		fair[key] += 1
 	}
