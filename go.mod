@@ -3,7 +3,7 @@ module github.com/sapcc/limesctl/v3
 go 1.24
 
 require (
-	github.com/google/go-cmp v0.6.0
+	github.com/google/go-cmp v0.7.0
 	github.com/gophercloud/gophercloud/v2 v2.5.0
 	github.com/gophercloud/utils/v2 v2.0.0-20250212084022-725b94822eeb
 	github.com/olekukonko/tablewriter v0.0.5
