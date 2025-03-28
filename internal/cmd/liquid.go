@@ -58,7 +58,7 @@ func newLiquidCmd() *cobra.Command {
 type liquidServiceInfoCmd struct {
 	*cobra.Command
 
-	liquidOperationFlags
+	flags liquidOperationFlags
 }
 
 func newLiquidServiceInfoCmd() *liquidServiceInfoCmd {
@@ -73,7 +73,7 @@ func newLiquidServiceInfoCmd() *liquidServiceInfoCmd {
 
 	// Flags
 	doNotSortFlags(cmd)
-	liquidServiceInfo.liquidOperationFlags.AddToCmd(cmd)
+	liquidServiceInfo.flags.AddToCmd(cmd)
 
 	liquidServiceInfo.Command = cmd
 	return liquidServiceInfo
@@ -102,12 +102,12 @@ func (c *liquidServiceInfoCmd) Run(cmd *cobra.Command, args []string) error {
 	if len(args) == 1 {
 		serviceType = args[0]
 	}
-	endpoint := c.liquidOperationFlags.endpoint
-	compare := c.liquidOperationFlags.compare
+	endpoint := c.flags.endpoint
+	compare := c.flags.compare
 	if compare && (endpoint == "" || serviceType == "") {
 		return errors.New("argument $SERVICE_TYPE and flag --endpoint are both required for comparison mode")
 	}
-	body := c.liquidOperationFlags.body
+	body := c.flags.body
 	if body != "" {
 		return errors.New("custom request body is not needed when retrieving service info")
 	}
@@ -153,7 +153,7 @@ func (c *liquidServiceInfoCmd) Run(cmd *cobra.Command, args []string) error {
 type liquidReportCapacityCmd struct {
 	*cobra.Command
 
-	liquidOperationFlags
+	flags liquidOperationFlags
 }
 
 func newLiquidReportCapacityCmd() *liquidReportCapacityCmd {
@@ -169,7 +169,7 @@ func newLiquidReportCapacityCmd() *liquidReportCapacityCmd {
 
 	// Flags
 	doNotSortFlags(cmd)
-	liquidReportCapacity.liquidOperationFlags.AddToCmd(cmd)
+	liquidReportCapacity.flags.AddToCmd(cmd)
 
 	liquidReportCapacity.Command = cmd
 	return liquidReportCapacity
@@ -196,12 +196,12 @@ func GetLiquidCapacityReport(provider *gophercloud.ProviderClient, opts liquidap
 func (c *liquidReportCapacityCmd) Run(cmd *cobra.Command, args []string) error {
 	serviceType := args[0]
 
-	endpoint := c.liquidOperationFlags.endpoint
-	compare := c.liquidOperationFlags.compare
+	endpoint := c.flags.endpoint
+	compare := c.flags.compare
 	if compare && (endpoint == "" || serviceType == "") {
 		return errors.New("argument $SERVICE_TYPE and flag --endpoint are both required for comparison mode")
 	}
-	body := c.liquidOperationFlags.body
+	body := c.flags.body
 
 	var serviceCapacityRequest *liquid.ServiceCapacityRequest
 	if body == "" {
@@ -267,7 +267,7 @@ func (c *liquidReportCapacityCmd) Run(cmd *cobra.Command, args []string) error {
 type liquidReportUsageCmd struct {
 	*cobra.Command
 
-	liquidOperationFlags
+	flags liquidOperationFlags
 }
 
 func newLiquidReportUsageCmd() *liquidReportUsageCmd {
@@ -283,7 +283,7 @@ func newLiquidReportUsageCmd() *liquidReportUsageCmd {
 
 	// Flags
 	doNotSortFlags(cmd)
-	liquidReportUsage.liquidOperationFlags.AddToCmd(cmd)
+	liquidReportUsage.flags.AddToCmd(cmd)
 
 	liquidReportUsage.Command = cmd
 	return liquidReportUsage
@@ -311,12 +311,12 @@ func (c *liquidReportUsageCmd) Run(cmd *cobra.Command, args []string) error {
 	serviceType := args[0]
 	projectID := args[1]
 
-	endpoint := c.liquidOperationFlags.endpoint
-	compare := c.liquidOperationFlags.compare
+	endpoint := c.flags.endpoint
+	compare := c.flags.compare
 	if compare && (endpoint == "" || serviceType == "") {
 		return errors.New("argument $SERVICE_TYPE and flag --endpoint are both required for comparison mode")
 	}
-	body := c.liquidOperationFlags.body
+	body := c.flags.body
 
 	var serviceUsageRequest *liquid.ServiceUsageRequest
 	if body == "" {
@@ -382,7 +382,7 @@ func (c *liquidReportUsageCmd) Run(cmd *cobra.Command, args []string) error {
 type liquidSetQuotaCmd struct {
 	*cobra.Command
 
-	liquidQuotaOperationFlags
+	flags liquidQuotaOperationFlags
 }
 
 func newLiquidSetQuotaCmd() *liquidSetQuotaCmd {
@@ -397,7 +397,7 @@ func newLiquidSetQuotaCmd() *liquidSetQuotaCmd {
 
 	// Flags
 	doNotSortFlags(cmd)
-	liquidSetQuota.liquidQuotaOperationFlags.AddToCmd(cmd)
+	liquidSetQuota.flags.AddToCmd(cmd)
 
 	liquidSetQuota.Command = cmd
 	return liquidSetQuota
@@ -407,14 +407,14 @@ func (c *liquidSetQuotaCmd) Run(cmd *cobra.Command, args []string) error {
 	serviceType := args[0]
 	projectID := args[1]
 
-	endpoint := c.liquidQuotaOperationFlags.endpoint
+	endpoint := c.flags.endpoint
 
-	if len(c.liquidQuotaOperationFlags.quotaValues) == 0 {
+	if len(c.flags.quotaValues) == 0 {
 		return errors.New("flag --quota-values is required")
 	}
 	var serviceQuotaRequest liquid.ServiceQuotaRequest
 	serviceQuotaRequest.Resources = make(map[liquid.ResourceName]liquid.ResourceQuotaRequest)
-	resourceQuotaStrings := c.liquidQuotaOperationFlags.quotaValues
+	resourceQuotaStrings := c.flags.quotaValues
 	for _, resourceQuotaString := range resourceQuotaStrings {
 		parts := strings.Split(resourceQuotaString, "=")
 		if len(parts) != 2 {

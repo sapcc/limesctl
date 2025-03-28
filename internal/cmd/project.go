@@ -66,9 +66,9 @@ func (pf *projectFlags) validateWithNameID(nameOrID string) error {
 type projectListCmd struct {
 	*cobra.Command
 
-	projectFlags
-	resourceFilterFlags
-	resourceOutputFmtFlags
+	projectFlags   projectFlags
+	filterFlags    resourceFilterFlags
+	outputFmtFlags resourceOutputFmtFlags
 }
 
 func newProjectListCmd() *projectListCmd {
@@ -91,21 +91,21 @@ This command requires a domain-admin token.`,
 	// Flags
 	doNotSortFlags(cmd)
 	projectList.projectFlags.AddToCmd(cmd)
-	projectList.resourceFilterFlags.AddToCmd(cmd)
-	projectList.resourceOutputFmtFlags.AddToCmd(cmd)
+	projectList.filterFlags.AddToCmd(cmd)
+	projectList.outputFmtFlags.AddToCmd(cmd)
 
 	projectList.Command = cmd
 	return projectList
 }
 
 func (p *projectListCmd) Run(cmd *cobra.Command, _ []string) error {
-	outputOpts, err := p.resourceOutputFmtFlags.validate()
+	outputOpts, err := p.outputFmtFlags.validate()
 	if err != nil {
 		return err
 	}
 
 	domainName := ""
-	domainID, err := auth.FindDomainID(cmd.Context(), identityClient, p.DomainNameOrID)
+	domainID, err := auth.FindDomainID(cmd.Context(), identityClient, p.projectFlags.DomainNameOrID)
 	if err == nil {
 		domainName, err = auth.FindDomainName(cmd.Context(), identityClient, domainID)
 	}
@@ -114,15 +114,15 @@ func (p *projectListCmd) Run(cmd *cobra.Command, _ []string) error {
 	}
 
 	res := projects.List(cmd.Context(), limesResourcesClient, domainID, projects.ListOpts{
-		Areas:     p.areas,
-		Services:  util.CastStringsTo[limes.ServiceType](p.services),
-		Resources: util.CastStringsTo[limesresources.ResourceName](p.resources),
+		Areas:     p.filterFlags.areas,
+		Services:  util.CastStringsTo[limes.ServiceType](p.filterFlags.services),
+		Resources: util.CastStringsTo[limesresources.ResourceName](p.filterFlags.resources),
 	})
 	if res.Err != nil {
 		return util.WrapError(res.Err, "could not get project reports")
 	}
 
-	if p.format == core.OutputFormatJSON {
+	if p.outputFmtFlags.format == core.OutputFormatJSON {
 		return writeJSON(res.Body)
 	}
 
@@ -141,9 +141,9 @@ func (p *projectListCmd) Run(cmd *cobra.Command, _ []string) error {
 type projectListRatesCmd struct {
 	*cobra.Command
 
-	projectFlags
-	rateFilterFlags
-	rateOutputFmtFlags
+	projectFlags   projectFlags
+	filterFlags    rateFilterFlags
+	outputFmtFlags rateOutputFmtFlags
 }
 
 func newProjectListRatesCmd() *projectListRatesCmd {
@@ -166,21 +166,21 @@ This command requires a domain-admin token.`,
 	// Flags
 	doNotSortFlags(cmd)
 	projectListRates.projectFlags.AddToCmd(cmd)
-	projectListRates.rateFilterFlags.AddToCmd(cmd)
-	projectListRates.rateOutputFmtFlags.AddToCmd(cmd)
+	projectListRates.filterFlags.AddToCmd(cmd)
+	projectListRates.outputFmtFlags.AddToCmd(cmd)
 
 	projectListRates.Command = cmd
 	return projectListRates
 }
 
 func (p *projectListRatesCmd) Run(cmd *cobra.Command, _ []string) error {
-	outputOpts, err := p.rateOutputFmtFlags.validate()
+	outputOpts, err := p.outputFmtFlags.validate()
 	if err != nil {
 		return err
 	}
 
 	domainName := ""
-	domainID, err := auth.FindDomainID(cmd.Context(), identityClient, p.DomainNameOrID)
+	domainID, err := auth.FindDomainID(cmd.Context(), identityClient, p.projectFlags.DomainNameOrID)
 	if err == nil {
 		domainName, err = auth.FindDomainName(cmd.Context(), identityClient, domainID)
 	}
@@ -189,14 +189,14 @@ func (p *projectListRatesCmd) Run(cmd *cobra.Command, _ []string) error {
 	}
 
 	res := ratesProjects.List(cmd.Context(), limesRatesClient, domainID, ratesProjects.ReadOpts{
-		Areas:    p.areas,
-		Services: util.CastStringsTo[limes.ServiceType](p.services),
+		Areas:    p.filterFlags.areas,
+		Services: util.CastStringsTo[limes.ServiceType](p.filterFlags.services),
 	})
 	if res.Err != nil {
 		return util.WrapError(res.Err, "could not get project reports")
 	}
 
-	if p.format == core.OutputFormatJSON {
+	if p.outputFmtFlags.format == core.OutputFormatJSON {
 		return writeJSON(res.Body)
 	}
 
@@ -215,9 +215,9 @@ func (p *projectListRatesCmd) Run(cmd *cobra.Command, _ []string) error {
 type projectShowCmd struct {
 	*cobra.Command
 
-	projectFlags
-	resourceFilterFlags
-	resourceOutputFmtFlags
+	projectFlags   projectFlags
+	filterFlags    resourceFilterFlags
+	outputFmtFlags resourceOutputFmtFlags
 }
 
 func newProjectShowCmd() *projectShowCmd {
@@ -240,8 +240,8 @@ This command requires a project member permissions.`,
 	// Flags
 	doNotSortFlags(cmd)
 	projectShow.projectFlags.AddToCmd(cmd)
-	projectShow.resourceFilterFlags.AddToCmd(cmd)
-	projectShow.resourceOutputFmtFlags.AddToCmd(cmd)
+	projectShow.filterFlags.AddToCmd(cmd)
+	projectShow.outputFmtFlags.AddToCmd(cmd)
 
 	projectShow.Command = cmd
 	return projectShow
@@ -257,26 +257,26 @@ func (p *projectShowCmd) Run(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	outputOpts, err := p.resourceOutputFmtFlags.validate()
+	outputOpts, err := p.outputFmtFlags.validate()
 	if err != nil {
 		return err
 	}
 
-	pInfo, err := auth.FindProject(cmd.Context(), identityClient, p.DomainNameOrID, nameOrID)
+	pInfo, err := auth.FindProject(cmd.Context(), identityClient, p.projectFlags.DomainNameOrID, nameOrID)
 	if err != nil {
 		return err
 	}
 
 	res := projects.Get(cmd.Context(), limesResourcesClient, pInfo.DomainID, pInfo.ID, projects.GetOpts{
-		Areas:     p.areas,
-		Services:  util.CastStringsTo[limes.ServiceType](p.services),
-		Resources: util.CastStringsTo[limesresources.ResourceName](p.resources),
+		Areas:     p.filterFlags.areas,
+		Services:  util.CastStringsTo[limes.ServiceType](p.filterFlags.services),
+		Resources: util.CastStringsTo[limesresources.ResourceName](p.filterFlags.resources),
 	})
 	if res.Err != nil {
 		return util.WrapError(res.Err, "could not get project report")
 	}
 
-	if p.format == core.OutputFormatJSON {
+	if p.outputFmtFlags.format == core.OutputFormatJSON {
 		return writeJSON(res.Body)
 	}
 
@@ -298,9 +298,9 @@ func (p *projectShowCmd) Run(cmd *cobra.Command, args []string) error {
 type projectShowRatesCmd struct {
 	*cobra.Command
 
-	projectFlags
-	rateFilterFlags
-	rateOutputFmtFlags
+	projectFlags   projectFlags
+	filterFlags    rateFilterFlags
+	outputFmtFlags rateOutputFmtFlags
 }
 
 func newProjectShowRatesCmd() *projectShowRatesCmd {
@@ -323,8 +323,8 @@ This command requires a project member permissions.`,
 	// Flags
 	doNotSortFlags(cmd)
 	projectShowRates.projectFlags.AddToCmd(cmd)
-	projectShowRates.rateFilterFlags.AddToCmd(cmd)
-	projectShowRates.rateOutputFmtFlags.AddToCmd(cmd)
+	projectShowRates.filterFlags.AddToCmd(cmd)
+	projectShowRates.outputFmtFlags.AddToCmd(cmd)
 
 	projectShowRates.Command = cmd
 	return projectShowRates
@@ -340,25 +340,25 @@ func (p *projectShowRatesCmd) Run(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	outputOpts, err := p.rateOutputFmtFlags.validate()
+	outputOpts, err := p.outputFmtFlags.validate()
 	if err != nil {
 		return err
 	}
 
-	pInfo, err := auth.FindProject(cmd.Context(), identityClient, p.DomainNameOrID, nameOrID)
+	pInfo, err := auth.FindProject(cmd.Context(), identityClient, p.projectFlags.DomainNameOrID, nameOrID)
 	if err != nil {
 		return err
 	}
 
 	res := ratesProjects.Get(cmd.Context(), limesRatesClient, pInfo.DomainID, pInfo.ID, ratesProjects.ReadOpts{
-		Areas:    p.areas,
-		Services: util.CastStringsTo[limes.ServiceType](p.services),
+		Areas:    p.filterFlags.areas,
+		Services: util.CastStringsTo[limes.ServiceType](p.filterFlags.services),
 	})
 	if res.Err != nil {
 		return util.WrapError(res.Err, "could not get project report")
 	}
 
-	if p.format == core.OutputFormatJSON {
+	if p.outputFmtFlags.format == core.OutputFormatJSON {
 		return writeJSON(res.Body)
 	}
 
@@ -380,7 +380,7 @@ func (p *projectShowRatesCmd) Run(cmd *cobra.Command, args []string) error {
 type projectSyncCmd struct {
 	*cobra.Command
 
-	projectFlags
+	flags projectFlags
 }
 
 func newProjectSyncCmd() *projectSyncCmd {
@@ -403,7 +403,7 @@ This command requires a project-admin token.`,
 
 	// Flags
 	doNotSortFlags(cmd)
-	projectSync.projectFlags.AddToCmd(cmd)
+	projectSync.flags.AddToCmd(cmd)
 
 	projectSync.Command = cmd
 	return projectSync
@@ -414,12 +414,12 @@ func (p *projectSyncCmd) Run(cmd *cobra.Command, args []string) error {
 	if len(args) > 0 {
 		nameOrID = args[0]
 	}
-	err := p.projectFlags.validateWithNameID(nameOrID)
+	err := p.flags.validateWithNameID(nameOrID)
 	if err != nil {
 		return err
 	}
 
-	pInfo, err := auth.FindProject(cmd.Context(), identityClient, p.DomainNameOrID, nameOrID)
+	pInfo, err := auth.FindProject(cmd.Context(), identityClient, p.flags.DomainNameOrID, nameOrID)
 	if err != nil {
 		return err
 	}
