@@ -121,7 +121,8 @@ func findProjectInCurrentToken(identityClient *gophercloud.ServiceClient, domain
 		return nil
 	}
 
-	if projectNameOrID == "" {
+	switch projectNameOrID {
+	case "":
 		// If no projectNameOrID is provided then we return the info from token.
 		if d1.ID != "" {
 			return &ProjectInfo{
@@ -137,7 +138,7 @@ func findProjectInCurrentToken(identityClient *gophercloud.ServiceClient, domain
 				DomainName: d2.Name,
 			}
 		}
-	} else if projectNameOrID == p.ID || projectNameOrID == p.Name {
+	case p.ID, p.Name:
 		// Check if token has the given name/ID(s).
 		if d1.ID != "" && (domainNameOrID == d1.ID || domainNameOrID == d1.Name) {
 			return &ProjectInfo{

@@ -43,8 +43,8 @@ func newClusterCmd() *cobra.Command {
 type clusterShowCmd struct {
 	*cobra.Command
 
-	resourceFilterFlags
-	resourceOutputFmtFlags
+	filterFlags    resourceFilterFlags
+	outputFmtFlags resourceOutputFmtFlags
 }
 
 func newClusterShowCmd() *clusterShowCmd {
@@ -60,29 +60,29 @@ func newClusterShowCmd() *clusterShowCmd {
 
 	// Flags
 	doNotSortFlags(cmd)
-	clusterShow.resourceFilterFlags.AddToCmd(cmd)
-	clusterShow.resourceOutputFmtFlags.AddToCmd(cmd)
+	clusterShow.filterFlags.AddToCmd(cmd)
+	clusterShow.outputFmtFlags.AddToCmd(cmd)
 
 	clusterShow.Command = cmd
 	return clusterShow
 }
 
 func (c *clusterShowCmd) Run(cmd *cobra.Command, _ []string) error {
-	outputOpts, err := c.resourceOutputFmtFlags.validate()
+	outputOpts, err := c.outputFmtFlags.validate()
 	if err != nil {
 		return err
 	}
 
 	res := clusters.Get(cmd.Context(), limesResourcesClient, clusters.GetOpts{
-		Areas:     c.areas,
-		Services:  util.CastStringsTo[limes.ServiceType](c.services),
-		Resources: util.CastStringsTo[limesresources.ResourceName](c.resources),
+		Areas:     c.filterFlags.areas,
+		Services:  util.CastStringsTo[limes.ServiceType](c.filterFlags.services),
+		Resources: util.CastStringsTo[limesresources.ResourceName](c.filterFlags.resources),
 	})
 	if res.Err != nil {
 		return util.WrapError(res.Err, "could not get cluster report")
 	}
 
-	if c.format == core.OutputFormatJSON {
+	if c.outputFmtFlags.format == core.OutputFormatJSON {
 		return writeJSON(res.Body)
 	}
 
@@ -100,8 +100,8 @@ func (c *clusterShowCmd) Run(cmd *cobra.Command, _ []string) error {
 type clusterShowRatesCmd struct {
 	*cobra.Command
 
-	rateFilterFlags
-	rateOutputFmtFlags
+	filterFlags    rateFilterFlags
+	outputFmtFlags rateOutputFmtFlags
 }
 
 func newClusterShowRatesCmd() *clusterShowRatesCmd {
@@ -117,28 +117,28 @@ func newClusterShowRatesCmd() *clusterShowRatesCmd {
 
 	// Flags
 	doNotSortFlags(cmd)
-	clusterShowRates.rateFilterFlags.AddToCmd(cmd)
-	clusterShowRates.rateOutputFmtFlags.AddToCmd(cmd)
+	clusterShowRates.filterFlags.AddToCmd(cmd)
+	clusterShowRates.outputFmtFlags.AddToCmd(cmd)
 
 	clusterShowRates.Command = cmd
 	return clusterShowRates
 }
 
 func (c *clusterShowRatesCmd) Run(cmd *cobra.Command, args []string) error {
-	outputOpts, err := c.rateOutputFmtFlags.validate()
+	outputOpts, err := c.outputFmtFlags.validate()
 	if err != nil {
 		return err
 	}
 
 	res := ratesClusters.Get(cmd.Context(), limesRatesClient, ratesClusters.GetOpts{
-		Areas:    c.areas,
-		Services: util.CastStringsTo[limes.ServiceType](c.services),
+		Areas:    c.filterFlags.areas,
+		Services: util.CastStringsTo[limes.ServiceType](c.filterFlags.services),
 	})
 	if res.Err != nil {
 		return util.WrapError(res.Err, "could not get cluster report")
 	}
 
-	if c.format == core.OutputFormatJSON {
+	if c.outputFmtFlags.format == core.OutputFormatJSON {
 		return writeJSON(res.Body)
 	}
 

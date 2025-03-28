@@ -45,8 +45,8 @@ func newDomainCmd() *cobra.Command {
 type domainListCmd struct {
 	*cobra.Command
 
-	resourceFilterFlags
-	resourceOutputFmtFlags
+	filterFlags    resourceFilterFlags
+	outputFmtFlags resourceOutputFmtFlags
 }
 
 func newDomainListCmd() *domainListCmd {
@@ -63,29 +63,29 @@ cloud-admin token.`,
 
 	// Flags
 	doNotSortFlags(cmd)
-	domainList.resourceFilterFlags.AddToCmd(cmd)
-	domainList.resourceOutputFmtFlags.AddToCmd(cmd)
+	domainList.filterFlags.AddToCmd(cmd)
+	domainList.outputFmtFlags.AddToCmd(cmd)
 
 	domainList.Command = cmd
 	return domainList
 }
 
 func (d *domainListCmd) Run(cmd *cobra.Command, _ []string) error {
-	outputOpts, err := d.resourceOutputFmtFlags.validate()
+	outputOpts, err := d.outputFmtFlags.validate()
 	if err != nil {
 		return err
 	}
 
 	res := domains.List(cmd.Context(), limesResourcesClient, domains.ListOpts{
-		Areas:     d.areas,
-		Services:  util.CastStringsTo[limes.ServiceType](d.services),
-		Resources: util.CastStringsTo[limesresources.ResourceName](d.resources),
+		Areas:     d.filterFlags.areas,
+		Services:  util.CastStringsTo[limes.ServiceType](d.filterFlags.services),
+		Resources: util.CastStringsTo[limesresources.ResourceName](d.filterFlags.resources),
 	})
 	if res.Err != nil {
 		return util.WrapError(res.Err, "could not get domain reports")
 	}
 
-	if d.format == core.OutputFormatJSON {
+	if d.outputFmtFlags.format == core.OutputFormatJSON {
 		return writeJSON(res.Body)
 	}
 
@@ -103,8 +103,8 @@ func (d *domainListCmd) Run(cmd *cobra.Command, _ []string) error {
 type domainShowCmd struct {
 	*cobra.Command
 
-	resourceFilterFlags
-	resourceOutputFmtFlags
+	filterFlags    resourceFilterFlags
+	outputFmtFlags resourceOutputFmtFlags
 }
 
 func newDomainShowCmd() *domainShowCmd {
@@ -121,15 +121,15 @@ domain-admin token.`,
 
 	// Flags
 	doNotSortFlags(cmd)
-	domainShow.resourceFilterFlags.AddToCmd(cmd)
-	domainShow.resourceOutputFmtFlags.AddToCmd(cmd)
+	domainShow.filterFlags.AddToCmd(cmd)
+	domainShow.outputFmtFlags.AddToCmd(cmd)
 
 	domainShow.Command = cmd
 	return domainShow
 }
 
 func (d *domainShowCmd) Run(cmd *cobra.Command, args []string) error {
-	outputOpts, err := d.resourceOutputFmtFlags.validate()
+	outputOpts, err := d.outputFmtFlags.validate()
 	if err != nil {
 		return err
 	}
@@ -144,15 +144,15 @@ func (d *domainShowCmd) Run(cmd *cobra.Command, args []string) error {
 	}
 
 	res := domains.Get(cmd.Context(), limesResourcesClient, domainID, domains.GetOpts{
-		Areas:     d.areas,
-		Services:  util.CastStringsTo[limes.ServiceType](d.services),
-		Resources: util.CastStringsTo[limesresources.ResourceName](d.resources),
+		Areas:     d.filterFlags.areas,
+		Services:  util.CastStringsTo[limes.ServiceType](d.filterFlags.services),
+		Resources: util.CastStringsTo[limesresources.ResourceName](d.filterFlags.resources),
 	})
 	if res.Err != nil {
 		return util.WrapError(res.Err, "could not get domain report")
 	}
 
-	if d.format == core.OutputFormatJSON {
+	if d.outputFmtFlags.format == core.OutputFormatJSON {
 		return writeJSON(res.Body)
 	}
 
