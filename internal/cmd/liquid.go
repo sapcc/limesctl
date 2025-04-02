@@ -239,18 +239,12 @@ func (c *liquidReportCapacityCmd) Run(cmd *cobra.Command, args []string) error {
 		return util.WrapError(err, "could not authenticate with openstack")
 	}
 
-	var serviceInfo liquid.ServiceInfo
-	if endpoint == "" {
-		serviceInfo, err = GetLiquidServiceInfo(provider, liquidapi.ClientOpts{ServiceType: "liquid-" + serviceType}, cmd.Context(), false)
-	} else {
-		serviceInfo, err = GetLiquidServiceInfo(provider, liquidapi.ClientOpts{EndpointOverride: endpoint}, cmd.Context(), false)
-	}
-	if err != nil {
-		return err
-	}
-
 	var serviceCapacityReport liquid.ServiceCapacityReport
 	if compare || endpoint == "" {
+		serviceInfo, err := GetLiquidServiceInfo(provider, liquidapi.ClientOpts{ServiceType: "liquid-" + serviceType}, cmd.Context(), false)
+		if err != nil {
+			return err
+		}
 		serviceCapacityReport, err = GetLiquidCapacityReport(provider, liquidapi.ClientOpts{ServiceType: "liquid-" + serviceType}, cmd.Context(), serviceCapacityRequest, serviceInfo, !compare)
 		if err != nil {
 			return err
@@ -259,7 +253,11 @@ func (c *liquidReportCapacityCmd) Run(cmd *cobra.Command, args []string) error {
 
 	var localServiceCapacityReport liquid.ServiceCapacityReport
 	if endpoint != "" {
-		localServiceCapacityReport, err = GetLiquidCapacityReport(provider, liquidapi.ClientOpts{EndpointOverride: endpoint}, cmd.Context(), serviceCapacityRequest, serviceInfo, !compare)
+		localServiceInfo, err := GetLiquidServiceInfo(provider, liquidapi.ClientOpts{EndpointOverride: endpoint}, cmd.Context(), false)
+		if err != nil {
+			return err
+		}
+		localServiceCapacityReport, err = GetLiquidCapacityReport(provider, liquidapi.ClientOpts{EndpointOverride: endpoint}, cmd.Context(), serviceCapacityRequest, localServiceInfo, !compare)
 		if err != nil {
 			return err
 		}
@@ -368,18 +366,12 @@ func (c *liquidReportUsageCmd) Run(cmd *cobra.Command, args []string) error {
 		return util.WrapError(err, "could not authenticate with openstack")
 	}
 
-	var serviceInfo liquid.ServiceInfo
-	if endpoint == "" {
-		serviceInfo, err = GetLiquidServiceInfo(provider, liquidapi.ClientOpts{ServiceType: "liquid-" + serviceType}, cmd.Context(), false)
-	} else {
-		serviceInfo, err = GetLiquidServiceInfo(provider, liquidapi.ClientOpts{EndpointOverride: endpoint}, cmd.Context(), false)
-	}
-	if err != nil {
-		return err
-	}
-
 	var serviceUsageReport liquid.ServiceUsageReport
 	if compare || endpoint == "" {
+		serviceInfo, err := GetLiquidServiceInfo(provider, liquidapi.ClientOpts{ServiceType: "liquid-" + serviceType}, cmd.Context(), false)
+		if err != nil {
+			return err
+		}
 		serviceUsageReport, err = GetLiquidUsageReport(provider, liquidapi.ClientOpts{ServiceType: "liquid-" + serviceType}, cmd.Context(), projectID, serviceUsageRequest, serviceInfo, !compare)
 		if err != nil {
 			return err
@@ -388,7 +380,11 @@ func (c *liquidReportUsageCmd) Run(cmd *cobra.Command, args []string) error {
 
 	var localServiceusageReport liquid.ServiceUsageReport
 	if endpoint != "" {
-		localServiceusageReport, err = GetLiquidUsageReport(provider, liquidapi.ClientOpts{EndpointOverride: endpoint}, cmd.Context(), projectID, serviceUsageRequest, serviceInfo, !compare)
+		localServiceInfo, err := GetLiquidServiceInfo(provider, liquidapi.ClientOpts{EndpointOverride: endpoint}, cmd.Context(), false)
+		if err != nil {
+			return err
+		}
+		localServiceusageReport, err = GetLiquidUsageReport(provider, liquidapi.ClientOpts{EndpointOverride: endpoint}, cmd.Context(), projectID, serviceUsageRequest, localServiceInfo, !compare)
 		if err != nil {
 			return err
 		}
