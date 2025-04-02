@@ -88,6 +88,10 @@ func GetLiquidServiceInfo(provider *gophercloud.ProviderClient, opts liquidapi.C
 	if err != nil {
 		return liquid.ServiceInfo{}, util.WrapError(err, "could not fetch service info from LIQUID api")
 	}
+	err = liquid.ValidateServiceInfo(serviceInfo)
+	if err != nil {
+		return liquid.ServiceInfo{}, util.WrapError(err, "received an invalid service info")
+	}
 	if output {
 		err = prettyPrint(serviceInfo)
 		if err != nil {
@@ -175,7 +179,7 @@ func newLiquidReportCapacityCmd() *liquidReportCapacityCmd {
 	return liquidReportCapacity
 }
 
-func GetLiquidCapacityReport(provider *gophercloud.ProviderClient, opts liquidapi.ClientOpts, ctx context.Context, serviceCapacityRequest *liquid.ServiceCapacityRequest, output bool) (liquid.ServiceCapacityReport, error) {
+func GetLiquidCapacityReport(provider *gophercloud.ProviderClient, opts liquidapi.ClientOpts, ctx context.Context, serviceCapacityRequest *liquid.ServiceCapacityRequest, serviceInfo liquid.ServiceInfo, output bool) (liquid.ServiceCapacityReport, error) {
 	liquidClient, err := liquidapi.NewClient(provider, gophercloud.EndpointOpts{}, opts)
 	if err != nil {
 		return liquid.ServiceCapacityReport{}, util.WrapError(err, "could not instantiate new LIQUID client")
@@ -183,6 +187,10 @@ func GetLiquidCapacityReport(provider *gophercloud.ProviderClient, opts liquidap
 	serviceCapacityReport, err := liquidClient.GetCapacityReport(ctx, *serviceCapacityRequest)
 	if err != nil {
 		return liquid.ServiceCapacityReport{}, util.WrapError(err, "could not fetch service capacity report from LIQUID api")
+	}
+	err = liquid.ValidateCapacityReport(serviceCapacityReport, *serviceCapacityRequest, serviceInfo)
+	if err != nil {
+		return liquid.ServiceCapacityReport{}, util.WrapError(err, "received an invalid service capacity report")
 	}
 	if output {
 		err = prettyPrint(serviceCapacityReport)
@@ -231,9 +239,19 @@ func (c *liquidReportCapacityCmd) Run(cmd *cobra.Command, args []string) error {
 		return util.WrapError(err, "could not authenticate with openstack")
 	}
 
+	var serviceInfo liquid.ServiceInfo
+	if endpoint == "" {
+		serviceInfo, err = GetLiquidServiceInfo(provider, liquidapi.ClientOpts{ServiceType: "liquid-" + serviceType}, cmd.Context(), false)
+	} else {
+		serviceInfo, err = GetLiquidServiceInfo(provider, liquidapi.ClientOpts{EndpointOverride: endpoint}, cmd.Context(), false)
+	}
+	if err != nil {
+		return err
+	}
+
 	var serviceCapacityReport liquid.ServiceCapacityReport
 	if compare || endpoint == "" {
-		serviceCapacityReport, err = GetLiquidCapacityReport(provider, liquidapi.ClientOpts{ServiceType: "liquid-" + serviceType}, cmd.Context(), serviceCapacityRequest, !compare)
+		serviceCapacityReport, err = GetLiquidCapacityReport(provider, liquidapi.ClientOpts{ServiceType: "liquid-" + serviceType}, cmd.Context(), serviceCapacityRequest, serviceInfo, !compare)
 		if err != nil {
 			return err
 		}
@@ -241,7 +259,7 @@ func (c *liquidReportCapacityCmd) Run(cmd *cobra.Command, args []string) error {
 
 	var localServiceCapacityReport liquid.ServiceCapacityReport
 	if endpoint != "" {
-		localServiceCapacityReport, err = GetLiquidCapacityReport(provider, liquidapi.ClientOpts{EndpointOverride: endpoint}, cmd.Context(), serviceCapacityRequest, !compare)
+		localServiceCapacityReport, err = GetLiquidCapacityReport(provider, liquidapi.ClientOpts{EndpointOverride: endpoint}, cmd.Context(), serviceCapacityRequest, serviceInfo, !compare)
 		if err != nil {
 			return err
 		}
@@ -289,7 +307,7 @@ func newLiquidReportUsageCmd() *liquidReportUsageCmd {
 	return liquidReportUsage
 }
 
-func GetLiquidUsageReport(provider *gophercloud.ProviderClient, opts liquidapi.ClientOpts, ctx context.Context, projectID string, serviceUsageRequest *liquid.ServiceUsageRequest, output bool) (liquid.ServiceUsageReport, error) {
+func GetLiquidUsageReport(provider *gophercloud.ProviderClient, opts liquidapi.ClientOpts, ctx context.Context, projectID string, serviceUsageRequest *liquid.ServiceUsageRequest, serviceInfo liquid.ServiceInfo, output bool) (liquid.ServiceUsageReport, error) {
 	liquidClient, err := liquidapi.NewClient(provider, gophercloud.EndpointOpts{}, opts)
 	if err != nil {
 		return liquid.ServiceUsageReport{}, util.WrapError(err, "could not instantiate new LIQUID client")
@@ -297,6 +315,10 @@ func GetLiquidUsageReport(provider *gophercloud.ProviderClient, opts liquidapi.C
 	serviceUsageReport, err := liquidClient.GetUsageReport(ctx, projectID, *serviceUsageRequest)
 	if err != nil {
 		return liquid.ServiceUsageReport{}, util.WrapError(err, "could not fetch service usage report from LIQUID api")
+	}
+	err = liquid.ValidateUsageReport(serviceUsageReport, *serviceUsageRequest, serviceInfo)
+	if err != nil {
+		return liquid.ServiceUsageReport{}, util.WrapError(err, "received an invalid service usage report")
 	}
 	if output {
 		err = prettyPrint(serviceUsageReport)
@@ -346,9 +368,19 @@ func (c *liquidReportUsageCmd) Run(cmd *cobra.Command, args []string) error {
 		return util.WrapError(err, "could not authenticate with openstack")
 	}
 
+	var serviceInfo liquid.ServiceInfo
+	if endpoint == "" {
+		serviceInfo, err = GetLiquidServiceInfo(provider, liquidapi.ClientOpts{ServiceType: "liquid-" + serviceType}, cmd.Context(), false)
+	} else {
+		serviceInfo, err = GetLiquidServiceInfo(provider, liquidapi.ClientOpts{EndpointOverride: endpoint}, cmd.Context(), false)
+	}
+	if err != nil {
+		return err
+	}
+
 	var serviceUsageReport liquid.ServiceUsageReport
 	if compare || endpoint == "" {
-		serviceUsageReport, err = GetLiquidUsageReport(provider, liquidapi.ClientOpts{ServiceType: "liquid-" + serviceType}, cmd.Context(), projectID, serviceUsageRequest, !compare)
+		serviceUsageReport, err = GetLiquidUsageReport(provider, liquidapi.ClientOpts{ServiceType: "liquid-" + serviceType}, cmd.Context(), projectID, serviceUsageRequest, serviceInfo, !compare)
 		if err != nil {
 			return err
 		}
@@ -356,7 +388,7 @@ func (c *liquidReportUsageCmd) Run(cmd *cobra.Command, args []string) error {
 
 	var localServiceusageReport liquid.ServiceUsageReport
 	if endpoint != "" {
-		localServiceusageReport, err = GetLiquidUsageReport(provider, liquidapi.ClientOpts{EndpointOverride: endpoint}, cmd.Context(), projectID, serviceUsageRequest, !compare)
+		localServiceusageReport, err = GetLiquidUsageReport(provider, liquidapi.ClientOpts{EndpointOverride: endpoint}, cmd.Context(), projectID, serviceUsageRequest, serviceInfo, !compare)
 		if err != nil {
 			return err
 		}

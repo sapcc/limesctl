@@ -51,6 +51,8 @@ github.com/rogpeppe/go-internal v1.10.0/go.mod h1:UQnix2H7Ngw/k4C5ijL5+65zddjncj
 github.com/russross/blackfriday/v2 v2.1.0/go.mod h1:+Rmxgy9KzJVeS9/2gXHxylqXiyQDYRxCVz55jmeOWTM=
 github.com/sapcc/go-api-declarations v1.14.2 h1:7ijnfrgGrCzhwpUnBR6QlRaN7x5mX7Ek/7I/Z6sq+/w=
 github.com/sapcc/go-api-declarations v1.14.2/go.mod h1:KEYQoknn0gSjhmI19b85YUEZkav9SOu2bC21VeDNlnU=
+github.com/sapcc/go-api-declarations v1.14.3 h1:iDmwB8LGO+tkgW4A4nh1pILWIs7w4AM6f7SSMZtltSk=
+github.com/sapcc/go-api-declarations v1.14.3/go.mod h1:KEYQoknn0gSjhmI19b85YUEZkav9SOu2bC21VeDNlnU=
 github.com/sapcc/go-bits v0.0.0-20250327084830-778195481ca6 h1:kDsapxCKqEr8pWS+RY/cOrriTjj6XiCR2ubo2qxnf9g=
 github.com/sapcc/go-bits v0.0.0-20250327084830-778195481ca6/go.mod h1:Cpx4J90pbutHzjlDOxqSTUwl96+xZcCJMBOLzjP5lyk=
 github.com/sapcc/gophercloud-sapcc/v2 v2.0.3 h1:w6xb4mLvYBIzfHctLqw/FpMi+FSDt7Cq26qL6xPDRAE=
