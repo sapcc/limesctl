@@ -5,13 +5,13 @@
 class Limesctl < Formula
   desc "Command-line interface for Limes"
   homepage "https://github.com/sapcc/limesctl"
-  version "3.5.0"
+  version "3.6.0"
   license "Apache-2.0"
 
   on_macos do
     if Hardware::CPU.intel?
-      url "https://github.com/sapcc/limesctl/releases/download/v3.5.0/limesctl-3.5.0-darwin-amd64.tar.gz"
-      sha256 "e30fe450d2d7195849f271dc14686585e77a582a8c530cdc7c0942ce2ee2f791"
+      url "https://github.com/sapcc/limesctl/releases/download/v3.6.0/limesctl-3.6.0-darwin-amd64.tar.gz"
+      sha256 "cb12699f8704dc48b8b15e11ec95a9287c2dfb52ad25c479c25545defd8b1725"
 
       def install
         bin.install "limesctl"
@@ -21,8 +21,8 @@ class Limesctl < Formula
       end
     end
     if Hardware::CPU.arm?
-      url "https://github.com/sapcc/limesctl/releases/download/v3.5.0/limesctl-3.5.0-darwin-arm64.tar.gz"
-      sha256 "facc5b65a6f4b74927490a6e200d6841fb43fd5a89a7d87079013a39692749e3"
+      url "https://github.com/sapcc/limesctl/releases/download/v3.6.0/limesctl-3.6.0-darwin-arm64.tar.gz"
+      sha256 "b45d40d1de547fc3dce0cda7c0dc47f6c2ef750fa7380e1be0d6c0aa225085ed"
 
       def install
         bin.install "limesctl"
@@ -36,8 +36,8 @@ class Limesctl < Formula
   on_linux do
     if Hardware::CPU.intel?
       if Hardware::CPU.is_64_bit?
-        url "https://github.com/sapcc/limesctl/releases/download/v3.5.0/limesctl-3.5.0-linux-amd64.tar.gz"
-        sha256 "e8895f2348a37f280e84177c029caa752772545e36084c191c8895455887ae7d"
+        url "https://github.com/sapcc/limesctl/releases/download/v3.6.0/limesctl-3.6.0-linux-amd64.tar.gz"
+        sha256 "4c2fc0cb3e3a8fffd0c25f30ff9606a454e73e68b0d17920ae713990d2c0fd32"
 
         def install
           bin.install "limesctl"
@@ -49,8 +49,8 @@ class Limesctl < Formula
     end
     if Hardware::CPU.arm?
       if Hardware::CPU.is_64_bit?
-        url "https://github.com/sapcc/limesctl/releases/download/v3.5.0/limesctl-3.5.0-linux-arm64.tar.gz"
-        sha256 "924d2be78ed73f241e5c0ec3b9cd6144e575648a6d393747413d1c1b4a12d49b"
+        url "https://github.com/sapcc/limesctl/releases/download/v3.6.0/limesctl-3.6.0-linux-arm64.tar.gz"
+        sha256 "b0d52ce843faf2c6c7220ce0063f7db9fc5ca830b9640a908ff1857a8302ce44"
 
         def install
           bin.install "limesctl"
