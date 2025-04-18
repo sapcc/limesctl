@@ -8,7 +8,7 @@ require (
 	github.com/gophercloud/utils/v2 v2.0.0-20250404104721-4c0f6d93d3a9
 	github.com/olekukonko/tablewriter v0.0.5
 	github.com/sapcc/go-api-declarations v1.14.3
-	github.com/sapcc/go-bits v0.0.0-20250410003731-7b4174e5d933
+	github.com/sapcc/go-bits v0.0.0-20250417142011-e904845ec8a3
 	github.com/sapcc/gophercloud-sapcc/v2 v2.0.3
 	github.com/spf13/cobra v1.9.1
 )
@@ -29,8 +29,8 @@ require (
 	github.com/prometheus/common v0.63.0 // indirect
 	github.com/prometheus/procfs v0.15.1 // indirect
 	github.com/spf13/pflag v1.0.6 // indirect
-	golang.org/x/sys v0.30.0 // indirect
-	golang.org/x/text v0.22.0 // indirect
+	golang.org/x/sys v0.31.0 // indirect
+	golang.org/x/text v0.23.0 // indirect
 	google.golang.org/protobuf v1.36.5 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
