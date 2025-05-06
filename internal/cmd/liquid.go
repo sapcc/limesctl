@@ -214,7 +214,7 @@ func (c *liquidReportCapacityCmd) Run(cmd *cobra.Command, args []string) error {
 	var serviceCapacityRequest *liquid.ServiceCapacityRequest
 	if body == "" {
 		var res gophercloud.Result
-		resp, err := limesAdminClient.Get(cmd.Context(), limesAdminClient.ServiceURL("liquid/service-capacity-request?service_type=liquid-"+serviceType), &res.Body, nil) //nolint:bodyclose
+		resp, err := limesAdminClient.Get(cmd.Context(), limesAdminClient.ServiceURL("liquid/service-capacity-request?service_type="+serviceType), &res.Body, nil) //nolint:bodyclose
 		_, res.Header, res.Err = gophercloud.ParseResponse(resp, err)
 		if err != nil {
 			return util.WrapError(err, "could not fetch service capacity request body from limes")
