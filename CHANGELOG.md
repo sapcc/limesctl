@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased](https://github.com/sapcc/limesctl/compare/v3.6.0...HEAD)
 
+### Changed
+
+- Fix derivation of service type in `limesctl liquid report-capacity` subcommand.
+
 ## 3.6.0 - 2025-04-16
 
 ### Added
