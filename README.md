@@ -1,3 +1,9 @@
+<!--
+SPDX-FileCopyrightText: 2025 SAP SE or an SAP affiliate company
+
+SPDX-License-Identifier: Apache-2.0
+-->
+
 # limesctl
 
 [![GitHub Release](https://img.shields.io/github/v/release/sapcc/limesctl)](https://github.com/sapcc/limesctl/releases/latest)

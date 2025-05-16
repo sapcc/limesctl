@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2025 SAP SE or an SAP affiliate company
+#
+# SPDX-License-Identifier: Apache-2.0
+
 # In order to stay consistent with upstream, we copy over the fixture files from Limes.
 #
 # Run `make all` and then adjust code and unit tests accordingly.
