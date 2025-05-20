@@ -74,9 +74,9 @@ func (d CSVRecords) Write(w io.Writer) error {
 // WriteAsTable writes CSVRecords to os.Stdout in table format.
 func (d CSVRecords) WriteAsTable() {
 	t := tablewriter.NewWriter(os.Stdout)
-	t.SetHeader(d[0])
-	t.AppendBulk(d[1:])
-	t.Render()
+	t.Header(d[0])
+	t.Bulk(d[1:]) //nolint:errcheck
+	t.Render()    //nolint:errcheck
 }
 
 type OutputOpts struct {
