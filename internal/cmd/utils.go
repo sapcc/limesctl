@@ -12,7 +12,7 @@ import (
 	"github.com/sapcc/limesctl/v3/internal/util"
 )
 
-func writeJSON(d interface{}) error {
+func writeJSON(d any) error {
 	b, err := json.Marshal(d)
 	if err != nil {
 		return util.WrapError(err, "could not marshal JSON")

@@ -6,7 +6,7 @@ package core
 
 import (
 	"math"
-	"sort"
+	"slices"
 	"strconv"
 
 	"github.com/sapcc/go-api-declarations/limes"
@@ -86,6 +86,6 @@ func smallestValue(vals []uint64) uint64 {
 	if len(nonZero) == 0 {
 		return 0
 	}
-	sort.Slice(nonZero, func(i, j int) bool { return nonZero[i] < nonZero[j] })
+	slices.Sort(nonZero)
 	return nonZero[0]
 }
