@@ -6,6 +6,7 @@ require (
 	github.com/google/go-cmp v0.7.0
 	github.com/gophercloud/gophercloud/v2 v2.7.0
 	github.com/gophercloud/utils/v2 v2.0.0-20250617123236-b0c67de63928
+	github.com/majewsky/gg v1.1.0
 	github.com/olekukonko/tablewriter v1.0.7
 	github.com/sapcc/go-api-declarations v1.16.0
 	github.com/sapcc/go-bits v0.0.0-20250626145224-6afa1101f97e
@@ -23,7 +24,6 @@ require (
 	github.com/hashicorp/golang-lru/v2 v2.0.7 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/kr/text v0.2.0 // indirect
-	github.com/majewsky/gg v1.1.0 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.19 // indirect
 	github.com/mattn/go-runewidth v0.0.16 // indirect
