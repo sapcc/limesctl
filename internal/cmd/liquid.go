@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"math/big"
 	"os"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -196,6 +197,18 @@ func GetLiquidCapacityReport(provider *gophercloud.ProviderClient, opts liquidap
 	if err != nil {
 		return liquid.ServiceCapacityReport{}, util.WrapError(err, "received an invalid service capacity report")
 	}
+
+	for _, report := range serviceCapacityReport.Resources {
+		for _, azReport := range report.PerAZ {
+			subCapacities := azReport.Subcapacities
+			if len(subCapacities) > 0 {
+				sort.Slice(subCapacities, func(i, j int) bool {
+					return subCapacities[i].Name < subCapacities[j].Name
+				})
+			}
+		}
+	}
+
 	if output {
 		err = prettyPrint(serviceCapacityReport)
 		if err != nil {
