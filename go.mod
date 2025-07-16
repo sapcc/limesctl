@@ -8,8 +8,8 @@ require (
 	github.com/gophercloud/utils/v2 v2.0.0-20250710092215-8f6f0255f600
 	github.com/majewsky/gg v1.1.0
 	github.com/olekukonko/tablewriter v1.0.8
-	github.com/sapcc/go-api-declarations v1.16.0
-	github.com/sapcc/go-bits v0.0.0-20250710190843-788fa8ba727b
+	github.com/sapcc/go-api-declarations v1.17.1
+	github.com/sapcc/go-bits v0.0.0-20250715133410-cb475b27c2f5
 	github.com/sapcc/gophercloud-sapcc/v2 v2.0.3
 	github.com/spf13/cobra v1.9.1
 )
