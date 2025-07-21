@@ -15,7 +15,7 @@ class Limesctl < Formula
   on_macos do
     if Hardware::CPU.intel?
       url "https://github.com/sapcc/limesctl/releases/download/v3.7.1/limesctl-3.7.1-darwin-amd64.tar.gz"
-      sha256 "sha256:c151a0dc6f864b26b524f3f3cd0ad3ccaa390b0c4ad120691f78ef4f2c8e5519"
+      sha256 "c151a0dc6f864b26b524f3f3cd0ad3ccaa390b0c4ad120691f78ef4f2c8e5519"
 
       def install
         bin.install "limesctl"
@@ -26,7 +26,7 @@ class Limesctl < Formula
     end
     if Hardware::CPU.arm?
       url "https://github.com/sapcc/limesctl/releases/download/v3.7.1/limesctl-3.7.1-darwin-arm64.tar.gz"
-      sha256 "sha256:8bb051f94c312b5aab72d7c9e06234ec9cee6431df90869333243899f28da66c"
+      sha256 "8bb051f94c312b5aab72d7c9e06234ec9cee6431df90869333243899f28da66c"
 
       def install
         bin.install "limesctl"
@@ -41,7 +41,7 @@ class Limesctl < Formula
     if Hardware::CPU.intel?
       if Hardware::CPU.is_64_bit?
         url "https://github.com/sapcc/limesctl/releases/download/v3.7.1/limesctl-3.7.1-linux-amd64.tar.gz"
-        sha256 "sha256:82b6c1e12acaec5dc9588d901ecfff4ee695d9dc861e13f203335259e063367d"
+        sha256 "82b6c1e12acaec5dc9588d901ecfff4ee695d9dc861e13f203335259e063367d"
 
         def install
           bin.install "limesctl"
@@ -54,7 +54,7 @@ class Limesctl < Formula
     if Hardware::CPU.arm?
       if Hardware::CPU.is_64_bit?
         url "https://github.com/sapcc/limesctl/releases/download/v3.7.1/limesctl-3.7.1-linux-arm64.tar.gz"
-        sha256 "sha256:a776b25233006450f735c42cb2b1d4962858056fe85f97ca01967c45b3d5b443"
+        sha256 "a776b25233006450f735c42cb2b1d4962858056fe85f97ca01967c45b3d5b443"
 
         def install
           bin.install "limesctl"
