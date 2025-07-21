@@ -9,7 +9,7 @@
 class Limesctl < Formula
   desc "Command-line interface for Limes"
   homepage "https://github.com/sapcc/limesctl"
-  version "3.6.0"
+  version "3.7.1"
   license "Apache-2.0"
 
   on_macos do
