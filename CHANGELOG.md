@@ -17,6 +17,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+## 3.7.1 - 2025-07-21
+
+### Changed
+
+- Sort subcapacities for capacity reports.
+- Updated all dependencies to their latest versions.
+
 ## 3.7.0 - 2025-06-16
 
 ### Changed
