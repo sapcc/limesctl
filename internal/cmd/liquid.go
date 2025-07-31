@@ -48,6 +48,10 @@ func newLiquidCmd() *cobra.Command {
 
 func diffOptions() []cmp.Option {
 	return []cmp.Option{
+		// Ignore all fields that contain timestamps
+		cmpopts.IgnoreFields(liquid.ServiceInfo{}, "Version"),
+		cmpopts.IgnoreFields(liquid.ServiceUsageReport{}, "InfoVersion"),
+		cmpopts.IgnoreFields(liquid.ServiceCapacityReport{}, "InfoVersion"),
 		// This needs one entry for each Option[] type instance that appears in go-api-declarations/liquid.
 		cmpopts.EquateComparable(Option[*big.Int]{}),
 		cmpopts.EquateComparable(Option[liquid.ProjectMetadata]{}),
@@ -143,8 +147,6 @@ func (c *liquidServiceInfoCmd) Run(cmd *cobra.Command, args []string) error {
 	}
 
 	if compare {
-		serviceInfo.Version = 0 // Version is usually a timestamp, ignore when comparing responses
-		localServiceInfo.Version = 0
 		diff := cmp.Diff(serviceInfo, localServiceInfo, diffOptions()...)
 		if diff == "" {
 			fmt.Println("ServiceInfo responses are identical")
@@ -281,8 +283,6 @@ func (c *liquidReportCapacityCmd) Run(cmd *cobra.Command, args []string) error {
 	}
 
 	if compare {
-		serviceCapacityReport.InfoVersion = 0 // InfoVersion is usually a timestamp, ignore when comparing responses
-		localServiceCapacityReport.InfoVersion = 0
 		diff := cmp.Diff(serviceCapacityReport, localServiceCapacityReport, diffOptions()...)
 		if diff == "" {
 			fmt.Println("ServiceCapacityReports are identical")
@@ -408,8 +408,6 @@ func (c *liquidReportUsageCmd) Run(cmd *cobra.Command, args []string) error {
 	}
 
 	if compare {
-		serviceUsageReport.InfoVersion = 0 // InfoVersion is usually a timestamp, ignore when comparing responses
-		localServiceusageReport.InfoVersion = 0
 		diff := cmp.Diff(serviceUsageReport, localServiceusageReport, diffOptions()...)
 		if diff == "" {
 			fmt.Println("ServiceUsageReports are identical")
