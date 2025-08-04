@@ -85,8 +85,8 @@ github.com/olekukonko/tablewriter/pkg/twwarp
 github.com/olekukonko/tablewriter/pkg/twwidth
 github.com/olekukonko/tablewriter/renderer
 github.com/olekukonko/tablewriter/tw
-# github.com/prometheus/client_golang v1.22.0
-## explicit; go 1.22
+# github.com/prometheus/client_golang v1.23.0
+## explicit; go 1.23.0
 github.com/prometheus/client_golang/internal/github.com/golang/gddo/httputil
 github.com/prometheus/client_golang/internal/github.com/golang/gddo/httputil/header
 github.com/prometheus/client_golang/prometheus
@@ -100,8 +100,8 @@ github.com/prometheus/client_model/go
 ## explicit; go 1.23.0
 github.com/prometheus/common/expfmt
 github.com/prometheus/common/model
-# github.com/prometheus/procfs v0.15.1
-## explicit; go 1.20
+# github.com/prometheus/procfs v0.16.1
+## explicit; go 1.23.0
 github.com/prometheus/procfs
 github.com/prometheus/procfs/internal/fs
 github.com/prometheus/procfs/internal/util
@@ -118,7 +118,7 @@ github.com/sapcc/go-api-declarations/limes
 github.com/sapcc/go-api-declarations/limes/rates
 github.com/sapcc/go-api-declarations/limes/resources
 github.com/sapcc/go-api-declarations/liquid
-# github.com/sapcc/go-bits v0.0.0-20250722084227-7a82273f02ae
+# github.com/sapcc/go-bits v0.0.0-20250804090407-8c55156bef1d
 ## explicit; go 1.24
 github.com/sapcc/go-bits/gophercloudext
 github.com/sapcc/go-bits/gopherpolicy
