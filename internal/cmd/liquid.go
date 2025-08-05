@@ -46,19 +46,27 @@ func newLiquidCmd() *cobra.Command {
 	return cmd
 }
 
-func diffOptions() []cmp.Option {
-	return []cmp.Option{
+var LiquidOptionTypes []any = []any{
+	Option[*big.Int]{},
+	Option[liquid.ProjectMetadata]{},
+	Option[time.Time]{},
+	Option[uint64]{},
+	Option[int64]{},
+}
+var diffOptions []cmp.Option = liquidDiffOptions()
+
+func liquidDiffOptions() []cmp.Option {
+	options := []cmp.Option{
 		// Ignore all fields that contain timestamps
 		cmpopts.IgnoreFields(liquid.ServiceInfo{}, "Version"),
 		cmpopts.IgnoreFields(liquid.ServiceUsageReport{}, "InfoVersion"),
 		cmpopts.IgnoreFields(liquid.ServiceCapacityReport{}, "InfoVersion"),
-		// This needs one entry for each Option[] type instance that appears in go-api-declarations/liquid.
-		cmpopts.EquateComparable(Option[*big.Int]{}),
-		cmpopts.EquateComparable(Option[liquid.ProjectMetadata]{}),
-		cmpopts.EquateComparable(Option[time.Time]{}),
-		cmpopts.EquateComparable(Option[uint64]{}),
-		cmpopts.EquateComparable(Option[int64]{}),
 	}
+	for _, optionType := range LiquidOptionTypes {
+		// This needs one entry for each Option[] type instance that appears in go-api-declarations/liquid.
+		options = append(options, cmpopts.EquateComparable(optionType))
+	}
+	return options
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -147,7 +155,7 @@ func (c *liquidServiceInfoCmd) Run(cmd *cobra.Command, args []string) error {
 	}
 
 	if compare {
-		diff := cmp.Diff(serviceInfo, localServiceInfo, diffOptions()...)
+		diff := cmp.Diff(serviceInfo, localServiceInfo, diffOptions...)
 		if diff == "" {
 			fmt.Println("ServiceInfo responses are identical")
 		} else {
@@ -283,7 +291,7 @@ func (c *liquidReportCapacityCmd) Run(cmd *cobra.Command, args []string) error {
 	}
 
 	if compare {
-		diff := cmp.Diff(serviceCapacityReport, localServiceCapacityReport, diffOptions()...)
+		diff := cmp.Diff(serviceCapacityReport, localServiceCapacityReport, diffOptions...)
 		if diff == "" {
 			fmt.Println("ServiceCapacityReports are identical")
 		} else {
@@ -408,7 +416,7 @@ func (c *liquidReportUsageCmd) Run(cmd *cobra.Command, args []string) error {
 	}
 
 	if compare {
-		diff := cmp.Diff(serviceUsageReport, localServiceusageReport, diffOptions()...)
+		diff := cmp.Diff(serviceUsageReport, localServiceusageReport, diffOptions...)
 		if diff == "" {
 			fmt.Println("ServiceUsageReports are identical")
 		} else {
