@@ -6,10 +6,10 @@ require (
 	github.com/google/go-cmp v0.7.0
 	github.com/gophercloud/gophercloud/v2 v2.7.0
 	github.com/gophercloud/utils/v2 v2.0.0-20250711132455-9770683b100a
-	github.com/majewsky/gg v1.1.0
+	github.com/majewsky/gg v1.3.0
 	github.com/olekukonko/tablewriter v1.0.9
 	github.com/sapcc/go-api-declarations v1.17.3
-	github.com/sapcc/go-bits v0.0.0-20250814121725-04e492184b75
+	github.com/sapcc/go-bits v0.0.0-20250815083328-9eefdef740e1
 	github.com/sapcc/gophercloud-sapcc/v2 v2.0.4
 	github.com/spf13/cobra v1.9.1
 )
