@@ -56,6 +56,12 @@ homebrew_casks:
       - formula: limesctl
     description: Command-line interface for Limes
     homepage: https://github.com/sapcc/limesctl
+    hooks:
+      post:
+        install: |
+          if OS.mac?
+            system_command "/usr/bin/xattr", args: ["-dr", "com.apple.quarantine", "#{staged_path}/limesctl"]
+          end
     license: Apache-2.0
     repository:
       owner: sapcc
