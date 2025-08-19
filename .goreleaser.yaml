@@ -30,7 +30,7 @@ builds:
     mod_timestamp: "{{ .CommitTimestamp }}"
 
 snapshot:
-  name_template: "{{ .Tag }}-next"
+  version_template: "{{ .Tag }}-next"
 
 checksum:
   name_template: "checksums.txt"
@@ -39,7 +39,7 @@ archives:
   - name_template: '{{ .ProjectName }}-{{ replace .Version "v" "" }}-{{ .Os }}-{{ .Arch }}'
     format_overrides:
       - goos: windows
-        format: zip
+        formats: [ zip ]
     files:
       - CHANGELOG.md
       - LICENSE
