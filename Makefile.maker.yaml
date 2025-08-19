@@ -32,6 +32,11 @@ githubWorkflow:
     enabled: true
   securityChecks:
     enabled: true
+
+nix:
+  extraPackages:
+    - syft
+
 renovate:
   enabled: true
   assignees:
