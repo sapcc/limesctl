@@ -35,7 +35,7 @@ githubWorkflow:
 
 nix:
   extraPackages:
-    - syft
+    - syft # for SBOM generation (see .goreleaser.yaml)
 
 renovate:
   enabled: true
