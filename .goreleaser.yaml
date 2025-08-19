@@ -46,19 +46,17 @@ archives:
       - README.md
       - completions/*
 
-brews:
-  - repository:
+homebrew_casks:
+  - commit_msg_template: "Homebrew: update formula to {{ .Tag }}"
+    completions:
+      bash: completions/limesctl.bash
+      fish: completions/limesctl.fish
+      zsh: completions/limesctl.zsh
+    conflicts:
+      - formula: limesctl
+    description: Command-line interface for Limes
+    homepage: https://github.com/sapcc/limesctl
+    license: Apache-2.0
+    repository:
       owner: sapcc
       name: limesctl
-    directory: HomebrewFormula
-    homepage: https://github.com/sapcc/limesctl
-    description: Command-line interface for Limes
-    license: Apache-2.0
-    install: |-
-      bin.install "limesctl"
-      bash_completion.install "completions/limesctl.bash" => "limesctl"
-      fish_completion.install "completions/limesctl.fish"
-      zsh_completion.install "completions/limesctl.zsh" => "_limesctl"
-    test: |
-      system "#{bin}/limesctl --version"
-    commit_msg_template: "Homebrew: update formula to {{ .Tag }}"
