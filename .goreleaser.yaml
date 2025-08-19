@@ -52,8 +52,9 @@ homebrew_casks:
       bash: completions/limesctl.bash
       fish: completions/limesctl.fish
       zsh: completions/limesctl.zsh
-    conflicts:
-      - formula: limesctl
+    # broken since https://github.com/Homebrew/brew/pull/20499
+    # conflicts:
+    #   - formula: limesctl
     description: Command-line interface for Limes
     homepage: https://github.com/sapcc/limesctl
     hooks:
