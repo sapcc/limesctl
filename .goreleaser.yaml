@@ -30,7 +30,7 @@ builds:
     mod_timestamp: "{{ .CommitTimestamp }}"
 
 snapshot:
-  name_template: "{{ .Tag }}-next"
+  version_template: "{{ .Tag }}-next"
 
 checksum:
   name_template: "checksums.txt"
@@ -39,26 +39,31 @@ archives:
   - name_template: '{{ .ProjectName }}-{{ replace .Version "v" "" }}-{{ .Os }}-{{ .Arch }}'
     format_overrides:
       - goos: windows
-        format: zip
+        formats: [ zip ]
     files:
       - CHANGELOG.md
       - LICENSE
       - README.md
       - completions/*
 
-brews:
-  - repository:
+homebrew_casks:
+  - commit_msg_template: "Homebrew: update formula to {{ .Tag }}"
+    completions:
+      bash: completions/limesctl.bash
+      fish: completions/limesctl.fish
+      zsh: completions/limesctl.zsh
+    # broken since https://github.com/Homebrew/brew/pull/20499
+    # conflicts:
+    #   - formula: limesctl
+    description: Command-line interface for Limes
+    homepage: https://github.com/sapcc/limesctl
+    hooks:
+      post:
+        install: |
+          if OS.mac?
+            system_command "/usr/bin/xattr", args: ["-dr", "com.apple.quarantine", "#{staged_path}/limesctl"]
+          end
+    license: Apache-2.0
+    repository:
       owner: sapcc
       name: limesctl
-    directory: HomebrewFormula
-    homepage: https://github.com/sapcc/limesctl
-    description: Command-line interface for Limes
-    license: Apache-2.0
-    install: |-
-      bin.install "limesctl"
-      bash_completion.install "completions/limesctl.bash" => "limesctl"
-      fish_completion.install "completions/limesctl.fish"
-      zsh_completion.install "completions/limesctl.zsh" => "_limesctl"
-    test: |
-      system "#{bin}/limesctl --version"
-    commit_msg_template: "Homebrew: update formula to {{ .Tag }}"
