@@ -32,6 +32,11 @@ githubWorkflow:
     enabled: true
   securityChecks:
     enabled: true
+
+nix:
+  extraPackages:
+    - syft # for SBOM generation (see .goreleaser.yaml)
+
 renovate:
   enabled: true
   assignees:

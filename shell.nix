@@ -13,6 +13,7 @@ mkShell {
     golangci-lint
     gotools # goimports
     reuse
+    syft
     # keep this line if you use bash
     bashInteractive
   ];
