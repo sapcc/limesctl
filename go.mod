@@ -5,13 +5,13 @@ go 1.25
 require (
 	github.com/google/go-cmp v0.7.0
 	github.com/gophercloud/gophercloud/v2 v2.8.0
-	github.com/gophercloud/utils/v2 v2.0.0-20250819195638-e4fc39f0eda4
+	github.com/gophercloud/utils/v2 v2.0.0-20250908160916-88fadeedd0ca
 	github.com/majewsky/gg v1.3.0
 	github.com/olekukonko/tablewriter v1.0.9
 	github.com/sapcc/go-api-declarations v1.17.4
 	github.com/sapcc/go-bits v0.0.0-20250904120357-fc660754039e
 	github.com/sapcc/gophercloud-sapcc/v2 v2.0.5
-	github.com/spf13/cobra v1.9.1
+	github.com/spf13/cobra v1.10.1
 )
 
 require (
@@ -36,7 +36,7 @@ require (
 	github.com/prometheus/common v0.66.0 // indirect
 	github.com/prometheus/procfs v0.17.0 // indirect
 	github.com/rivo/uniseg v0.2.0 // indirect
-	github.com/spf13/pflag v1.0.6 // indirect
+	github.com/spf13/pflag v1.0.9 // indirect
 	golang.org/x/sys v0.35.0 // indirect
 	golang.org/x/text v0.28.0 // indirect
 	google.golang.org/protobuf v1.36.8 // indirect
