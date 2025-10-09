@@ -9,7 +9,7 @@ require (
 	github.com/majewsky/gg v1.3.0
 	github.com/olekukonko/tablewriter v1.1.0
 	github.com/sapcc/go-api-declarations v1.17.4
-	github.com/sapcc/go-bits v0.0.0-20251002190222-32e18bbcae76
+	github.com/sapcc/go-bits v0.0.0-20251009112313-51a4d641ae65
 	github.com/sapcc/gophercloud-sapcc/v2 v2.0.5
 	github.com/spf13/cobra v1.10.1
 )
@@ -32,13 +32,13 @@ require (
 	github.com/olekukonko/ll v0.0.9 // indirect
 	github.com/prometheus/client_golang v1.23.2 // indirect
 	github.com/prometheus/client_model v0.6.2 // indirect
-	github.com/prometheus/common v0.66.1 // indirect
+	github.com/prometheus/common v0.67.1 // indirect
 	github.com/prometheus/procfs v0.17.0 // indirect
 	github.com/rivo/uniseg v0.2.0 // indirect
 	github.com/spf13/pflag v1.0.9 // indirect
-	go.yaml.in/yaml/v2 v2.4.2 // indirect
-	golang.org/x/sys v0.35.0 // indirect
-	golang.org/x/text v0.28.0 // indirect
-	google.golang.org/protobuf v1.36.8 // indirect
+	go.yaml.in/yaml/v2 v2.4.3 // indirect
+	golang.org/x/sys v0.37.0 // indirect
+	golang.org/x/text v0.30.0 // indirect
+	google.golang.org/protobuf v1.36.10 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
