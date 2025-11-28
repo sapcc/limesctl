@@ -5,7 +5,7 @@ go 1.25
 require (
 	github.com/google/go-cmp v0.7.0
 	github.com/gophercloud/gophercloud/v2 v2.9.0
-	github.com/gophercloud/utils/v2 v2.0.0-20251103115625-7dba497d90f8
+	github.com/gophercloud/utils/v2 v2.0.0-20251121145439-0a38d66a3d88
 	github.com/majewsky/gg v1.5.0
 	github.com/olekukonko/tablewriter v1.1.1
 	github.com/sapcc/go-api-declarations v1.18.0
