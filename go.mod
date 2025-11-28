@@ -6,10 +6,10 @@ require (
 	github.com/google/go-cmp v0.7.0
 	github.com/gophercloud/gophercloud/v2 v2.9.0
 	github.com/gophercloud/utils/v2 v2.0.0-20251103115625-7dba497d90f8
-	github.com/majewsky/gg v1.4.0
+	github.com/majewsky/gg v1.5.0
 	github.com/olekukonko/tablewriter v1.1.1
-	github.com/sapcc/go-api-declarations v1.17.4
-	github.com/sapcc/go-bits v0.0.0-20251119215428-a048ca8f6eba
+	github.com/sapcc/go-api-declarations v1.18.0
+	github.com/sapcc/go-bits v0.0.0-20251127001757-54a64663b18f
 	github.com/sapcc/gophercloud-sapcc/v2 v2.0.5
 	github.com/spf13/cobra v1.10.1
 )
@@ -36,7 +36,7 @@ require (
 	github.com/olekukonko/ll v0.1.2 // indirect
 	github.com/prometheus/client_golang v1.23.2 // indirect
 	github.com/prometheus/client_model v0.6.2 // indirect
-	github.com/prometheus/common v0.67.3 // indirect
+	github.com/prometheus/common v0.67.4 // indirect
 	github.com/prometheus/procfs v0.17.0 // indirect
 	github.com/spf13/pflag v1.0.9 // indirect
 	go.yaml.in/yaml/v2 v2.4.3 // indirect
