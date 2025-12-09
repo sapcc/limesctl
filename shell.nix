@@ -15,6 +15,7 @@ mkShell {
     renovate
     reuse
     syft
+    typos
     # keep this line if you use bash
     bashInteractive
   ];
