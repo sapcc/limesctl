@@ -36,7 +36,7 @@ func newOpsValidateQuotaOverridesCmd() *cobra.Command {
 		Short: "Validate a quota-overrides.json file for usage with an existing Limes instance",
 		Long: `Validate a quota-overrides.json file for usage with an existing Limes instance.
 
-Requies project member permissions.`,
+Requires project member permissions.`,
 		Args:    cobra.ExactArgs(1),
 		PreRunE: authWithLimesResources,
 		RunE:    runValidateQuotaOverrides,
