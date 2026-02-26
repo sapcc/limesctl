@@ -17,6 +17,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+## 3.8.0 - 2026-02-26
+
+### Changed
+
+- Updated all dependencies to their latest versions. (adds support for liquid display name fields)
+
 ## 3.7.1 - 2025-07-21
 
 ### Changed
