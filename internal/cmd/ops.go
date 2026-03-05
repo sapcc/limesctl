@@ -64,15 +64,15 @@ func runValidateQuotaOverrides(cmd *cobra.Command, args []string) error {
 	getUnit := func(serviceType limes.ServiceType, resourceName limesresources.ResourceName) (limes.Unit, error) {
 		srvReport := report.Services[serviceType]
 		if srvReport == nil {
-			return limes.UnitUnspecified, fmt.Errorf("%q is not a valid service", serviceType)
+			return limes.UnitNone, fmt.Errorf("%q is not a valid service", serviceType)
 		}
 		resReport := srvReport.Resources[resourceName]
 		if resReport == nil {
 			fullResourceName := fmt.Sprintf("%s/%s", serviceType, resourceName)
-			return limes.UnitUnspecified, fmt.Errorf("%q is not a valid resource", fullResourceName)
+			return limes.UnitNone, fmt.Errorf("%q is not a valid resource", fullResourceName)
 		}
 		if resReport.Quota == nil {
-			return limes.UnitUnspecified, fmt.Errorf("%s/%s does not track quota", serviceType, resourceName)
+			return limes.UnitNone, fmt.Errorf("%s/%s does not track quota", serviceType, resourceName)
 		}
 		return resReport.Unit, nil
 	}
