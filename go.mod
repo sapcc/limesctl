@@ -4,12 +4,12 @@ go 1.26
 
 require (
 	github.com/google/go-cmp v0.7.0
-	github.com/gophercloud/gophercloud/v2 v2.10.0
+	github.com/gophercloud/gophercloud/v2 v2.11.0
 	github.com/gophercloud/utils/v2 v2.0.0-20260107124036-1d7954eb9711
 	github.com/majewsky/gg v1.5.0
 	github.com/olekukonko/tablewriter v1.1.3
 	github.com/sapcc/go-api-declarations v1.20.2
-	github.com/sapcc/go-bits v0.0.0-20260303121209-46babdc0d583
+	github.com/sapcc/go-bits v0.0.0-20260304154021-aa2c8a1d2bca
 	github.com/sapcc/gophercloud-sapcc/v2 v2.0.5
 	github.com/spf13/cobra v1.10.2
 )
