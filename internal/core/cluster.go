@@ -70,11 +70,11 @@ func (c ClusterReport) render(opts *OutputOpts) CSVRecords {
 			if opts.CSVRecFmt == CSVRecordFormatLong {
 				r = append(r, c.ID, cSrv.Area, string(cSrv.Type), cSrvRes.Category, string(cSrvRes.Name), emptyStrIfNil(capacity, valToStr),
 					emptyStrIfNil(domsQ, valToStr), valToStr(cSrvRes.Usage), emptyStrIfNil(physU, valToStr),
-					string(unit), timestampToString(cSrv.MinScrapedAt),
+					unit.String(), timestampToString(cSrv.MinScrapedAt),
 				)
 			} else {
 				r = append(r, c.ID, string(cSrv.Type), string(cSrvRes.Name), emptyStrIfNil(capacity, valToStr),
-					emptyStrIfNil(domsQ, valToStr), valToStr(cSrvRes.Usage), string(unit),
+					emptyStrIfNil(domsQ, valToStr), valToStr(cSrvRes.Usage), unit.String(),
 				)
 			}
 
