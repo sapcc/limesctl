@@ -88,6 +88,7 @@ func newLiquidServiceInfoCmd() *liquidServiceInfoCmd {
 	return liquidServiceInfo
 }
 
+// GetLiquidServiceInfo retrieves the liquid.ServiceInfo from the liquid client and does validation and pretty printing on it.
 func GetLiquidServiceInfo(provider *gophercloud.ProviderClient, opts liquidapi.ClientOpts, ctx context.Context, output bool) (liquid.ServiceInfo, error) {
 	liquidClient, err := liquidapi.NewClient(provider, gophercloud.EndpointOpts{}, opts)
 	if err != nil {
@@ -110,6 +111,7 @@ func GetLiquidServiceInfo(provider *gophercloud.ProviderClient, opts liquidapi.C
 	return serviceInfo, nil
 }
 
+// Run is called by Cobra when this command is executed.
 func (c *liquidServiceInfoCmd) Run(cmd *cobra.Command, args []string) error {
 	var serviceType string
 	if len(args) == 1 {
@@ -186,6 +188,7 @@ func newLiquidReportCapacityCmd() *liquidReportCapacityCmd {
 	return liquidReportCapacity
 }
 
+// GetLiquidCapacityReport retrieves the liquid.ServiceCapacityReport from the liquid client and does validation and pretty printing on it.
 func GetLiquidCapacityReport(provider *gophercloud.ProviderClient, opts liquidapi.ClientOpts, ctx context.Context, serviceCapacityRequest *liquid.ServiceCapacityRequest, serviceInfo liquid.ServiceInfo, output bool) (liquid.ServiceCapacityReport, error) {
 	liquidClient, err := liquidapi.NewClient(provider, gophercloud.EndpointOpts{}, opts)
 	if err != nil {
@@ -220,6 +223,7 @@ func GetLiquidCapacityReport(provider *gophercloud.ProviderClient, opts liquidap
 	return serviceCapacityReport, nil
 }
 
+// Run is called by Cobra when this command is executed.
 func (c *liquidReportCapacityCmd) Run(cmd *cobra.Command, args []string) error {
 	serviceType := args[0]
 
@@ -322,6 +326,7 @@ func newLiquidReportUsageCmd() *liquidReportUsageCmd {
 	return liquidReportUsage
 }
 
+// GetLiquidUsageReport retrieves the liquid.ServiceUsageReport from the liquid client and does validation and pretty printing on it.
 func GetLiquidUsageReport(provider *gophercloud.ProviderClient, opts liquidapi.ClientOpts, ctx context.Context, projectID string, serviceUsageRequest *liquid.ServiceUsageRequest, serviceInfo liquid.ServiceInfo, output bool) (liquid.ServiceUsageReport, error) {
 	liquidClient, err := liquidapi.NewClient(provider, gophercloud.EndpointOpts{}, opts)
 	if err != nil {
@@ -344,6 +349,7 @@ func GetLiquidUsageReport(provider *gophercloud.ProviderClient, opts liquidapi.C
 	return serviceUsageReport, nil
 }
 
+// Run is called by Cobra when this command is executed.
 func (c *liquidReportUsageCmd) Run(cmd *cobra.Command, args []string) error {
 	serviceType := args[0]
 	projectID := args[1]
@@ -446,6 +452,7 @@ func newLiquidSetQuotaCmd() *liquidSetQuotaCmd {
 	return liquidSetQuota
 }
 
+// Run is called by Cobra when this command is executed.
 func (c *liquidSetQuotaCmd) Run(cmd *cobra.Command, args []string) error {
 	serviceType := args[0]
 	projectID := args[1]

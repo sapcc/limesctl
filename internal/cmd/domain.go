@@ -59,6 +59,7 @@ cloud-admin token.`,
 	return domainList
 }
 
+// Run is called by Cobra when this command is executed.
 func (d *domainListCmd) Run(cmd *cobra.Command, _ []string) error {
 	outputOpts, err := d.outputFmtFlags.validate()
 	if err != nil {
@@ -117,6 +118,7 @@ domain-admin token.`,
 	return domainShow
 }
 
+// Run is called by Cobra when this command is executed.
 func (d *domainShowCmd) Run(cmd *cobra.Command, args []string) error {
 	outputOpts, err := d.outputFmtFlags.validate()
 	if err != nil {

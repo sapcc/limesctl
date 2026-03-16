@@ -21,12 +21,14 @@ import (
 	"github.com/sapcc/limesctl/v3/internal/util"
 )
 
+// VersionInfo contains all relevant information about the version of limesctl.
 type VersionInfo struct {
 	Version       string
 	GitCommitHash string
 	BuildDate     string
 }
 
+// Execute creates the root command and executes it.
 func Execute(ctx context.Context, v *VersionInfo) {
 	if err := newRootCmd(v).ExecuteContext(ctx); err != nil {
 		fmt.Println(err)

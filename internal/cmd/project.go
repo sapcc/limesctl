@@ -38,6 +38,7 @@ type projectFlags struct {
 	DomainNameOrID string `short:"d" name:"domain" help:"Name or ID of the domain."`
 }
 
+// AddToCmd adds the projectFlags to the cobra.Command.
 func (pf *projectFlags) AddToCmd(cmd *cobra.Command) {
 	cmd.Flags().StringVarP(&pf.DomainNameOrID, "domain", "d", "", "name or ID of the domain")
 }
@@ -87,6 +88,7 @@ This command requires a domain-admin token.`,
 	return projectList
 }
 
+// Run is called by Cobra when this command is executed.
 func (p *projectListCmd) Run(cmd *cobra.Command, _ []string) error {
 	outputOpts, err := p.outputFmtFlags.validate()
 	if err != nil {
@@ -162,6 +164,7 @@ This command requires a domain-admin token.`,
 	return projectListRates
 }
 
+// Run is called by Cobra when this command is executed.
 func (p *projectListRatesCmd) Run(cmd *cobra.Command, _ []string) error {
 	outputOpts, err := p.outputFmtFlags.validate()
 	if err != nil {
@@ -236,6 +239,7 @@ This command requires a project member permissions.`,
 	return projectShow
 }
 
+// Run is called by Cobra when this command is executed.
 func (p *projectShowCmd) Run(cmd *cobra.Command, args []string) error {
 	nameOrID := ""
 	if len(args) > 0 {
@@ -319,6 +323,7 @@ This command requires a project member permissions.`,
 	return projectShowRates
 }
 
+// Run is called by Cobra when this command is executed.
 func (p *projectShowRatesCmd) Run(cmd *cobra.Command, args []string) error {
 	nameOrID := ""
 	if len(args) > 0 {
@@ -398,6 +403,7 @@ This command requires a project-admin token.`,
 	return projectSync
 }
 
+// Run is called by Cobra when this command is executed.
 func (p *projectSyncCmd) Run(cmd *cobra.Command, args []string) error {
 	nameOrID := ""
 	if len(args) > 0 {
