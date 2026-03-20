@@ -15,6 +15,11 @@ golang:
 
 golangciLint:
   createConfig: true
+  reviveRules:
+    - name: exported
+      arguments:
+        - checkPrivateReceivers
+        - disableChecksOnConstants
 
 goReleaser:
   # NOTE: this is default behavior but we define this option explicitly for documentation purposes.

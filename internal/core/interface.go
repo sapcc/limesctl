@@ -79,6 +79,7 @@ func (d CSVRecords) WriteAsTable() {
 	t.Render()    //nolint:errcheck
 }
 
+// OutputOpts contains all relevant settings how to format an output of a command.
 type OutputOpts struct {
 	Fmt       OutputFormat
 	CSVRecFmt CSVRecordFormat

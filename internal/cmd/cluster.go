@@ -56,6 +56,7 @@ func newClusterShowCmd() *clusterShowCmd {
 	return clusterShow
 }
 
+// Run is called by Cobra when this command is executed.
 func (c *clusterShowCmd) Run(cmd *cobra.Command, _ []string) error {
 	outputOpts, err := c.outputFmtFlags.validate()
 	if err != nil {
@@ -113,6 +114,7 @@ func newClusterShowRatesCmd() *clusterShowRatesCmd {
 	return clusterShowRates
 }
 
+// Run is called by Cobra when this command is executed.
 func (c *clusterShowRatesCmd) Run(cmd *cobra.Command, args []string) error {
 	outputOpts, err := c.outputFmtFlags.validate()
 	if err != nil {
