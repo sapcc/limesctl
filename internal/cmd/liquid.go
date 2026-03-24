@@ -8,17 +8,14 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"math/big"
 	"os"
 	"sort"
 	"strconv"
 	"strings"
-	"time"
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
 	"github.com/gophercloud/gophercloud/v2"
-	. "github.com/majewsky/gg/option"
 	"github.com/sapcc/go-api-declarations/liquid"
 	"github.com/sapcc/go-bits/liquidapi"
 	"github.com/spf13/cobra"
@@ -47,18 +44,13 @@ func newLiquidCmd() *cobra.Command {
 }
 
 func diffOptions() []cmp.Option {
-	return []cmp.Option{
+	return append(
+		liquid.ForeachOptionType(cmpopts.EquateComparable),
 		// Ignore all fields that contain timestamps
 		cmpopts.IgnoreFields(liquid.ServiceInfo{}, "Version"),
 		cmpopts.IgnoreFields(liquid.ServiceUsageReport{}, "InfoVersion"),
 		cmpopts.IgnoreFields(liquid.ServiceCapacityReport{}, "InfoVersion"),
-		// This needs one entry for each Option[] type instance that appears in go-api-declarations/liquid.
-		cmpopts.EquateComparable(Option[*big.Int]{}),
-		cmpopts.EquateComparable(Option[liquid.ProjectMetadata]{}),
-		cmpopts.EquateComparable(Option[time.Time]{}),
-		cmpopts.EquateComparable(Option[uint64]{}),
-		cmpopts.EquateComparable(Option[int64]{}),
-	}
+	)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
