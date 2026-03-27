@@ -46,6 +46,7 @@ func newLiquidCmd() *cobra.Command {
 func diffOptions() []cmp.Option {
 	return append(
 		liquid.ForeachOptionType(cmpopts.EquateComparable),
+		cmpopts.EquateComparable(liquid.Unit{}),
 		// Ignore all fields that contain timestamps
 		cmpopts.IgnoreFields(liquid.ServiceInfo{}, "Version"),
 		cmpopts.IgnoreFields(liquid.ServiceUsageReport{}, "InfoVersion"),
