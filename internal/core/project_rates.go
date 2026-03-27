@@ -94,7 +94,7 @@ func (p ProjectRatesReport) render(opts *OutputOpts) CSVRecords {
 			if opts.CSVRecFmt == CSVRecordFormatLong {
 				r = append(r, p.DomainID, p.DomainName, p.UUID, p.Name, pSrv.Area, string(pSrv.Type), string(pSrvRate.Name),
 					valToStr(pSrvRate.Limit), valToStr(pSrvRate.DefaultLimit), window, defaultWindow,
-					pSrvRate.UsageAsBigint, string(pSrvRate.Unit), timestampToString(pSrv.ScrapedAt),
+					pSrvRate.UsageAsBigint, pSrvRate.Unit.String(), timestampToString(pSrv.ScrapedAt),
 				)
 			} else {
 				projectNameOrID := p.UUID
@@ -104,7 +104,7 @@ func (p ProjectRatesReport) render(opts *OutputOpts) CSVRecords {
 					domainNameOrID = p.DomainName
 				}
 				r = append(r, domainNameOrID, projectNameOrID, string(pSrv.Type), string(pSrvRate.Name),
-					valToStr(pSrvRate.Limit), window, pSrvRate.UsageAsBigint, string(pSrvRate.Unit),
+					valToStr(pSrvRate.Limit), window, pSrvRate.UsageAsBigint, pSrvRate.Unit.String(),
 				)
 			}
 

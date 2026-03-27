@@ -85,7 +85,7 @@ func (d DomainReport) render(opts *OutputOpts) CSVRecords {
 			if opts.CSVRecFmt == CSVRecordFormatLong {
 				r = append(r, d.UUID, d.Name, dSrv.Area, string(dSrv.Type), dSrvRes.Category, string(dSrvRes.Name),
 					emptyStrIfNil(domQ, valToStr), emptyStrIfNil(projectsQ, valToStr), valToStr(dSrvRes.Usage),
-					emptyStrIfNil(physU, valToStr), string(unit), timestampToString(dSrv.MinScrapedAt),
+					emptyStrIfNil(physU, valToStr), unit.String(), timestampToString(dSrv.MinScrapedAt),
 				)
 			} else {
 				nameOrID := d.UUID
@@ -93,7 +93,7 @@ func (d DomainReport) render(opts *OutputOpts) CSVRecords {
 					nameOrID = d.Name
 				}
 				r = append(r, nameOrID, string(dSrv.Type), string(dSrvRes.Name), emptyStrIfNil(domQ, valToStr),
-					emptyStrIfNil(projectsQ, valToStr), valToStr(dSrvRes.Usage), string(unit),
+					emptyStrIfNil(projectsQ, valToStr), valToStr(dSrvRes.Usage), unit.String(),
 				)
 			}
 
