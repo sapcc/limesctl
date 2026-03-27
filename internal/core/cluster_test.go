@@ -21,6 +21,7 @@ func TestClusterResourcesSingleReportRender(t *testing.T) {
 	err = json.Unmarshal(mockJSONBytes, &data)
 	th.AssertNoErr(t, err)
 
+	// test CSV rendering with humanize = false
 	opts := &OutputOpts{
 		CSVRecFmt: CSVRecordFormatDefault,
 		Humanize:  false,
@@ -30,4 +31,15 @@ func TestClusterResourcesSingleReportRender(t *testing.T) {
 	err = RenderReports(opts, rep).Write(&actual)
 	th.AssertNoErr(t, err)
 	assertEquals(t, "cluster-get-west.csv", actual.Bytes())
+
+	// test CSV rendering with humanize = true
+	opts = &OutputOpts{
+		CSVRecFmt: CSVRecordFormatDefault,
+		Humanize:  true,
+	}
+	actual = bytes.Buffer{}
+	rep = ClusterReport{&data.Cluster}
+	err = RenderReports(opts, rep).Write(&actual)
+	th.AssertNoErr(t, err)
+	assertEquals(t, "cluster-get-west-humanize.csv", actual.Bytes())
 }

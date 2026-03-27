@@ -51,12 +51,12 @@ func (c ClusterRatesReport) render(opts *OutputOpts) CSVRecords {
 			cSrv := c.Services[srv]
 			cSrvRate := c.Services[srv].Rates[rate]
 
-			valToStr := defaultValToStrFunc
+			formatter := DefaultValueFormatter
 			if opts.CSVRecFmt == CSVRecordFormatLong {
-				r = append(r, c.ID, cSrv.Area, string(cSrv.Type), string(cSrvRate.Name), valToStr(cSrvRate.Limit),
+				r = append(r, c.ID, cSrv.Area, string(cSrv.Type), string(cSrvRate.Name), formatter(cSrvRate.Limit),
 					cSrvRate.Window.String(), cSrvRate.Unit.String(), timestampToString(cSrv.MinScrapedAt))
 			} else {
-				r = append(r, c.ID, string(cSrv.Type), string(cSrvRate.Name), valToStr(cSrvRate.Limit), cSrvRate.Window.String(), cSrvRate.Unit.String())
+				r = append(r, c.ID, string(cSrv.Type), string(cSrvRate.Name), formatter(cSrvRate.Limit), cSrvRate.Window.String(), cSrvRate.Unit.String())
 			}
 
 			records = append(records, r)
