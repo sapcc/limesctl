@@ -1,7 +1,7 @@
 cluster id;service;resource;capacity;domains quota;usage;unit
 current;shared;capacity;185;25;6;B
 current;shared;capacity_portion;;;3;B
-current;shared;nonstandardunit;0;;64;2032 MiB
+current;shared;nonstandardunit;0;;127;GiB
 current;shared;things;246;30;6;
 current;unshared;capacity;;100;6;B
 current;unshared;capacity_portion;;;3;B

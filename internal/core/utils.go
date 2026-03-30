@@ -27,11 +27,11 @@ func zeroIfNil(ptr *uint64) uint64 {
 	return *ptr
 }
 
-func emptyStrIfNil(ptr *uint64, valToStr valToStrFunc) string {
+func emptyStrIfNil(ptr *uint64, formatter ValueFormatter) string {
 	if ptr == nil {
 		return ""
 	}
-	return valToStr(*ptr)
+	return formatter(*ptr)
 }
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -133,12 +133,14 @@ github.com/sapcc/go-api-declarations/limes/resources
 github.com/sapcc/go-api-declarations/liquid
 # github.com/sapcc/go-bits v0.0.0-20260327094541-67aa124e8f0a
 ## explicit; go 1.26
+github.com/sapcc/go-bits/assert
 github.com/sapcc/go-bits/gophercloudext
 github.com/sapcc/go-bits/gopherpolicy
 github.com/sapcc/go-bits/httpapi
 github.com/sapcc/go-bits/httpapi/pprofapi
 github.com/sapcc/go-bits/httpext
 github.com/sapcc/go-bits/internal
+github.com/sapcc/go-bits/internal/testdiff
 github.com/sapcc/go-bits/liquidapi
 github.com/sapcc/go-bits/logg
 github.com/sapcc/go-bits/must
@@ -154,6 +156,9 @@ github.com/sapcc/gophercloud-sapcc/v2/rates/v1/projects
 github.com/sapcc/gophercloud-sapcc/v2/resources/v1/clusters
 github.com/sapcc/gophercloud-sapcc/v2/resources/v1/domains
 github.com/sapcc/gophercloud-sapcc/v2/resources/v1/projects
+# github.com/sergi/go-diff v1.4.0
+## explicit; go 1.13
+github.com/sergi/go-diff/diffmatchpatch
 # github.com/spf13/cobra v1.10.2
 ## explicit; go 1.15
 github.com/spf13/cobra
