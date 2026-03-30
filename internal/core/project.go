@@ -88,14 +88,17 @@ func (p ProjectResourcesReport) render(opts *OutputOpts) CSVRecords {
 			quota := pSrvRes.Quota
 			usage := pSrvRes.Usage
 
-			valToStr, unit := getValToStrFunc(opts.Humanize, pSrvRes.Unit, []uint64{
-				zeroIfNil(physU), zeroIfNil(quota), usage,
-			})
+			unit, formatter := pSrvRes.Unit, DefaultValueFormatter
+			if opts.Humanize {
+				unit, formatter = PickHumanizedValueFormatter(unit, []uint64{
+					zeroIfNil(physU), zeroIfNil(quota), usage,
+				})
+			}
 
 			if opts.CSVRecFmt == CSVRecordFormatLong {
 				r = append(r, p.DomainID, p.DomainName, p.UUID, p.Name, pSrv.Area, string(pSrv.Type), pSrvRes.Category,
-					string(pSrvRes.Name), emptyStrIfNil(quota, valToStr), valToStr(usage),
-					emptyStrIfNil(physU, valToStr), unit.String(), timestampToString(pSrv.ScrapedAt),
+					string(pSrvRes.Name), emptyStrIfNil(quota, formatter), formatter(usage),
+					emptyStrIfNil(physU, formatter), unit.String(), timestampToString(pSrv.ScrapedAt),
 				)
 			} else {
 				projectNameOrID := p.UUID
@@ -105,7 +108,7 @@ func (p ProjectResourcesReport) render(opts *OutputOpts) CSVRecords {
 					domainNameOrID = p.DomainName
 				}
 				r = append(r, domainNameOrID, projectNameOrID, string(pSrv.Type), string(pSrvRes.Name),
-					emptyStrIfNil(quota, valToStr), valToStr(usage), unit.String(),
+					emptyStrIfNil(quota, formatter), formatter(usage), unit.String(),
 				)
 			}
 

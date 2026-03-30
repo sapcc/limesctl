@@ -77,23 +77,26 @@ func (d DomainReport) render(opts *OutputOpts) CSVRecords {
 			domQ := dSrvRes.DomainQuota
 			projectsQ := dSrvRes.ProjectsQuota
 
-			valToStr, unit := getValToStrFunc(opts.Humanize, dSrvRes.Unit, []uint64{
-				zeroIfNil(physU), zeroIfNil(domQ), zeroIfNil(projectsQ),
-				dSrvRes.Usage,
-			})
+			unit, formatter := dSrvRes.Unit, DefaultValueFormatter
+			if opts.Humanize {
+				unit, formatter = PickHumanizedValueFormatter(unit, []uint64{
+					zeroIfNil(physU), zeroIfNil(domQ), zeroIfNil(projectsQ),
+					dSrvRes.Usage,
+				})
+			}
 
 			if opts.CSVRecFmt == CSVRecordFormatLong {
 				r = append(r, d.UUID, d.Name, dSrv.Area, string(dSrv.Type), dSrvRes.Category, string(dSrvRes.Name),
-					emptyStrIfNil(domQ, valToStr), emptyStrIfNil(projectsQ, valToStr), valToStr(dSrvRes.Usage),
-					emptyStrIfNil(physU, valToStr), unit.String(), timestampToString(dSrv.MinScrapedAt),
+					emptyStrIfNil(domQ, formatter), emptyStrIfNil(projectsQ, formatter), formatter(dSrvRes.Usage),
+					emptyStrIfNil(physU, formatter), unit.String(), timestampToString(dSrv.MinScrapedAt),
 				)
 			} else {
 				nameOrID := d.UUID
 				if opts.CSVRecFmt == CSVRecordFormatNames {
 					nameOrID = d.Name
 				}
-				r = append(r, nameOrID, string(dSrv.Type), string(dSrvRes.Name), emptyStrIfNil(domQ, valToStr),
-					emptyStrIfNil(projectsQ, valToStr), valToStr(dSrvRes.Usage), unit.String(),
+				r = append(r, nameOrID, string(dSrv.Type), string(dSrvRes.Name), emptyStrIfNil(domQ, formatter),
+					emptyStrIfNil(projectsQ, formatter), formatter(dSrvRes.Usage), unit.String(),
 				)
 			}
 

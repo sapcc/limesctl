@@ -21,6 +21,12 @@
             "usage": 3
           },
           {
+            "name": "nonstandardunit",
+            "unit": "2032 MiB",
+            "capacity": 0,
+            "usage": 64
+          },
+          {
             "name": "things",
             "capacity": 246,
             "domains_quota": 30,
