@@ -13,7 +13,13 @@ The sections should follow the order `Added`, `Changed`, `Fixed`, `Removed`, and
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased](https://github.com/sapcc/limesctl/compare/v3.10.0...HEAD)
+## [Unreleased](https://github.com/sapcc/limesctl/compare/v3.11.0...HEAD)
+
+### Added
+
+### Changed
+
+## 3.11.0 - 2026-03-30
 
 ### Added
 
@@ -21,7 +27,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Updated all dependencies to their latest versions.
+- Updated all dependencies to their latest versions. (add basic liquid support for complex units)
 
 ## 3.10.0 - 2026-03-04
 
