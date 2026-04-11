@@ -4,8 +4,8 @@ go 1.26
 
 require (
 	github.com/google/go-cmp v0.7.0
-	github.com/gophercloud/gophercloud/v2 v2.11.1
-	github.com/gophercloud/utils/v2 v2.0.0-20260107124036-1d7954eb9711
+	github.com/gophercloud/gophercloud/v2 v2.12.0
+	github.com/gophercloud/utils/v2 v2.0.0-20260409164906-cd2167a8681a
 	github.com/olekukonko/tablewriter v1.1.4
 	github.com/sapcc/go-api-declarations v1.21.0
 	github.com/sapcc/go-bits v0.0.0-20260409170436-d7b7822ab7d3
@@ -40,7 +40,7 @@ require (
 	github.com/sergi/go-diff v1.4.0 // indirect
 	github.com/spf13/pflag v1.0.9 // indirect
 	go.yaml.in/yaml/v2 v2.4.3 // indirect
-	golang.org/x/sys v0.39.0 // indirect
+	golang.org/x/sys v0.42.0 // indirect
 	golang.org/x/text v0.32.0 // indirect
 	google.golang.org/protobuf v1.36.11 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
