@@ -4,6 +4,9 @@
 package cmd
 
 import (
+	"fmt"
+
+	"github.com/gophercloud/gophercloud/v2"
 	"github.com/sapcc/go-api-declarations/limes"
 	limesresources "github.com/sapcc/go-api-declarations/limes/resources"
 	ratesClusters "github.com/sapcc/gophercloud-sapcc/v2/rates/v1/clusters"
@@ -23,6 +26,7 @@ func newClusterCmd() *cobra.Command {
 	doNotSortFlags(cmd)
 	cmd.AddCommand(newClusterShowCmd().Command)
 	cmd.AddCommand(newClusterShowRatesCmd().Command)
+	cmd.AddCommand(newClusterMailTemplateRenderer().Command)
 	return cmd
 }
 
@@ -139,4 +143,85 @@ func (c *clusterShowRatesCmd) Run(cmd *cobra.Command, args []string) error {
 	}
 
 	return writeReports(outputOpts, core.ClusterRatesReport{ClusterReport: limesRep})
+}
+
+type clusterMailTemplate struct {
+	*cobra.Command
+
+	jsonOutput             bool
+	confirmedCommitments   bool
+	expiringCommitments    bool
+	transferredCommitments bool
+}
+
+type mailTemplates struct {
+	ConfirmedCommitments   string `json:"confirmed_commitments"`
+	ExpiringCommitments    string `json:"expiring_commitments"`
+	TransferredCommitments string `json:"transferred_commitments"`
+}
+
+func newClusterMailTemplateRenderer() *clusterMailTemplate {
+	clusterMail := &clusterMailTemplate{}
+	cmd := &cobra.Command{
+		Use:     "show-mail-templates",
+		Short:   "Display configured mail templates.",
+		Long:    "Display configured mail templates. Can be used to check the validity of the configured templates.",
+		Args:    cobra.NoArgs,
+		PreRunE: authWithLimesAdmin,
+		RunE:    clusterMail.Run,
+	}
+
+	// Flags
+	doNotSortFlags(cmd)
+	cmd.Flags().BoolVar(&clusterMail.jsonOutput, "json", false, "output as JSON (with escaped HTML characters)")
+	cmd.Flags().BoolVar(&clusterMail.confirmedCommitments, "confirmed", false, "show only confirmed commitments template")
+	cmd.Flags().BoolVar(&clusterMail.expiringCommitments, "expiring", false, "show only expiring commitments template")
+	cmd.Flags().BoolVar(&clusterMail.transferredCommitments, "transferred", false, "show only transferred commitments template")
+	clusterMail.Command = cmd
+	return clusterMail
+}
+
+// Run is called by Cobra when this command is executed.
+func (c *clusterMailTemplate) Run(cmd *cobra.Command, args []string) error {
+	var res gophercloud.Result
+	resp, err := limesAdminClient.Get(cmd.Context(), limesAdminClient.ServiceURL("mail/render"), &res.Body, nil) //nolint:bodyclose
+	_, _, res.Err = gophercloud.ParseResponse(resp, err)
+	if res.Err != nil {
+		return util.WrapError(res.Err, "could not fetch mail template request body from limes")
+	}
+
+	templates := &mailTemplates{}
+	err = res.ExtractInto(templates)
+	if err != nil {
+		return util.WrapError(err, "could not extract mail templates")
+	}
+
+	switch {
+	case c.confirmedCommitments:
+		if c.jsonOutput {
+			return writeJSON(templates.ConfirmedCommitments)
+		}
+		fmt.Println(templates.ConfirmedCommitments)
+		return nil
+	case c.expiringCommitments:
+		if c.jsonOutput {
+			return writeJSON(templates.ExpiringCommitments)
+		}
+		fmt.Println(templates.ExpiringCommitments)
+		return nil
+	case c.transferredCommitments:
+		if c.jsonOutput {
+			return writeJSON(templates.TransferredCommitments)
+		}
+		fmt.Println(templates.TransferredCommitments)
+		return nil
+	default:
+		if c.jsonOutput {
+			return writeJSON(res.Body)
+		}
+		fmt.Println(templates.ConfirmedCommitments)
+		fmt.Println(templates.ExpiringCommitments)
+		fmt.Println(templates.TransferredCommitments)
+		return nil
+	}
 }
