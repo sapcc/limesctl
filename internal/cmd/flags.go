@@ -55,6 +55,15 @@ func (f *rateFilterFlags) AddToCmd(cmd *cobra.Command) {
 	f.commonFilterFlags.AddToCmd(cmd)
 }
 
+// mailTemplateFlags define parameters for Limes API requests that concern mail templates.
+type mailTemplateFlags struct {
+	jsonOutput bool
+}
+
+func (f *mailTemplateFlags) AddToCmd(cmd *cobra.Command) {
+	cmd.Flags().BoolVar(&f.jsonOutput, "json", false, "JSON output with escaped HTML characters")
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 // CLI output format flags.
 
