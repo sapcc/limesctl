@@ -12,19 +12,19 @@ import (
 	"github.com/sapcc/limesctl/v3/internal/util"
 )
 
-// MailTemplates holds the rendered mail templates from the API.
-type MailTemplates struct {
+// mailTemplates holds the rendered mail templates from the API.
+type mailTemplates struct {
 	ConfirmedCommitments   string `json:"confirmed_commitments"`
 	ExpiringCommitments    string `json:"expiring_commitments"`
 	TransferredCommitments string `json:"transferred_commitments"`
 }
 
 func newMailTemplateCmd() *cobra.Command {
-	var fetchedMailTemplates *MailTemplates
+	var fetchedMailTemplates *mailTemplates
 
 	// subcommands can access the templates.
 	// called after PersistentPreRunE has populated the data.
-	getTemplates := func() *MailTemplates {
+	getTemplates := func() *mailTemplates {
 		return fetchedMailTemplates
 	}
 
@@ -44,7 +44,7 @@ func newMailTemplateCmd() *cobra.Command {
 				return util.WrapError(res.Err, "could not fetch mail templates from limes")
 			}
 
-			fetchedMailTemplates = &MailTemplates{}
+			fetchedMailTemplates = &mailTemplates{}
 			if err := res.ExtractInto(fetchedMailTemplates); err != nil {
 				return util.WrapError(err, "could not extract mail templates")
 			}
@@ -64,7 +64,7 @@ func newMailTemplateCmd() *cobra.Command {
 	return cmd
 }
 
-func newAllTemplatesCmd(getTemplates func() *MailTemplates) *cobra.Command {
+func newAllTemplatesCmd(getTemplates func() *mailTemplates) *cobra.Command {
 	var flags mailTemplateFlags
 
 	cmd := &cobra.Command{
@@ -95,7 +95,7 @@ func newAllTemplatesCmd(getTemplates func() *MailTemplates) *cobra.Command {
 	return cmd
 }
 
-func newConfirmedCommitmentsCmd(getTemplates func() *MailTemplates) *cobra.Command {
+func newConfirmedCommitmentsCmd(getTemplates func() *mailTemplates) *cobra.Command {
 	var flags mailTemplateFlags
 
 	cmd := &cobra.Command{
@@ -112,7 +112,7 @@ func newConfirmedCommitmentsCmd(getTemplates func() *MailTemplates) *cobra.Comma
 	return cmd
 }
 
-func newExpiringCommitmentsCmd(getTemplates func() *MailTemplates) *cobra.Command {
+func newExpiringCommitmentsCmd(getTemplates func() *mailTemplates) *cobra.Command {
 	var flags mailTemplateFlags
 
 	cmd := &cobra.Command{
@@ -129,7 +129,7 @@ func newExpiringCommitmentsCmd(getTemplates func() *MailTemplates) *cobra.Comman
 	return cmd
 }
 
-func newTransferredCommitmentsCmd(getTemplates func() *MailTemplates) *cobra.Command {
+func newTransferredCommitmentsCmd(getTemplates func() *mailTemplates) *cobra.Command {
 	var flags mailTemplateFlags
 
 	cmd := &cobra.Command{
