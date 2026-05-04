@@ -7,8 +7,8 @@ require (
 	github.com/gophercloud/gophercloud/v2 v2.12.0
 	github.com/gophercloud/utils/v2 v2.0.0-20260424064311-2eeed4ceb3e9
 	github.com/olekukonko/tablewriter v1.1.4
-	github.com/sapcc/go-api-declarations v1.21.0
-	github.com/sapcc/go-bits v0.0.0-20260423021225-fb5e4523b6c5
+	github.com/sapcc/go-api-declarations v1.21.1
+	github.com/sapcc/go-bits v0.0.0-20260504092817-9df533508379
 	github.com/sapcc/gophercloud-sapcc/v2 v2.0.5
 	github.com/spf13/cobra v1.10.2
 )
@@ -25,7 +25,6 @@ require (
 	github.com/hashicorp/golang-lru/v2 v2.0.7 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/kr/text v0.2.0 // indirect
-	github.com/majewsky/gg v1.6.0 // indirect
 	github.com/mattn/go-colorable v0.1.14 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/mattn/go-runewidth v0.0.19 // indirect
@@ -39,6 +38,7 @@ require (
 	github.com/prometheus/procfs v0.17.0 // indirect
 	github.com/sergi/go-diff v1.4.0 // indirect
 	github.com/spf13/pflag v1.0.9 // indirect
+	go.xyrillian.de/gg v1.7.0 // indirect
 	go.yaml.in/yaml/v2 v2.4.3 // indirect
 	golang.org/x/sys v0.43.0 // indirect
 	golang.org/x/text v0.36.0 // indirect
