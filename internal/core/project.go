@@ -37,11 +37,17 @@ func LimesProjectResourcesToReportRenderer(
 	return out
 }
 
-var csvHeaderProjectDefault = []string{"domain id", "project id", "service", "resource", "quota", "usage", "unit"}
+var csvHeaderProjectDefault = []string{
+	csvHeaderDomainID, csvHeaderProjectID,
+	csvHeaderService, csvHeaderResource, csvHeaderQuota, csvHeaderUsage,
+	csvHeaderUnit,
+}
 
 var csvHeaderProjectLong = []string{
-	"domain id", "domain name", "project id", "project name", "area", "service",
-	"category", "resource", "quota", "usage", "physical usage", "unit", "scraped at (UTC)",
+	csvHeaderDomainID, csvHeaderDomainName, csvHeaderProjectID, csvHeaderProjectName,
+	csvHeaderArea, csvHeaderService, csvHeaderCategory, csvHeaderResource,
+	csvHeaderQuota, csvHeaderUsage, csvHeaderPhysicalUsage,
+	csvHeaderUnit, csvHeaderScrapedAt,
 }
 
 // GetHeaderRow implements the LimesReportRenderer interface.
@@ -51,8 +57,8 @@ func (p ProjectResourcesReport) getHeaderRow(opts *OutputOpts) []string {
 		return csvHeaderProjectLong
 	case CSVRecordFormatNames:
 		h := csvHeaderProjectDefault
-		h[0] = domainName
-		h[1] = "project name"
+		h[0] = csvHeaderDomainName
+		h[1] = csvHeaderProjectName
 		return h
 	default:
 		return csvHeaderProjectDefault
