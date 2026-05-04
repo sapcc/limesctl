@@ -30,7 +30,7 @@ func newMailTemplateCmd() *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "mail-template",
-		Short: "Display configured mail templates",
+		Short: "Display configured mail templates (cloud-admin only)",
 		Long:  "Display configured mail templates. Can be used to check the validity of the configured templates.",
 		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 			if err := authWithLimesAdmin(cmd, args); err != nil {
