@@ -16,13 +16,15 @@ type ClusterReport struct {
 }
 
 var csvHeaderClusterLong = []string{
-	"cluster id", "area", "service", "category", "resource", "capacity",
-	"domains quota", "usage", "physical usage", "unit", "scraped at (UTC)",
+	csvHeaderClusterID, csvHeaderArea, csvHeaderService, csvHeaderCategory, csvHeaderResource,
+	csvHeaderCapacity, csvHeaderDomainsQuota, csvHeaderUsage, csvHeaderPhysicalUsage,
+	csvHeaderUnit, csvHeaderScrapedAt,
 }
 
 var csvHeaderClusterDefault = []string{
-	"cluster id", "service", "resource", "capacity", "domains quota",
-	"usage", "unit",
+	csvHeaderClusterID, csvHeaderService, csvHeaderResource,
+	csvHeaderCapacity, csvHeaderDomainsQuota, csvHeaderUsage,
+	csvHeaderUnit,
 }
 
 // GetHeaderRow implements the LimesReportRenderer interface.

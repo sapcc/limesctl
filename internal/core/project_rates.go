@@ -37,11 +37,18 @@ func LimesProjectRatesToReportRenderer(
 	return out
 }
 
-var csvHeaderProjectRatesDefault = []string{"domain id", "project id", "service", "rate", "limit", "window", "usage", "unit"}
+var csvHeaderProjectRatesDefault = []string{
+	csvHeaderDomainID, csvHeaderProjectID,
+	csvHeaderService, csvHeaderRate,
+	csvHeaderLimit, csvHeaderWindow, csvHeaderUsage,
+	csvHeaderUnit,
+}
 
 var csvHeaderProjectRatesLong = []string{
-	"domain id", "domain name", "project id", "project name", "area", "service",
-	"rate", "limit", "default limit", "window", "default window", "usage", "unit", "scraped at (UTC)",
+	csvHeaderDomainID, csvHeaderDomainName, csvHeaderProjectID, csvHeaderProjectName,
+	csvHeaderArea, csvHeaderService, csvHeaderRate,
+	csvHeaderLimit, csvHeaderDefaultLimit, csvHeaderWindow, csvHeaderDefaultWindow, csvHeaderUsage,
+	csvHeaderUnit, csvHeaderScrapedAt,
 }
 
 func (p ProjectRatesReport) getHeaderRow(opts *OutputOpts) []string {
@@ -50,8 +57,8 @@ func (p ProjectRatesReport) getHeaderRow(opts *OutputOpts) []string {
 		return csvHeaderProjectRatesLong
 	case CSVRecordFormatNames:
 		h := csvHeaderProjectRatesDefault
-		h[0] = domainName
-		h[1] = "project name"
+		h[0] = csvHeaderDomainName
+		h[1] = csvHeaderProjectName
 		return h
 	default:
 		return csvHeaderProjectRatesDefault

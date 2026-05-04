@@ -13,6 +13,33 @@ import (
 	"github.com/sapcc/go-api-declarations/limes"
 )
 
+const (
+	csvHeaderClusterID   = "cluster id"
+	csvHeaderDomainID    = "domain id"
+	csvHeaderDomainName  = "domain name"
+	csvHeaderProjectID   = "project id"
+	csvHeaderProjectName = "project name"
+
+	csvHeaderArea     = "area"
+	csvHeaderService  = "service"
+	csvHeaderCategory = "category"
+	csvHeaderResource = "resource"
+	csvHeaderRate     = "rate"
+
+	csvHeaderCapacity      = "capacity"
+	csvHeaderQuota         = "quota"
+	csvHeaderProjectsQuota = "projects quota"
+	csvHeaderDomainsQuota  = "domains quota"
+	csvHeaderUsage         = "usage"
+	csvHeaderPhysicalUsage = "physical usage"
+	csvHeaderLimit         = "limit"
+	csvHeaderDefaultLimit  = "default limit"
+	csvHeaderWindow        = "window"
+	csvHeaderDefaultWindow = "default window"
+	csvHeaderUnit          = "unit"
+	csvHeaderScrapedAt     = "scraped at (UTC)"
+)
+
 func timestampToString(timestamp *limes.UnixEncodedTime) string {
 	if timestamp == nil {
 		return ""

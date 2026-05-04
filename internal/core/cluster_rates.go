@@ -15,10 +15,17 @@ type ClusterRatesReport struct {
 	*limesrates.ClusterReport
 }
 
-var csvHeaderClusterRatesDefault = []string{"cluster id", "service", "rate", "limit", "window", "unit"}
+var csvHeaderClusterRatesDefault = []string{
+	csvHeaderClusterID, csvHeaderService, csvHeaderRate,
+	csvHeaderLimit, csvHeaderWindow,
+	csvHeaderUnit,
+}
 
-var csvHeaderClusterRatesLong = []string{"cluster id", "area", "service", "rate", "limit",
-	"window", "unit", "scraped at (UTC)"}
+var csvHeaderClusterRatesLong = []string{
+	csvHeaderClusterID, csvHeaderArea, csvHeaderService,
+	csvHeaderRate, csvHeaderLimit, csvHeaderWindow,
+	csvHeaderUnit, csvHeaderScrapedAt,
+}
 
 func (c ClusterRatesReport) getHeaderRow(opts *OutputOpts) []string {
 	if opts.CSVRecFmt == CSVRecordFormatLong {

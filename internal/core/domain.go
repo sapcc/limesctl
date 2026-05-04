@@ -25,14 +25,17 @@ func LimesDomainsToReportRenderer(in []limesresources.DomainReport) []LimesRepor
 	return out
 }
 
-var csvHeaderDomainDefault = []string{"domain id", "service", "resource", "quota", "projects quota", "usage", "unit"}
-
-var csvHeaderDomainLong = []string{
-	"domain id", "domain name", "area", "service", "category", "resource",
-	"quota", "projects quota", "usage", "physical usage", "unit", "scraped at (UTC)",
+var csvHeaderDomainDefault = []string{
+	csvHeaderDomainID, csvHeaderService, csvHeaderResource,
+	csvHeaderQuota, csvHeaderProjectsQuota, csvHeaderUsage,
+	csvHeaderUnit,
 }
 
-const domainName = "domain name"
+var csvHeaderDomainLong = []string{
+	csvHeaderDomainID, csvHeaderDomainName, csvHeaderArea, csvHeaderService, csvHeaderCategory, csvHeaderResource,
+	csvHeaderQuota, csvHeaderProjectsQuota, csvHeaderUsage, csvHeaderPhysicalUsage,
+	csvHeaderUnit, csvHeaderScrapedAt,
+}
 
 // GetHeaderRow implements the LimesReportRenderer interface.
 func (d DomainReport) getHeaderRow(opts *OutputOpts) []string {
@@ -41,7 +44,7 @@ func (d DomainReport) getHeaderRow(opts *OutputOpts) []string {
 		return csvHeaderDomainLong
 	case CSVRecordFormatNames:
 		h := csvHeaderDomainDefault
-		h[0] = domainName
+		h[0] = csvHeaderDomainName
 		return h
 	default:
 		return csvHeaderDomainDefault
