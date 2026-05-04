@@ -23,6 +23,7 @@ func newClusterCmd() *cobra.Command {
 	doNotSortFlags(cmd)
 	cmd.AddCommand(newClusterShowCmd().Command)
 	cmd.AddCommand(newClusterShowRatesCmd().Command)
+	cmd.AddCommand(newMailTemplateCmd())
 	return cmd
 }
 
