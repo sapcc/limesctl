@@ -65,17 +65,12 @@ func newMailTemplateCmd() *cobra.Command {
 }
 
 func newAllTemplatesCmd(getTemplates func() *mailTemplates) *cobra.Command {
-	var flags mailTemplateFlags
-
 	cmd := &cobra.Command{
 		Use:   "all",
 		Short: "Display all mail templates",
 		Args:  cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			templates := getTemplates()
-			if flags.jsonOutput {
-				return writeJSON(templates)
-			}
 
 			fmt.Println("=== Confirmed Commitments ===")
 			fmt.Println(templates.ConfirmedCommitments)
@@ -91,67 +86,53 @@ func newAllTemplatesCmd(getTemplates func() *mailTemplates) *cobra.Command {
 	}
 
 	doNotSortFlags(cmd)
-	flags.AddToCmd(cmd)
 	return cmd
 }
 
 func newConfirmedCommitmentsCmd(getTemplates func() *mailTemplates) *cobra.Command {
-	var flags mailTemplateFlags
-
 	cmd := &cobra.Command{
 		Use:   "confirmed",
 		Short: "Display the confirmed commitments mail template",
 		Args:  cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return outputTemplate("confirmed_commitments", getTemplates().ConfirmedCommitments, flags.jsonOutput)
+			return outputTemplate(getTemplates().ConfirmedCommitments)
 		},
 	}
 
 	doNotSortFlags(cmd)
-	flags.AddToCmd(cmd)
 	return cmd
 }
 
 func newExpiringCommitmentsCmd(getTemplates func() *mailTemplates) *cobra.Command {
-	var flags mailTemplateFlags
-
 	cmd := &cobra.Command{
 		Use:   "expiring",
 		Short: "Display the expiring commitments mail template",
 		Args:  cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return outputTemplate("expiring_commitments", getTemplates().ExpiringCommitments, flags.jsonOutput)
+			return outputTemplate(getTemplates().ExpiringCommitments)
 		},
 	}
 
 	doNotSortFlags(cmd)
-	flags.AddToCmd(cmd)
 	return cmd
 }
 
 func newTransferredCommitmentsCmd(getTemplates func() *mailTemplates) *cobra.Command {
-	var flags mailTemplateFlags
-
 	cmd := &cobra.Command{
 		Use:   "transferred",
 		Short: "Display the transferred commitments mail template",
 		Args:  cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return outputTemplate("transferred_commitments", getTemplates().TransferredCommitments, flags.jsonOutput)
+			return outputTemplate(getTemplates().TransferredCommitments)
 		},
 	}
 
 	doNotSortFlags(cmd)
-	flags.AddToCmd(cmd)
 	return cmd
 }
 
-// outputTemplate handles the output of a single template with optional JSON formatting.
-func outputTemplate(name, content string, jsonOutput bool) error {
-	if jsonOutput {
-		output := map[string]string{name: content}
-		return writeJSON(output)
-	}
+// outputTemplate handles the output of a single template.
+func outputTemplate(content string) error {
 	fmt.Println(content)
 	return nil
 }

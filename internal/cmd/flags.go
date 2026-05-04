@@ -55,16 +55,6 @@ func (f *rateFilterFlags) AddToCmd(cmd *cobra.Command) {
 	f.commonFilterFlags.AddToCmd(cmd)
 }
 
-// mailTemplateFlags define parameters that concern mail templates.
-type mailTemplateFlags struct {
-	jsonOutput bool
-}
-
-// AddToCmd adds the mailTemplateFlags to the cobra.Command.
-func (f *mailTemplateFlags) AddToCmd(cmd *cobra.Command) {
-	cmd.Flags().BoolVar(&f.jsonOutput, "json", false, "JSON output with escaped HTML characters")
-}
-
 ///////////////////////////////////////////////////////////////////////////////
 // CLI output format flags.
 
