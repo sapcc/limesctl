@@ -25,7 +25,7 @@ golangciLint:
 
 goReleaser:
   # NOTE: this is default behavior but we define this option explicitly for documentation purposes.
-  # limesctl uses a custom config file which includes Homebrew tap definition.
+  # limesctl uses a custom config file which includes completions.
   createConfig: false
 
 githubWorkflow:
