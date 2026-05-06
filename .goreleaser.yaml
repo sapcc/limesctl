@@ -1,43 +1,7 @@
-# SPDX-FileCopyrightText: 2025 SAP SE or an SAP affiliate company
-#
+# yaml-language-server: $schema=https://goreleaser.com/static/schema.json
+# SPDX-FileCopyrightText: 2020 SAP SE or an SAP affiliate company
 # SPDX-License-Identifier: Apache-2.0
-
 version: 2
-before:
-  hooks:
-    - rm -rf completions
-    - mkdir completions
-    - sh -c "for sh in bash zsh fish; do go run main.go completion "$sh" >"completions/limesctl.$sh"; done"
-
-builds:
-  - env:
-      - CGO_ENABLED=0
-    goos:
-      - linux
-      - windows
-      - darwin
-    goarch:
-      - amd64
-      - arm64
-    ldflags:
-      - -s -w
-      - -X github.com/sapcc/go-api-declarations/bininfo.binName=limesctl
-      - -X github.com/sapcc/go-api-declarations/bininfo.version={{ .Version }}
-      - -X github.com/sapcc/go-api-declarations/bininfo.commit={{ .FullCommit  }}
-      # Use CommitDate instead of Date for reproducibility.
-      - -X github.com/sapcc/go-api-declarations/bininfo.buildDate={{ .CommitDate }}
-    # Set the modified timestamp on the output binary to ensure that builds are reproducible.
-    mod_timestamp: "{{ .CommitTimestamp }}"
-
-sboms:
-  - id: archive
-    artifacts: archive
-
-snapshot:
-  version_template: "{{ .Tag }}-next"
-
-checksum:
-  name_template: "checksums.txt"
 
 archives:
   - name_template: '{{ .ProjectName }}-{{ replace .Version "v" "" }}-{{ .Os }}-{{ .Arch }}'
@@ -50,24 +14,48 @@ archives:
       - README.md
       - completions/*
 
-homebrew_casks:
-  - commit_msg_template: "Homebrew: update formula to {{ .Tag }}"
-    completions:
-      bash: completions/limesctl.bash
-      fish: completions/limesctl.fish
-      zsh: completions/limesctl.zsh
-    # broken since https://github.com/Homebrew/brew/pull/20499
-    # conflicts:
-    #   - formula: limesctl
-    description: Command-line interface for Limes
-    homepage: https://github.com/sapcc/limesctl
-    hooks:
-      post:
-        install: |
-          if OS.mac?
-            system_command "/usr/bin/xattr", args: ["-dr", "com.apple.quarantine", "#{staged_path}/limesctl"]
-          end
-    license: Apache-2.0
-    repository:
-      owner: sapcc
-      name: limesctl
+before:
+  hooks:
+    - rm -rf completions
+    - mkdir completions
+    - sh -c "for sh in bash zsh fish; do go run main.go completion "$sh" >"completions/limesctl.$sh"; done"
+
+builds:
+  - binary: 'limesctl'
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - windows
+      - darwin
+    goarch:
+      - amd64
+      - arm64
+    ignore:
+      - goos: windows
+        goarch: arm64
+    ldflags:
+      - -s -w
+      - -X github.com/sapcc/go-api-declarations/bininfo.binName=limesctl
+      - -X github.com/sapcc/go-api-declarations/bininfo.version={{ .Version }}
+      - -X github.com/sapcc/go-api-declarations/bininfo.commit={{ .FullCommit  }}
+      - -X github.com/sapcc/go-api-declarations/bininfo.buildDate={{ .CommitDate }} # use CommitDate instead of Date for reproducibility
+    main: .
+    # Set the modified timestamp on the output binary to ensure that builds are reproducible.
+    mod_timestamp: "{{ .CommitTimestamp }}"
+
+checksum:
+  name_template: "checksums.txt"
+
+release:
+  make_latest: true
+  prerelease: auto
+
+sboms:
+  - id: binary
+    artifacts: binary
+  - id: package
+    artifacts: package
+
+snapshot:
+  version_template: "{{ .Tag }}-next"
