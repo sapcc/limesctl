@@ -19,6 +19,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+## 3.12.0 - 2026-05-06
+
+### Added
+
+- Added mail template command for cloud admin users.
+
 ## 3.11.0 - 2026-03-30
 
 ### Added
