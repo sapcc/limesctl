@@ -130,7 +130,6 @@ github.com/sapcc/go-api-declarations/limes/resources
 github.com/sapcc/go-api-declarations/liquid
 # github.com/sapcc/go-bits v0.0.0-20260618170412-b440edfb4e25
 ## explicit; go 1.26
-github.com/sapcc/go-bits/assert
 github.com/sapcc/go-bits/gophercloudext
 github.com/sapcc/go-bits/gopherpolicy
 github.com/sapcc/go-bits/httpapi
@@ -152,17 +151,16 @@ github.com/sapcc/gophercloud-sapcc/v2/rates/v1/projects
 github.com/sapcc/gophercloud-sapcc/v2/resources/v1/clusters
 github.com/sapcc/gophercloud-sapcc/v2/resources/v1/domains
 github.com/sapcc/gophercloud-sapcc/v2/resources/v1/projects
-# github.com/sergi/go-diff v1.4.0
-## explicit; go 1.13
-github.com/sergi/go-diff/diffmatchpatch
 # github.com/spf13/cobra v1.10.2
 ## explicit; go 1.15
 github.com/spf13/cobra
 # github.com/spf13/pflag v1.0.9
 ## explicit; go 1.12
 github.com/spf13/pflag
-# go.xyrillian.de/gg v1.9.1
-## explicit; go 1.24
+# go.xyrillian.de/gg v1.10.1
+## explicit; go 1.26
+go.xyrillian.de/gg/assert
+go.xyrillian.de/gg/internal/path
 go.xyrillian.de/gg/option
 # golang.org/x/sys v0.46.0
 ## explicit; go 1.25.0
