@@ -7,8 +7,8 @@ import (
 	"testing"
 
 	"github.com/sapcc/go-api-declarations/limes"
-	"github.com/sapcc/go-bits/assert"
 	"github.com/sapcc/go-bits/must"
+	"go.xyrillian.de/gg/assert"
 )
 
 func TestValueFormatter(t *testing.T) {

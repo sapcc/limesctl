@@ -11,6 +11,7 @@ require (
 	github.com/sapcc/go-bits v0.0.0-20260618170412-b440edfb4e25
 	github.com/sapcc/gophercloud-sapcc/v2 v2.1.0
 	github.com/spf13/cobra v1.10.2
+	go.xyrillian.de/gg v1.10.1
 )
 
 require (
@@ -36,9 +37,7 @@ require (
 	github.com/prometheus/client_model v0.6.2 // indirect
 	github.com/prometheus/common v0.69.0 // indirect
 	github.com/prometheus/procfs v0.17.0 // indirect
-	github.com/sergi/go-diff v1.4.0 // indirect
 	github.com/spf13/pflag v1.0.9 // indirect
-	go.xyrillian.de/gg v1.9.1 // indirect
 	golang.org/x/sys v0.46.0 // indirect
 	golang.org/x/text v0.38.0 // indirect
 	google.golang.org/protobuf v1.36.11 // indirect
