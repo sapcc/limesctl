@@ -45,7 +45,7 @@ github.com/gophercloud/gophercloud/v2/openstack/image/v2/images
 github.com/gophercloud/gophercloud/v2/openstack/utils
 github.com/gophercloud/gophercloud/v2/pagination
 github.com/gophercloud/gophercloud/v2/testhelper
-# github.com/gophercloud/utils/v2 v2.0.0-20260625225919-abcba73f9c96
+# github.com/gophercloud/utils/v2 v2.0.0-20260626221802-4ae35253ac13
 ## explicit; go 1.25.0
 github.com/gophercloud/utils/v2/client
 github.com/gophercloud/utils/v2/env
