@@ -15,22 +15,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.13.1] - 2026-07-14
+
 ### Added
 
 ### Changed
 
-## 3.13.0 - 2026-07-24
+## [3.13.0] - 2026-07-24
 
 ### Changed
-- Updated all dependencies to their latest versions. 
 
-## 3.12.0 - 2026-05-06
+- Updated all dependencies to their latest versions.
+
+## [3.12.0] - 2026-05-06
 
 ### Added
 
 - Added mail template command for cloud admin users.
 
-## 3.11.0 - 2026-03-30
+## [3.11.0] - 2026-03-30
 
 ### Added
 
@@ -40,49 +43,49 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Updated all dependencies to their latest versions. (add basic liquid support for complex units)
 
-## 3.10.0 - 2026-03-04
+## [3.10.0] - 2026-03-04
 
 ### Changed
 
 - Updated all dependencies to their latest versions. (remove pre-defined liquid category "default")
 
-## 3.9.0 - 2026-02-27
+## [3.9.0] - 2026-02-27
 
 ### Changed
 
 - Updated all dependencies to their latest versions. (adds support for liquid resource category with display name)
 
-## 3.8.0 - 2026-02-26
+## [3.8.0] - 2026-02-26
 
 ### Changed
 
 - Updated all dependencies to their latest versions. (adds support for liquid display name fields)
 
-## 3.7.1 - 2025-07-21
+## [3.7.1] - 2025-07-21
 
 ### Changed
 
 - Sort subcapacities for capacity reports.
 - Updated all dependencies to their latest versions.
 
-## 3.7.0 - 2025-06-16
+## [3.7.0] - 2025-06-16
 
 ### Changed
 
 - Fix derivation of service type in `limesctl liquid report-capacity` subcommand.
 - Updated all dependencies to their latest versions.
 
-## 3.6.0 - 2025-04-16
+## [3.6.0] - 2025-04-16
 
 ### Added
 
-- Added validation of the responses from LIQUID implementations when running a `liquid` subcommand. 
+- Added validation of the responses from LIQUID implementations when running a `liquid` subcommand.
 
 ### Changed
 
 - Updated all dependencies to their latest versions.
 
-## 3.5.0 - 2025-02-03
+## [3.5.0] - 2025-02-03
 
 ### Added
 
@@ -96,7 +99,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Removed Muhammad Talal Anwar (@talal) from the list of maintainers. Thanks for all the fish!
 
-## 3.4.0 - 2024-08-29
+## [3.4.0] - 2024-08-29
 
 ### Added
 
@@ -114,63 +117,61 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Removed `domain set` and `project set` subcommands
   Support for writing quotas manually has been removed in Limes.
 
-## 3.3.2 - 2024-01-03
+## [3.3.2] - 2024-01-03
 
 ### Changed
 
 - `OS_PW_CMD` is now handled by go-bits which code is mostly adopted from limesctl.
 - Updated all dependencies to their latest version.
 
-## 3.3.1 - 2023-10-23
+## [3.3.1] - 2023-10-23
 
 ### Fixed
 
 - Completions generation for release archives.
 
-## 3.3.0 - 2023-10-04
+## [3.3.0] - 2023-10-04
 
 ### Added
 
 - Support for specifying shell command which will be used for retrieving user password
   using `--os-pw-cmd` flag or `OS_PW_CMD` environment variable.
 
-## 3.2.1 - 2023-09-01
+## [3.2.1] - 2023-09-01
 
 ### Changed
 
 - Use Golang 1.21 for prebuilt binaries.
 - Updated all dependencies to their latest version.
 
-## 3.2.0 - 2023-03-03
+## [3.2.0] - 2023-03-03
 
 ### Added
 
 - Support for showing cluster global rate limits.
 
-  ```
-  limesctl cluster show-rates
-  ```
+      limesctl cluster show-rates
 
-## 3.1.3 - 2022-12-15
+## [3.1.3] - 2022-12-15
 
 ### Added
 
 - Support for specifying TLS client certificate and key using flags (`--os-cert`/`--os-key`) or
   environment variables (`OS_CERT`/`OS_KEY`).
 
-## 3.1.2 - 2022-11-24
+## [3.1.2] - 2022-11-24
 
 ### Fixed
 
 - Examples for `domain set` and `project set` commands.
 
-## 3.1.1 - 2022-11-20
+## [3.1.1] - 2022-11-20
 
 ### Fixed
 
 - Removed dead code.
 
-## 3.1.0 - 2022-11-20
+## [3.1.0] - 2022-11-20
 
 ### Added
 
@@ -183,7 +184,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Use [Cobra](https://github.com/spf13/cobra) for command-line parsing.
 - Improved command descriptions.
 
-## 3.0.3 - 2022-10-25
+## [3.0.3] - 2022-10-25
 
 ### Changed
 
@@ -193,19 +194,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Switched to new Limes client for project's rate reports.
 
-## 3.0.2 - 2022-08-30
+## [3.0.2] - 2022-08-30
 
 ### Changed
 
 - Use Golang 1.19 in release workflow.
 
-## 3.0.1 - 2022-08-30
+## [3.0.1] - 2022-08-30
 
 ### Changed
 
 - Updated all dependencies to their latest version.
 
-## 3.0.0 - 2022-03-03
+## [3.0.0] - 2022-03-03
 
 ### Changed
 
@@ -216,33 +217,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `cluster list` command; Limes has removed multi-cluster support.
 - `--cluster` flag for domain and project subcommands.
 
-## 2.0.1 - 2021-10-06
+## [2.0.1] - 2021-10-06
 
 ### Fixed
 
 - Convert given quota value to resource's base unit during relative quota change.
 
-## 2.0.0 - 2021-09-28
+## [2.0.0] - 2021-09-28
 
 ### Added
 
 - Support for showing project rate limits.
 
-  ```
-  limesctl project show-rates
-  limesctl project list-rates
-  ```
+      limesctl project show-rates
+      limesctl project list-rates
 
 - Support for specifying multiple area, service, resource values for the respective flags.
+
 - Support for resources without quota.
+
 - Support for relative quota adjustment. The following operators are supported: `+=`,
   `-=`, `*=`, `/=`.
 
   Example:
 
-  ```
-  limesctl project set -q compute/cores+=100
-  ```
+      limesctl project set -q compute/cores+=100
 
 ### Changed
 
@@ -254,40 +253,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
   Old style:
 
-  ```
-  limesctl project set compute/cores=250 compute/ram=20GiB
-  ```
+      limesctl project set compute/cores=250 compute/ram=20GiB
 
   New style option 1, use `--quotas` flag with comma-separated values:
 
-  ```
-  limesctl project set --quotas=compute/cores=250,compute/ram=20GiB
-  ```
+      limesctl project set --quotas=compute/cores=250,compute/ram=20GiB
 
   New style option 2, use `-q` shorthand flag for each new quota value:
 
-  ```
-  limesctl project set -q compute/cores=250 -q compute/ram=20GiB
-  ```
+      limesctl project set -q compute/cores=250 -q compute/ram=20GiB
 
 ### Removed
 
 - `cluster set` command, Limes' API no longer accepts cluster `PUT` requests.
 
-## 1.6.2 - 2020-11-12
+## [1.6.2] - 2020-11-12
 
 ### Fixed
 
 - Show error if domain ID is used for project subcommands.
 
-## 1.6.1 - 2020-07-29
+## [1.6.1] - 2020-07-29
 
 ### Changed
 
 - Migrate from gophercloud-limes to gophercloud-sapcc.
 - Version flag now prints the Git commit hash and build date.
 
-## 1.6.0 - 2019-11-18
+## [1.6.0] - 2019-11-18
 
 ### Added
 
@@ -306,28 +299,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Do not crash when unknown service/resource are used with `set` subcommand.
 
-## 1.5.3 - 2019-08-20
+## [1.5.3] - 2019-08-20
 
 ### Fixed
 
 - Do not throw segmentation fault error for invalid service names while setting
   quota(s).
 
-## 1.5.2 - 2019-07-17
+## [1.5.2] - 2019-07-17
 
 ### Fixed
 
 - A typo that resulted in a previous instance of error not being properly
   recycled.
 
-## 1.5.1 - 2019-06-26
+## [1.5.1] - 2019-06-26
 
 ### Changed
 
 - Report non-existent `physical_usage` data as an empty string in the table and
   csv format.
 
-## 1.5.0 - 2019-06-19
+## [1.5.0] - 2019-06-19
 
 ### Added
 
@@ -339,21 +332,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   explicitly given then they are extracted from the current authorization
   token.
 
-## 1.4.1 - 2019-06-12
+## [1.4.1] - 2019-06-12
 
 ### Changed
 
 - Do not fail project operations when Keystone permissions for domain listing
   are missing.
 
-## 1.4.0 - 2019-03-28
+## [1.4.0] - 2019-03-28
 
 ### Changed
 
 - Avoid extra requests to Keystone to resolve a domain name into an ID, when
   the token scope already contains the correct domain ID.
 
-## 1.3.0 - 2019-01-07
+## [1.3.0] - 2019-01-07
 
 ### Changed
 
@@ -361,7 +354,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Allow fractional quota values for the `set` subcommand.
 - Optimize library dependencies. Binary size has been reduced by over 20%.
 
-## 1.2.0 - 2018-11-05
+## [1.2.0] - 2018-11-05
 
 ### Added
 
@@ -377,7 +370,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - `--cluster` flag now works as expected.
 
-## 1.1.0 - 2018-10-29
+## [1.1.0] - 2018-10-29
 
 ### Added
 
@@ -386,8 +379,90 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   table/CSV output and can be combined with other output flags: `--names` or
   `--long`.
 
-## 1.0.0 - 2018-10-24
+## [1.0.0] - 2018-10-24
 
 ### Added
 
 - Initial release.
+
+[Unreleased]: https://github.com/sapcc/limesctl/compare/v3.13.1...HEAD
+
+[3.13.1]: https://github.com/sapcc/limesctl/compare/v3.13.0...v3.13.1
+
+[3.13.0]: https://github.com/sapcc/limesctl/compare/v3.12.0...v3.13.0
+
+[3.12.0]: https://github.com/sapcc/limesctl/compare/v3.11.0...v3.12.0
+
+[3.11.0]: https://github.com/sapcc/limesctl/compare/v3.10.0...v3.11.0
+
+[3.10.0]: https://github.com/sapcc/limesctl/compare/v3.9.0...v3.10.0
+
+[3.9.0]: https://github.com/sapcc/limesctl/compare/v3.8.0...v3.9.0
+
+[3.8.0]: https://github.com/sapcc/limesctl/compare/v3.7.1...v3.8.0
+
+[3.7.1]: https://github.com/sapcc/limesctl/compare/v3.7.0...v3.7.1
+
+[3.7.0]: https://github.com/sapcc/limesctl/compare/v3.6.0...v3.7.0
+
+[3.6.0]: https://github.com/sapcc/limesctl/compare/v3.5.0...v3.6.0
+
+[3.5.0]: https://github.com/sapcc/limesctl/compare/v3.4.0...v3.5.0
+
+[3.4.0]: https://github.com/sapcc/limesctl/compare/v3.3.2...v3.4.0
+
+[3.3.2]: https://github.com/sapcc/limesctl/compare/v3.3.1...v3.3.2
+
+[3.3.1]: https://github.com/sapcc/limesctl/compare/v3.3.0...v3.3.1
+
+[3.3.0]: https://github.com/sapcc/limesctl/compare/v3.2.1...v3.3.0
+
+[3.2.1]: https://github.com/sapcc/limesctl/compare/v3.2.0...v3.2.1
+
+[3.2.0]: https://github.com/sapcc/limesctl/compare/v3.1.3...v3.2.0
+
+[3.1.3]: https://github.com/sapcc/limesctl/compare/v3.1.2...v3.1.3
+
+[3.1.2]: https://github.com/sapcc/limesctl/compare/v3.1.1...v3.1.2
+
+[3.1.1]: https://github.com/sapcc/limesctl/compare/v3.1.0...v3.1.1
+
+[3.1.0]: https://github.com/sapcc/limesctl/compare/v3.0.3...v3.1.0
+
+[3.0.3]: https://github.com/sapcc/limesctl/compare/v3.0.2...v3.0.3
+
+[3.0.2]: https://github.com/sapcc/limesctl/compare/v3.0.1...v3.0.2
+
+[3.0.1]: https://github.com/sapcc/limesctl/compare/v3.0.0...v3.0.1
+
+[3.0.0]: https://github.com/sapcc/limesctl/compare/v2.0.1...v3.0.0
+
+[2.0.1]: https://github.com/sapcc/limesctl/compare/v2.0.0...v2.0.1
+
+[2.0.0]: https://github.com/sapcc/limesctl/compare/v1.6.2...v2.0.0
+
+[1.6.2]: https://github.com/sapcc/limesctl/compare/v1.6.1...v1.6.2
+
+[1.6.1]: https://github.com/sapcc/limesctl/compare/v1.6.0...v1.6.1
+
+[1.6.0]: https://github.com/sapcc/limesctl/compare/v1.5.3...v1.6.0
+
+[1.5.3]: https://github.com/sapcc/limesctl/compare/v1.5.2...v1.5.3
+
+[1.5.2]: https://github.com/sapcc/limesctl/compare/v1.5.1...v1.5.2
+
+[1.5.1]: https://github.com/sapcc/limesctl/compare/v1.5.0...v1.5.1
+
+[1.5.0]: https://github.com/sapcc/limesctl/compare/v1.4.1...v1.5.0
+
+[1.4.1]: https://github.com/sapcc/limesctl/compare/v1.4.0...v1.4.1
+
+[1.4.0]: https://github.com/sapcc/limesctl/compare/v1.3.0...v1.4.0
+
+[1.3.0]: https://github.com/sapcc/limesctl/compare/v1.2.0...v1.3.0
+
+[1.2.0]: https://github.com/sapcc/limesctl/compare/v1.1.0...v1.2.0
+
+[1.1.0]: https://github.com/sapcc/limesctl/compare/v1.0.0...v1.1.0
+
+[1.0.0]: https://github.com/sapcc/limesctl/releases/tag/v1.0.0
