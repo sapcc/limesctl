@@ -38,8 +38,8 @@ require (
 	github.com/prometheus/common v0.69.0 // indirect
 	github.com/prometheus/procfs v0.17.0 // indirect
 	github.com/spf13/pflag v1.0.9 // indirect
-	golang.org/x/sys v0.46.0 // indirect
-	golang.org/x/text v0.38.0 // indirect
+	golang.org/x/sys v0.47.0 // indirect
+	golang.org/x/text v0.40.0 // indirect
 	google.golang.org/protobuf v1.36.11 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
