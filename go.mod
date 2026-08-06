@@ -8,10 +8,10 @@ require (
 	github.com/gophercloud/utils/v2 v2.0.0-20260626221802-4ae35253ac13
 	github.com/olekukonko/tablewriter v1.1.4
 	github.com/sapcc/go-api-declarations v1.24.0
-	github.com/sapcc/go-bits v0.0.0-20260730170321-f6f727520601
+	github.com/sapcc/go-bits v0.0.0-20260806170240-4bbc84d224db
 	github.com/sapcc/gophercloud-sapcc/v2 v2.2.0
 	github.com/spf13/cobra v1.10.2
-	go.xyrillian.de/gg v1.11.1
+	go.xyrillian.de/gg v1.13.3
 )
 
 require (
@@ -21,7 +21,7 @@ require (
 	github.com/clipperhouse/uax29/v2 v2.6.0 // indirect
 	github.com/databus23/goslo.policy v0.0.0-20250326134918-4afc2c56a903 // indirect
 	github.com/fatih/color v1.18.0 // indirect
-	github.com/gofrs/uuid/v5 v5.5.0 // indirect
+	github.com/gofrs/uuid/v5 v5.5.1 // indirect
 	github.com/gorilla/mux v1.8.1 // indirect
 	github.com/hashicorp/golang-lru/v2 v2.0.7 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
