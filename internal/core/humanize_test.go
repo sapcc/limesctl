@@ -39,4 +39,15 @@ func TestValueFormatter(t *testing.T) {
 	assert.Equal(t, u.String(), "GiB")
 	assert.Equal(t, f(64), "127")
 	assert.Equal(t, f(128), "254")
+
+	// PickHumanizedValueFormatter should ignore zero values
+	u, f = PickHumanizedValueFormatter(limes.UnitBytes, []uint64{0, 0, 0})
+	assert.Equal(t, u.String(), "B")
+	assert.Equal(t, f(0), "0")
+
+	u, f = PickHumanizedValueFormatter(limes.UnitBytes, []uint64{0, 1024, 2048})
+	assert.Equal(t, u.String(), "KiB")
+	assert.Equal(t, f(0), "0")
+	assert.Equal(t, f(1024), "1")
+	assert.Equal(t, f(2048), "2")
 }
