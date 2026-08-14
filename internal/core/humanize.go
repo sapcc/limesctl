@@ -4,6 +4,7 @@
 package core
 
 import (
+	"slices"
 	"strconv"
 
 	"github.com/sapcc/go-api-declarations/limes"
@@ -55,6 +56,11 @@ func PickHumanizedValueFormatter(unit limes.Unit, values []uint64) (limes.Unit, 
 		return unit, DefaultValueFormatter
 	}
 
+	// if all inputs are zero, do not perform conversion at all
+	if !slices.ContainsFunc(values, func(x uint64) bool { return x != 0 }) {
+		return unit, DefaultValueFormatter
+	}
+
 	// pick the first candidate unit that produces clean integers for all presented values
 UNIT:
 	for _, targetUnit := range possibleUnits {
@@ -64,6 +70,10 @@ UNIT:
 			continue
 		}
 		for _, value := range values {
+			if value == 0 {
+				// input values that are zero can be represented in every unit
+				continue
+			}
 			rawValue := value * multiplierToBase
 			if rawValue/multiplierToBase != value {
 				// if conversion to the base unit runs into an integer overflow, not humanizing is a safe fallback
