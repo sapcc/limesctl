@@ -7,11 +7,11 @@ require (
 	github.com/gophercloud/gophercloud/v2 v2.13.0
 	github.com/gophercloud/utils/v2 v2.0.0-20260626221802-4ae35253ac13
 	github.com/olekukonko/tablewriter v1.1.4
-	github.com/sapcc/go-api-declarations v1.24.0
-	github.com/sapcc/go-bits v0.0.0-20260813170327-ea1a14435d35
+	github.com/sapcc/go-api-declarations v1.25.0
+	github.com/sapcc/go-bits v0.0.0-20260818140528-75bdd20c7867
 	github.com/sapcc/gophercloud-sapcc/v2 v2.2.0
 	github.com/spf13/cobra v1.10.2
-	go.xyrillian.de/gg v1.13.3
+	go.xyrillian.de/gg v1.14.0
 )
 
 require (
