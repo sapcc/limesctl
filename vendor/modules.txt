@@ -27,7 +27,7 @@ github.com/google/go-cmp/cmp/internal/diff
 github.com/google/go-cmp/cmp/internal/flags
 github.com/google/go-cmp/cmp/internal/function
 github.com/google/go-cmp/cmp/internal/value
-# github.com/gophercloud/gophercloud/v2 v2.13.0
+# github.com/gophercloud/gophercloud/v2 v2.14.0
 ## explicit; go 1.25.0
 github.com/gophercloud/gophercloud/v2
 github.com/gophercloud/gophercloud/v2/openstack
@@ -45,7 +45,7 @@ github.com/gophercloud/gophercloud/v2/openstack/image/v2/images
 github.com/gophercloud/gophercloud/v2/openstack/utils
 github.com/gophercloud/gophercloud/v2/pagination
 github.com/gophercloud/gophercloud/v2/testhelper
-# github.com/gophercloud/utils/v2 v2.0.0-20260626221802-4ae35253ac13
+# github.com/gophercloud/utils/v2 v2.0.0-20260820140002-321c0f238d1a
 ## explicit; go 1.25.0
 github.com/gophercloud/utils/v2/client
 github.com/gophercloud/utils/v2/env
