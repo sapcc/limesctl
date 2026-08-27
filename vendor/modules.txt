@@ -45,7 +45,7 @@ github.com/gophercloud/gophercloud/v2/openstack/image/v2/images
 github.com/gophercloud/gophercloud/v2/openstack/utils
 github.com/gophercloud/gophercloud/v2/pagination
 github.com/gophercloud/gophercloud/v2/testhelper
-# github.com/gophercloud/utils/v2 v2.0.0-20260820140002-321c0f238d1a
+# github.com/gophercloud/utils/v2 v2.0.0-20260824073324-42b9474d09d4
 ## explicit; go 1.25.0
 github.com/gophercloud/utils/v2/client
 github.com/gophercloud/utils/v2/env
@@ -126,8 +126,8 @@ github.com/sapcc/go-api-declarations/limes
 github.com/sapcc/go-api-declarations/limes/rates
 github.com/sapcc/go-api-declarations/limes/resources
 github.com/sapcc/go-api-declarations/liquid
-# github.com/sapcc/go-bits v0.0.0-20260818140528-75bdd20c7867
-## explicit; go 1.26
+# github.com/sapcc/go-bits v0.0.0-20260827091731-7669cbdb53fb
+## explicit; go 1.27
 github.com/sapcc/go-bits/gophercloudext
 github.com/sapcc/go-bits/gopherpolicy
 github.com/sapcc/go-bits/httpapi
