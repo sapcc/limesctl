@@ -126,7 +126,7 @@ github.com/sapcc/go-api-declarations/limes
 github.com/sapcc/go-api-declarations/limes/rates
 github.com/sapcc/go-api-declarations/limes/resources
 github.com/sapcc/go-api-declarations/liquid
-# github.com/sapcc/go-bits v0.0.0-20260903170501-70fd009916cb
+# github.com/sapcc/go-bits v0.0.0-20260907125021-ceb8c12b73ac
 ## explicit; go 1.27
 github.com/sapcc/go-bits/gophercloudext
 github.com/sapcc/go-bits/gopherpolicy
