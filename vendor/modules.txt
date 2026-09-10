@@ -126,7 +126,7 @@ github.com/sapcc/go-api-declarations/limes
 github.com/sapcc/go-api-declarations/limes/rates
 github.com/sapcc/go-api-declarations/limes/resources
 github.com/sapcc/go-api-declarations/liquid
-# github.com/sapcc/go-bits v0.0.0-20260907125021-ceb8c12b73ac
+# github.com/sapcc/go-bits v0.0.0-20260908173957-572b68774a1c
 ## explicit; go 1.27
 github.com/sapcc/go-bits/gophercloudext
 github.com/sapcc/go-bits/gopherpolicy
@@ -155,7 +155,7 @@ github.com/spf13/cobra
 # github.com/spf13/pflag v1.0.9
 ## explicit; go 1.12
 github.com/spf13/pflag
-# go.xyrillian.de/gg v1.14.0
+# go.xyrillian.de/gg v1.15.0
 ## explicit; go 1.26
 go.xyrillian.de/gg/assert
 go.xyrillian.de/gg/internal/path
