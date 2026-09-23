@@ -71,8 +71,7 @@ func runValidateQuotaOverrides(cmd *cobra.Command, args []string) error {
 			fullResourceName := fmt.Sprintf("%s/%s", serviceType, resourceName)
 			return limes.UnitNone, fmt.Errorf("%q is not a valid resource", fullResourceName)
 		}
-		// There might be cases where limes is not able to set quota to the backend, but the resource is configured for quota operations.
-		// This check therefore includes the QuotaDistributionModel to ensure quota can be overridden by reported nil quota.
+		// For az-separated resources, the resource Quota field is omitted because quota is managed per-AZ.
 		if resReport.Quota == nil && resReport.QuotaDistributionModel == "" {
 			return limes.UnitNone, fmt.Errorf("%s/%s does not track quota", serviceType, resourceName)
 		}

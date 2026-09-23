@@ -15,6 +15,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Includes a workaround for `ops validate-quota-overrides` rejecting az-separated resources where quota is tracked per-AZ.
+
 ## [3.13.1] - 2026-07-14
 
 ### Added
