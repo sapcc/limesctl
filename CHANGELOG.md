@@ -15,6 +15,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.13.2] - 2026-09-24
+
 ### Changed
 
 - Includes a workaround for `ops validate-quota-overrides` rejecting az-separated resources where quota is tracked per-AZ.
@@ -389,7 +391,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial release.
 
-[Unreleased]: https://github.com/sapcc/limesctl/compare/v3.13.1...HEAD
+[Unreleased]: https://github.com/sapcc/limesctl/compare/v3.13.2...HEAD
+
+[3.13.2]: https://github.com/sapcc/limesctl/compare/v3.13.1...v3.13.2
 
 [3.13.1]: https://github.com/sapcc/limesctl/compare/v3.13.0...v3.13.1
 
