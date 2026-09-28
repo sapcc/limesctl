@@ -15,6 +15,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Revert the workaround for `ops validate-quota-overrides`. Quota values are now provided from the API.
+
 ## [3.13.2] - 2026-09-24
 
 ### Changed
