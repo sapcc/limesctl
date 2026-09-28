@@ -15,6 +15,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.13.3] - 2026-09-28
+
 ### Changed
 
 - Revert the workaround for `ops validate-quota-overrides`. Quota values are now provided from the API.
@@ -395,7 +397,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial release.
 
-[Unreleased]: https://github.com/sapcc/limesctl/compare/v3.13.2...HEAD
+[Unreleased]: https://github.com/sapcc/limesctl/compare/v3.13.3...HEAD
+
+[3.13.3]: https://github.com/sapcc/limesctl/compare/v3.13.2...v3.13.3
 
 [3.13.2]: https://github.com/sapcc/limesctl/compare/v3.13.1...v3.13.2
 
