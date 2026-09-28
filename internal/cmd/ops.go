@@ -71,8 +71,7 @@ func runValidateQuotaOverrides(cmd *cobra.Command, args []string) error {
 			fullResourceName := fmt.Sprintf("%s/%s", serviceType, resourceName)
 			return limes.UnitNone, fmt.Errorf("%q is not a valid resource", fullResourceName)
 		}
-		// For az-separated resources, the resource Quota field is omitted because quota is managed per-AZ.
-		if resReport.Quota == nil && resReport.QuotaDistributionModel == "" {
+		if resReport.Quota == nil {
 			return limes.UnitNone, fmt.Errorf("%s/%s does not track quota", serviceType, resourceName)
 		}
 		return resReport.Unit, nil
